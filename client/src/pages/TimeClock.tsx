@@ -1,4 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -188,8 +189,9 @@ export default function TimeClock() {
   const isManager = user.role === 'owner' || user.role === 'manager';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 p-6">
-      <div className="max-w-7xl mx-auto">
+    <Layout>
+      <div className="p-6">
+        <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900">Tidsstempling</h1>
@@ -501,6 +503,7 @@ export default function TimeClock() {
           </DialogContent>
         </Dialog>
       )}
-    </div>
+      </div>
+    </Layout>
   );
 }
