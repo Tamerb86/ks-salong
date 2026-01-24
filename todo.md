@@ -263,3 +263,13 @@
 - [ ] Display payment confirmation after successful Vipps payment
 - [ ] Handle payment failures gracefully
 - [x] Allow "Pay Later" option when payment is not required
+
+## CRM Page Implementation
+- [x] Create customer list API with search and filters
+- [x] Add customer statistics (total visits, total spending, last visit)
+- [x] Build customer detail view with booking history
+- [x] Display customer profile information
+- [ ] Show spending breakdown by service/product
+- [ ] Add customer tags (VIP, Regular, New)
+- [ ] Implement customer notes and alerts
+- [ ] Add GDPR compliance features (data export/delete)

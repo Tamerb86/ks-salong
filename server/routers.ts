@@ -347,6 +347,18 @@ export const appRouter = router({
         await db.updateCustomer(id, data);
         return { success: true };
       }),
+    
+    getBookingHistory: protectedProcedure
+      .input(z.object({ customerId: z.number() }))
+      .query(async ({ input }) => {
+        return await db.getCustomerBookingHistory(input.customerId);
+      }),
+    
+    getStatistics: protectedProcedure
+      .input(z.object({ customerId: z.number() }))
+      .query(async ({ input }) => {
+        return await db.getCustomerStatistics(input.customerId);
+      }),
   }),
 
   orders: router({

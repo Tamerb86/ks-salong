@@ -368,6 +368,67 @@ export async function updateCustomer(id: number, data: Partial<typeof customers.
   await db.update(customers).set(data).where(eq(customers.id, id));
 }
 
+export async function getCustomerBookingHistory(customerId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select({
+    id: appointments.id,
+    appointmentDate: appointments.appointmentDate,
+    startTime: appointments.startTime,
+    endTime: appointments.endTime,
+    status: appointments.status,
+    notes: appointments.notes,
+    serviceName: services.name,
+    servicePrice: services.price,
+    staffName: users.name,
+  })
+    .from(appointments)
+    .leftJoin(services, eq(appointments.serviceId, services.id))
+    .leftJoin(users, eq(appointments.staffId, users.id))
+    .where(eq(appointments.customerId, customerId))
+    .orderBy(desc(appointments.appointmentDate));
+}
+
+export async function getCustomerStatistics(customerId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  // Get total visits (completed appointments)
+  const completedAppointments = await db.select({
+    count: sql<number>`count(*)`,
+  })
+    .from(appointments)
+    .where(and(
+      eq(appointments.customerId, customerId),
+      eq(appointments.status, 'completed')
+    ));
+  
+  // Get total spending from orders
+  const totalSpending = await db.select({
+    total: sql<number>`COALESCE(SUM(${orders.total}), 0)`,
+  })
+    .from(orders)
+    .where(eq(orders.customerId, customerId));
+  
+  // Get last visit date
+  const lastVisit = await db.select({
+    date: appointments.appointmentDate,
+  })
+    .from(appointments)
+    .where(and(
+      eq(appointments.customerId, customerId),
+      eq(appointments.status, 'completed')
+    ))
+    .orderBy(desc(appointments.appointmentDate))
+    .limit(1);
+  
+  return {
+    totalVisits: Number(completedAppointments[0]?.count || 0),
+    totalSpending: Number(totalSpending[0]?.total || 0),
+    lastVisit: lastVisit[0]?.date || null,
+  };
+}
+
 /**
  * ============================================
  * ORDERS & PAYMENTS
