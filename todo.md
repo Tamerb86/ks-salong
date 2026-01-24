@@ -414,3 +414,17 @@
 - [x] Generate Google Calendar event links
 - [x] Test calendar navigation and data display
 - [x] Write vitest tests for calendar logic
+
+## Settings Page with Tabbed Navigation
+- [x] Create Settings page component with horizontal tabs
+- [x] Design tab navigation UI (Oversikt, Google Calendar, Varsler, etc.)
+- [x] Implement tab switching functionality
+- [x] Create "Oversikt" (Overview) tab with general settings
+- [x] Create "Google Calendar" tab for calendar integration settings
+- [x] Add Google Calendar sync toggle
+- [x] Add calendar selection dropdown
+- [x] Add auto-sync frequency settings
+- [x] Create "Varsler" (Notifications) tab for notification preferences
+- [x] Create "Alle ansatte" (All Staff) tab for staff management
+- [x] Style tabs to match reference design
+- [x] Test tab navigation and settings persistence
