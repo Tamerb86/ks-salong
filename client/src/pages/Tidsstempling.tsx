@@ -7,6 +7,7 @@ import { Clock, LogIn, LogOut, Users, TrendingUp } from "lucide-react";
 import { format } from "date-fns";
 import { nb } from "date-fns/locale";
 import { toast } from "sonner";
+import { Layout } from "@/components/Layout";
 
 export default function Tidsstempling() {
   const [pin, setPin] = useState("");
@@ -77,6 +78,7 @@ export default function Tidsstempling() {
   };
   
   return (
+    <Layout>
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-amber-50 p-8">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
@@ -259,5 +261,6 @@ export default function Tidsstempling() {
         </div>
       </div>
     </div>
+    </Layout>
   );
 }

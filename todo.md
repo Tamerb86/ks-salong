@@ -337,3 +337,12 @@
 - [x] Fix invalid mutation calls (clockIn/clockOut expecting undefined instead of object)
 - [x] Redirect TimeClock to Tidsstempling page (simplified solution)
 - [x] Fix TypeScript errors in Tidsstempling.tsx (totalMinutes possibly undefined)
+
+## Sidebar Consistency Fix
+- [x] Identify all pages missing DashboardLayout/Sidebar
+- [x] Wrap BookOnline.tsx with Layout (includes Sidebar)
+- [ ] Keep QueueTV.tsx standalone (TV display doesn't need sidebar)
+- [x] Wrap Tidsstempling.tsx with Layout (includes Sidebar)
+- [x] Wrap Settings.tsx with Layout (includes Sidebar)
+- [x] Wrap Customers.tsx with Layout (includes Sidebar)
+- [x] Ensure all admin pages have consistent navigation

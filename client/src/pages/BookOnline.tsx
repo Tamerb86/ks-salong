@@ -19,6 +19,7 @@ import { trpc } from "@/lib/trpc";
 import { Calendar, Clock, Loader2, MapPin, Phone, Scissors, User } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Layout } from "@/components/Layout";
 
 export default function BookOnline() {
   const [step, setStep] = useState(1);
@@ -145,15 +146,17 @@ export default function BookOnline() {
 
   if (servicesLoading || staffLoading) {
     return (
+      <Layout>
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-white to-amber-50">
         <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
       </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50">
-      {/* Header */}
+    <Layout>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="bg-gradient-to-r from-purple-600 to-amber-600 text-white py-12">
         <div className="container mx-auto px-6">
           <div className="flex items-center gap-3 mb-4">
@@ -637,5 +640,6 @@ export default function BookOnline() {
         )}
       </div>
     </div>
+    </Layout>
   );
 }

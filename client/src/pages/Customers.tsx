@@ -29,6 +29,7 @@ import {
   Users,
 } from "lucide-react";
 import { useState } from "react";
+import { Layout } from "@/components/Layout";
 
 export default function Customers() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -91,6 +92,7 @@ export default function Customers() {
   }
 
   return (
+    <Layout>
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -424,5 +426,6 @@ export default function Customers() {
         </DialogContent>
       </Dialog>
     </div>
+    </Layout>
   );
 }

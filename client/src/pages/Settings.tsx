@@ -13,6 +13,7 @@ import { trpc } from "@/lib/trpc";
 import { Loader2, Save, Settings as SettingsIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Layout } from "@/components/Layout";
 
 export default function Settings() {
   const { data: settings, isLoading } = trpc.settings.get.useQuery();
@@ -73,7 +74,8 @@ export default function Settings() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 p-6">
+    <Layout>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -340,5 +342,6 @@ export default function Settings() {
         </form>
       </div>
     </div>
+    </Layout>
   );
 }
