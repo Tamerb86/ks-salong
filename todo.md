@@ -382,3 +382,11 @@
 - [x] Add UI in Settings page to configure auto-logout time (default 22:00)
 - [x] Test automatic logout functionality
 - [ ] Add notification when employee is auto-logged out (optional enhancement)
+
+## Separate Staff Page
+- [x] Extract staff management section from Services.tsx
+- [x] Create dedicated Staff.tsx page (Ansatte)
+- [x] Add Staff route to App.tsx
+- [x] Add "Ansatte" link to Sidebar navigation
+- [x] Keep Services.tsx for services only
+- [x] Test staff PIN management in new page

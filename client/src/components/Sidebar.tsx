@@ -60,8 +60,13 @@ const navItems: NavItem[] = [
   },
   {
     title: "Tidsstempling",
-    href: "/time-clock",
+    href: "/tidsstempling",
     icon: Clock,
+  },
+  {
+    title: "Ansatte",
+    href: "/staff",
+    icon: Users,
   },
   {
     title: "Tjenester",
