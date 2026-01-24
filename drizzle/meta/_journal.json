@@ -15,6 +15,13 @@
       "when": 1769269975908,
       "tag": "0001_broken_peter_quill",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1769289505117,
+      "tag": "0002_clammy_hitman",
+      "breakpoints": true
     }
   ]
 }

@@ -254,3 +254,12 @@
 - [ ] Add quick status update from calendar
 - [ ] Add appointment details popup on click
 - [ ] Show staff availability in calendar
+
+## Book Online Page Enhancements
+- [x] Add settings table with requirePaymentForBooking field
+- [x] Create Settings page for admin to control payment requirement
+- [x] Add Vipps payment option to booking flow (Step 5: Payment)
+- [x] Make payment step conditional based on settings
+- [ ] Display payment confirmation after successful Vipps payment
+- [ ] Handle payment failures gracefully
+- [x] Allow "Pay Later" option when payment is not required

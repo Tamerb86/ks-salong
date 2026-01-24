@@ -11,6 +11,7 @@ import Appointments from "./pages/Appointments";
 import Queue from "./pages/Queue";
 import POS from "./pages/POS";
 import TimeClock from "./pages/TimeClock";
+import Settings from "./pages/Settings";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -23,6 +24,7 @@ function Router() {
       <Route path={"/queue"} component={Queue} />
       <Route path={"/pos"} component={POS} />
       <Route path={"/time-clock"} component={TimeClock} />
+      <Route path={"/settings"} component={Settings} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

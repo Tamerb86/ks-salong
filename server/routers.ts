@@ -533,6 +533,8 @@ export const appRouter = router({
         cancellationPolicyHours: z.number().optional(),
         reminder24hEnabled: z.boolean().optional(),
         reminder2hEnabled: z.boolean().optional(),
+        vippsEnabled: z.boolean().optional(),
+        requirePaymentForBooking: z.boolean().optional(),
       }))
       .mutation(async ({ input }) => {
         await db.updateSalonSettings(input);

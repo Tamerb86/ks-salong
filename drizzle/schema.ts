@@ -275,6 +275,7 @@ export const salonSettings = mysqlTable("salonSettings", {
   vippsClientSecret: text("vippsClientSecret"),
   vippsMerchantSerialNumber: text("vippsMerchantSerialNumber"),
   vippsSubscriptionKey: text("vippsSubscriptionKey"),
+  requirePaymentForBooking: boolean("requirePaymentForBooking").default(false).notNull(), // Require payment before confirming online booking
   stripeEnabled: boolean("stripeEnabled").default(false).notNull(),
   stripePublishableKey: text("stripePublishableKey"),
   stripeSecretKey: text("stripeSecretKey"),

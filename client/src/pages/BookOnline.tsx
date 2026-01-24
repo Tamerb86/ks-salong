@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { Calendar, Clock, DollarSign, Loader2, MapPin, Phone, Sparkles, User } from "lucide-react";
+import { Calendar, Clock, Loader2, MapPin, Phone, Sparkles, User } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -32,9 +32,11 @@ export default function BookOnline() {
     phone: "",
     notes: "",
   });
+  const [paymentMethod, setPaymentMethod] = useState<"vipps" | "pay_later">("vipps");
 
   const { data: services, isLoading: servicesLoading } = trpc.services.list.useQuery();
   const { data: staff, isLoading: staffLoading } = trpc.staff.list.useQuery();
+  const { data: settings } = trpc.settings.get.useQuery();
   const { data: appointments } = trpc.appointments.listByDate.useQuery(
     { date: selectedDate ? new Date(selectedDate) : new Date() },
     { enabled: !!selectedDate }
@@ -43,7 +45,7 @@ export default function BookOnline() {
   const createBookingMutation = trpc.appointments.create.useMutation({
     onSuccess: () => {
       toast.success("Booking bekreftet! Vi gleder oss til å se deg!");
-      setStep(4); // Success step
+      setStep(6); // Success step
     },
     onError: (error) => {
       toast.error("Feil ved booking: " + error.message);
@@ -67,7 +69,22 @@ export default function BookOnline() {
       toast.error("Vennligst velg dato og tid");
       return;
     }
-    setStep(4);
+    setStep(4); // Customer info
+  };
+
+  const handleCustomerInfoNext = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!customerInfo.name || !customerInfo.phone) {
+      toast.error("Vennligst fyll inn navn og telefon");
+      return;
+    }
+    // Skip payment step if not required
+    if (settings?.requirePaymentForBooking && settings?.vippsEnabled) {
+      setStep(5); // Payment step
+    } else {
+      // Submit booking directly
+      handleSubmitBooking(e);
+    }
   };
 
   const handleSubmitBooking = (e: React.FormEvent) => {
@@ -215,7 +232,6 @@ export default function BookOnline() {
                         <span>{service.duration} minutter</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <DollarSign className="h-5 w-5 text-gray-600" />
                         <span className="text-2xl font-bold text-gray-900">
                           {service.price} kr
                         </span>
@@ -373,7 +389,7 @@ export default function BookOnline() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleSubmitBooking} className="space-y-4">
+                <form onSubmit={handleCustomerInfoNext} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="name">Navn *</Label>
                     <Input
@@ -437,12 +453,8 @@ export default function BookOnline() {
                   <Button
                     type="submit"
                     className="w-full bg-gradient-to-r from-purple-600 to-amber-600 hover:from-purple-700 hover:to-amber-700"
-                    disabled={createBookingMutation.isPending}
                   >
-                    {createBookingMutation.isPending && (
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    )}
-                    Bekreft booking
+                    Neste: Betaling
                   </Button>
                 </form>
               </CardContent>
@@ -450,8 +462,134 @@ export default function BookOnline() {
           </div>
         )}
 
-        {/* Success Message */}
+        {/* Step 5: Payment */}
         {step === 5 && (
+          <div className="max-w-2xl mx-auto">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="h-6 w-6 text-purple-600" />
+                  Betaling
+                </CardTitle>
+                <CardDescription>
+                  Velg betalingsmetode for å bekrefte bookingen
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Booking Summary */}
+                <div className="p-4 bg-purple-50 rounded-lg space-y-2">
+                  <h3 className="font-semibold text-lg">Oppsummering:</h3>
+                  <div className="space-y-1 text-sm">
+                    <p><strong>Tjeneste:</strong> {selectedService.name}</p>
+                    <p><strong>Varighet:</strong> {selectedService.duration} minutter</p>
+                    <p><strong>Dato:</strong> {selectedDate}</p>
+                    <p><strong>Tid:</strong> {selectedTime}</p>
+                    <p><strong>Kunde:</strong> {customerInfo.name}</p>
+                    <p><strong>Telefon:</strong> {customerInfo.phone}</p>
+                  </div>
+                  <div className="pt-3 mt-3 border-t border-purple-200">
+                    <p className="text-2xl font-bold text-purple-900">
+                      Total: {selectedService.price} kr
+                    </p>
+                  </div>
+                </div>
+
+                {/* Payment Options */}
+                <div className="space-y-4">
+                  <Label className="text-base">Velg betalingsmetode:</Label>
+                  
+                  {/* Vipps Payment */}
+                  <div
+                    className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                      paymentMethod === "vipps"
+                        ? "border-purple-600 bg-purple-50"
+                        : "border-gray-200 hover:border-purple-300"
+                    }`}
+                    onClick={() => setPaymentMethod("vipps")}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center">
+                        <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-semibold">Betal med Vipps</p>
+                        <p className="text-sm text-gray-600">Rask og sikker betaling</p>
+                      </div>
+                      {paymentMethod === "vipps" && (
+                        <div className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center">
+                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Pay Later Option (if not required) */}
+                  {!settings?.requirePaymentForBooking && (
+                    <div
+                      className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                        paymentMethod === "pay_later"
+                          ? "border-purple-600 bg-purple-50"
+                          : "border-gray-200 hover:border-purple-300"
+                      }`}
+                      onClick={() => setPaymentMethod("pay_later")}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 bg-gradient-to-br from-gray-500 to-gray-600 rounded-lg flex items-center justify-center">
+                          <Clock className="w-6 h-6 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-semibold">Betal senere</p>
+                          <p className="text-sm text-gray-600">Betal når du kommer til salonen</p>
+                        </div>
+                        {paymentMethod === "pay_later" && (
+                          <div className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center">
+                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={() => setStep(4)}
+                    className="flex-1"
+                  >
+                    Tilbake
+                  </Button>
+                  <Button
+                    onClick={(e) => {
+                      if (paymentMethod === "vipps") {
+                        toast.info("Vipps-betaling vil bli implementert snart");
+                        // TODO: Integrate Vipps payment API
+                      }
+                      handleSubmitBooking(e);
+                    }}
+                    className="flex-1 bg-gradient-to-r from-purple-600 to-amber-600 hover:from-purple-700 hover:to-amber-700"
+                    disabled={createBookingMutation.isPending}
+                  >
+                    {createBookingMutation.isPending && (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    )}
+                    {paymentMethod === "vipps" ? "Betal med Vipps" : "Bekreft booking"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Success Message */}
+        {step === 6 && (
           <div className="max-w-2xl mx-auto text-center">
             <Card className="p-12">
               <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">

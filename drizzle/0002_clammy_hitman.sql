@@ -1,0 +1,1 @@
+ALTER TABLE `salonSettings` ADD `requirePaymentForBooking` boolean DEFAULT false NOT NULL;
