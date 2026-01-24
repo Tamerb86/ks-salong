@@ -1,8 +1,9 @@
 import { trpc } from "@/lib/trpc";
 import { format } from "date-fns";
 import { nb } from "date-fns/locale";
-import { Clock, Sparkles, Users } from "lucide-react";
+import { Clock, Sparkles, Users, Smartphone } from "lucide-react";
 import { useEffect, useState } from "react";
+import { QRCodeSVG } from "qrcode.react";
 
 export default function QueueTV() {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -169,6 +170,37 @@ export default function QueueTV() {
               </p>
             </div>
           )}
+        </div>
+
+        {/* QR Code Section */}
+        <div className="mt-12 bg-white/10 backdrop-blur-lg rounded-3xl p-10 border-4 border-white/30 shadow-2xl">
+          <div className="flex items-center justify-between gap-12">
+            <div className="flex-1">
+              <div className="flex items-center gap-6 mb-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-amber-400 rounded-full flex items-center justify-center">
+                  <Smartphone className="h-10 w-10 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-5xl font-bold mb-2">Bli med i køen!</h2>
+                  <p className="text-3xl text-purple-100">Skann QR-koden med mobilen din</p>
+                </div>
+              </div>
+              <p className="text-2xl text-purple-200 mt-4">
+                ✓ Ingen app nødvendig<br />
+                ✓ Få beskjed når det er din tur<br />
+                ✓ Se din plass i køen live
+              </p>
+            </div>
+            <div className="bg-white p-8 rounded-3xl shadow-2xl">
+              <QRCodeSVG
+                value={`${window.location.origin}/queue`}
+                size={280}
+                level="H"
+                includeMargin={true}
+                fgColor="#7c3aed"
+              />
+            </div>
+          </div>
         </div>
 
         {/* Footer */}

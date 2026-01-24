@@ -285,3 +285,10 @@
 - [x] Add fullscreen mode support (F11 browser feature)
 - [x] Show current time and date
 - [x] Add smooth animations for queue updates
+
+## QR Code for Queue Join
+- [x] Install QR code generation library (qrcode.react)
+- [x] Add QR code to TV display pointing to /queue join page
+- [x] Position QR code prominently on screen
+- [x] Add instructional text in Norwegian
+- [x] Test QR code scanning with mobile devices
