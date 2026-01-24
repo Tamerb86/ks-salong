@@ -1,4 +1,4 @@
-import { eq, and, gte, lte, desc, asc, sql, or, like } from "drizzle-orm";
+import { eq, and, gte, lte, desc, asc, sql, or, like, isNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { 
   InsertUser, users, permissions, services, products, serviceStaff,
@@ -647,4 +647,172 @@ export async function createAuditLog(data: typeof auditLogs.$inferInsert) {
   const db = await getDb();
   if (!db) return;
   await db.insert(auditLogs).values(data);
+}
+
+
+/**
+ * ============================================
+ * TIME TRACKING
+ * ============================================
+ */
+
+// Verify PIN and get employee
+export async function verifyEmployeePin(pin: string) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const employee = await db
+    .select()
+    .from(users)
+    .where(and(
+      eq(users.pin, pin),
+      eq(users.isActive, true)
+    ))
+    .limit(1);
+  
+  return employee[0] || null;
+}
+
+// Clock in employee
+export async function clockInEmployee(staffId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  // Check if already clocked in
+  const existing = await db
+    .select()
+    .from(timeEntries)
+    .where(and(
+      eq(timeEntries.staffId, staffId),
+      isNull(timeEntries.clockOut)
+    ))
+    .limit(1);
+  
+  if (existing[0]) {
+    return { error: "Already clocked in", entry: existing[0] };
+  }
+  
+  const result = await db.insert(timeEntries).values({
+    staffId,
+    clockIn: new Date(),
+  });
+  
+  return { success: true, id: result[0].insertId };
+}
+
+// Clock out employee
+export async function clockOutEmployee(staffId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const entry = await db
+    .select()
+    .from(timeEntries)
+    .where(and(
+      eq(timeEntries.staffId, staffId),
+      isNull(timeEntries.clockOut)
+    ))
+    .limit(1);
+  
+  if (!entry[0]) {
+    return { error: "Not clocked in" };
+  }
+  
+  const clockOut = new Date();
+  const clockIn = entry[0].clockIn;
+  const totalMinutes = Math.floor((clockOut.getTime() - clockIn.getTime()) / 60000);
+  
+  // Calculate overtime (weekends = Saturday & Sunday)
+  const dayOfWeek = clockIn.getDay();
+  const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+  const overtimeMinutes = isWeekend ? totalMinutes : 0;
+  
+  await db
+    .update(timeEntries)
+    .set({
+      clockOut,
+      totalWorkMinutes: totalMinutes - entry[0].totalBreakMinutes,
+      overtimeMinutes,
+    })
+    .where(eq(timeEntries.id, entry[0].id));
+  
+  return { success: true, totalMinutes, overtimeMinutes };
+}
+
+// Get currently clocked in employees
+export async function getClockedInEmployees() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const entries = await db
+    .select({
+      id: timeEntries.id,
+      staffId: timeEntries.staffId,
+      clockIn: timeEntries.clockIn,
+      name: users.name,
+      role: users.role,
+    })
+    .from(timeEntries)
+    .leftJoin(users, eq(timeEntries.staffId, users.id))
+    .where(isNull(timeEntries.clockOut))
+    .orderBy(desc(timeEntries.clockIn));
+  
+  return entries;
+}
+
+// Get time entries for date range
+export async function getTimeEntries(startDate: Date, endDate: Date, staffId?: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const conditions = [
+    gte(timeEntries.clockIn, startDate),
+    lte(timeEntries.clockIn, endDate),
+  ];
+  
+  if (staffId) {
+    conditions.push(eq(timeEntries.staffId, staffId));
+  }
+  
+  const entries = await db
+    .select({
+      id: timeEntries.id,
+      staffId: timeEntries.staffId,
+      staffName: users.name,
+      clockIn: timeEntries.clockIn,
+      clockOut: timeEntries.clockOut,
+      totalWorkMinutes: timeEntries.totalWorkMinutes,
+      overtimeMinutes: timeEntries.overtimeMinutes,
+      totalBreakMinutes: timeEntries.totalBreakMinutes,
+    })
+    .from(timeEntries)
+    .leftJoin(users, eq(timeEntries.staffId, users.id))
+    .where(and(...conditions))
+    .orderBy(desc(timeEntries.clockIn));
+  
+  return entries;
+}
+
+// Get employee work summary
+export async function getEmployeeWorkSummary(staffId: number, startDate: Date, endDate: Date) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const entries = await getTimeEntries(startDate, endDate, staffId);
+  
+  const totalWorkMinutes = entries.reduce((sum, e) => sum + (e.totalWorkMinutes || 0), 0);
+  const totalOvertimeMinutes = entries.reduce((sum, e) => sum + (e.overtimeMinutes || 0), 0);
+  const totalBreakMinutes = entries.reduce((sum, e) => sum + (e.totalBreakMinutes || 0), 0);
+  const totalDays = entries.filter(e => e.clockOut).length;
+  
+  return {
+    staffId,
+    totalWorkMinutes,
+    totalOvertimeMinutes,
+    totalBreakMinutes,
+    totalDays,
+    totalWorkHours: (totalWorkMinutes / 60).toFixed(2),
+    totalOvertimeHours: (totalOvertimeMinutes / 60).toFixed(2),
+    entries,
+  };
 }

@@ -318,3 +318,16 @@
 - [x] Fix infinite loop in useEffect at line 20 (removed refetch from dependencies)
 - [x] Remove all problematic dependencies causing re-renders
 - [x] Test queue updates work correctly after fix
+
+## Tidsstempling (Time Tracking System)
+- [x] Create timeEntries table in database schema (already exists)
+- [x] Add PIN field to staff table for authentication (already exists in users table)
+- [x] Create API endpoints for clock in/out with PIN
+- [x] Build Tidsstempling page with PIN pad interface
+- [x] Show current logged-in employees with duration
+- [ ] Add time reports (daily, weekly, monthly)
+- [x] Calculate overtime for weekends (Saturday/Sunday) - implemented in backend
+- [ ] Implement automatic logout at configurable time
+- [ ] Link all sales/orders to logged-in employee
+- [ ] Add employee productivity reports
+- [ ] Show total hours worked and sales per employee

@@ -437,60 +437,8 @@ export const appRouter = router({
       }),
   }),
 
-  timeTracking: router({
-    clockIn: protectedProcedure.mutation(async ({ ctx }) => {
-      const id = await db.clockIn(ctx.user!.id);
-      return { id };
-    }),
-    
-    clockOut: protectedProcedure.mutation(async ({ ctx }) => {
-      // Find the active entry for this user
-      const entries = await db.getTimeEntriesByStaffAndDate(ctx.user!.id, new Date());
-      const activeEntry = entries.find((e: any) => !e.clockOutTime);
-      if (activeEntry) {
-        await db.clockOut(activeEntry.id);
-      }
-      return { success: true };
-    }),
-    
-    startBreak: protectedProcedure.mutation(async ({ ctx }) => {
-      const entries = await db.getTimeEntriesByStaffAndDate(ctx.user!.id, new Date());
-      const activeEntry = entries.find((e: any) => !e.clockOutTime);
-      if (activeEntry) {
-        await db.startBreak(activeEntry.id);
-      }
-      return { success: true };
-    }),
-    
-    endBreak: protectedProcedure.mutation(async ({ ctx }) => {
-      const entries = await db.getTimeEntriesByStaffAndDate(ctx.user!.id, new Date());
-      const activeEntry = entries.find((e: any) => !e.clockOutTime);
-      if (activeEntry) {
-        await db.endBreak(activeEntry.id);
-      }
-      return { success: true };
-    }),
-    
-    getCurrentStatus: protectedProcedure.query(async ({ ctx }) => {
-      const entries = await db.getTimeEntriesByStaffAndDate(ctx.user!.id, new Date());
-      const activeEntry = entries.find((e: any) => !e.clockOutTime);
-      if (activeEntry) {
-        return {
-          isClockedIn: true,
-          clockInTime: activeEntry.clockIn,
-          isOnBreak: activeEntry.breakStart && !activeEntry.breakEnd,
-        };
-      }
-      return { isClockedIn: false };
-    }),
-    
-    getDailyLogs: protectedProcedure
-      .input(z.object({ date: z.date() }))
-      .query(async ({ ctx, input }) => {
-        return await db.getTimeEntriesByStaffAndDate(ctx.user!.id, input.date);
-      }),
-    
-    getByStaffAndDate: protectedProcedure
+  oldTimeTracking: router({
+    getEntriesByStaffAndDate: protectedProcedure
       .input(z.object({ staffId: z.number(), date: z.date() }))
       .query(async ({ input }) => {
         return await db.getTimeEntriesByStaffAndDate(input.staffId, input.date);
@@ -568,6 +516,69 @@ export const appRouter = router({
         const { dayOfWeek, ...data } = input;
         await db.updateBusinessHours(dayOfWeek, data);
         return { success: true };
+      }),
+  }),
+
+  timeTracking: router({    
+    // Verify PIN and clock in
+    clockIn: publicProcedure
+      .input(z.object({ pin: z.string().length(4).or(z.string().length(6)) }))
+      .mutation(async ({ input }) => {
+        const employee = await db.verifyEmployeePin(input.pin);
+        if (!employee) {
+          throw new TRPCError({ code: "UNAUTHORIZED", message: "Ugyldig PIN" });
+        }
+        
+        const result = await db.clockInEmployee(employee.id);
+        if (result?.error) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: result.error });
+        }
+        
+        return { success: true, employee: { id: employee.id, name: employee.name, role: employee.role } };
+      }),
+    
+    // Clock out
+    clockOut: publicProcedure
+      .input(z.object({ pin: z.string().length(4).or(z.string().length(6)) }))
+      .mutation(async ({ input }) => {
+        const employee = await db.verifyEmployeePin(input.pin);
+        if (!employee) {
+          throw new TRPCError({ code: "UNAUTHORIZED", message: "Ugyldig PIN" });
+        }
+        
+        const result = await db.clockOutEmployee(employee.id);
+        if (result?.error) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: result.error });
+        }
+        
+        return { success: true, ...result };
+      }),
+    
+    // Get currently clocked in employees
+    getClockedIn: protectedProcedure.query(async () => {
+      return await db.getClockedInEmployees();
+    }),
+    
+    // Get time entries for date range
+    getEntries: protectedProcedure
+      .input(z.object({
+        startDate: z.date(),
+        endDate: z.date(),
+        staffId: z.number().optional(),
+      }))
+      .query(async ({ input }) => {
+        return await db.getTimeEntries(input.startDate, input.endDate, input.staffId);
+      }),
+    
+    // Get employee work summary
+    getSummary: protectedProcedure
+      .input(z.object({
+        staffId: z.number(),
+        startDate: z.date(),
+        endDate: z.date(),
+      }))
+      .query(async ({ input }) => {
+        return await db.getEmployeeWorkSummary(input.staffId, input.startDate, input.endDate);
       }),
   }),
 });
