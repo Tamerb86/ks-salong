@@ -34,6 +34,11 @@ export const appRouter = router({
       return await db.getAllStaff();
     }),
     
+    listActive: publicProcedure.query(async () => {
+      const allStaff = await db.getAllStaff();
+      return allStaff.filter(staff => staff.isActive);
+    }),
+    
     getById: protectedProcedure
       .input(z.object({ id: z.number() }))
       .query(async ({ input }) => {
@@ -514,6 +519,7 @@ export const appRouter = router({
         vippsEnabled: z.boolean().optional(),
         requirePaymentForBooking: z.boolean().optional(),
         autoLogoutTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/).optional(), // HH:MM format
+        universalPin: z.string().length(4).or(z.string().length(6)).optional(),
       }))
       .mutation(async ({ input }) => {
         await db.updateSalonSettings(input);
@@ -541,11 +547,21 @@ export const appRouter = router({
   timeTracking: router({    
     // Verify PIN and clock in
     clockIn: publicProcedure
-      .input(z.object({ pin: z.string().length(4).or(z.string().length(6)) }))
+      .input(z.object({ 
+        pin: z.string().length(4).or(z.string().length(6)),
+        employeeId: z.number()
+      }))
       .mutation(async ({ input }) => {
-        const employee = await db.verifyEmployeePin(input.pin);
-        if (!employee) {
+        // Verify universal PIN
+        const settings = await db.getSalonSettings();
+        if (!settings || input.pin !== settings.universalPin) {
           throw new TRPCError({ code: "UNAUTHORIZED", message: "Ugyldig PIN" });
+        }
+        
+        // Get employee
+        const employee = await db.getUserById(input.employeeId);
+        if (!employee || !employee.isActive) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Ansatt ikke funnet" });
         }
         
         const result = await db.clockInEmployee(employee.id);
@@ -558,11 +574,21 @@ export const appRouter = router({
     
     // Clock out
     clockOut: publicProcedure
-      .input(z.object({ pin: z.string().length(4).or(z.string().length(6)) }))
+      .input(z.object({ 
+        pin: z.string().length(4).or(z.string().length(6)),
+        employeeId: z.number()
+      }))
       .mutation(async ({ input }) => {
-        const employee = await db.verifyEmployeePin(input.pin);
-        if (!employee) {
+        // Verify universal PIN
+        const settings = await db.getSalonSettings();
+        if (!settings || input.pin !== settings.universalPin) {
           throw new TRPCError({ code: "UNAUTHORIZED", message: "Ugyldig PIN" });
+        }
+        
+        // Get employee
+        const employee = await db.getUserById(input.employeeId);
+        if (!employee || !employee.isActive) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Ansatt ikke funnet" });
         }
         
         const result = await db.clockOutEmployee(employee.id);

@@ -33,6 +33,8 @@ export default function POS() {
   const [loggedInEmployee, setLoggedInEmployee] = useState<any>(null);
   const [isPinLoginOpen, setIsPinLoginOpen] = useState(true);
   const [pinInput, setPinInput] = useState("");
+  const [showEmployeeSelect, setShowEmployeeSelect] = useState(false);
+  const [isSwitchEmployeeOpen, setIsSwitchEmployeeOpen] = useState(false);
   
   const [cart, setCart] = useState<CartItem[]>([]);
   const [customerId, setCustomerId] = useState<number | null>(null);
@@ -48,6 +50,7 @@ export default function POS() {
   const { data: services = [] } = trpc.services.list.useQuery(undefined, { enabled: !authLoading });
   const { data: products = [] } = trpc.products.list.useQuery(undefined, { enabled: !authLoading });
   const { data: staff = [] } = trpc.staff.list.useQuery(undefined, { enabled: !authLoading });
+  const { data: activeEmployees = [] } = trpc.staff.listActive.useQuery();
   const { data: customers = [] } = trpc.customers.search.useQuery(
     { query: customerSearch },
     { enabled: customerSearch.length > 2 }
@@ -73,14 +76,36 @@ export default function POS() {
     onSuccess: (data) => {
       setLoggedInEmployee(data.employee);
       setIsPinLoginOpen(false);
+      setShowEmployeeSelect(false);
       setPinInput("");
       toast.success(`Velkommen, ${data.employee.name}!`);
     },
     onError: () => {
       toast.error("Ugyldig PIN");
       setPinInput("");
+      setShowEmployeeSelect(false);
     },
   });
+  
+  const handlePinSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (pinInput.length >= 4) {
+      setShowEmployeeSelect(true);
+    }
+  };
+  
+  const handleEmployeeSelect = (employeeId: number) => {
+    pinLoginMutation.mutate({ pin: pinInput, employeeId });
+  };
+  
+  const handleSwitchEmployee = (employeeId: number) => {
+    const employee = activeEmployees.find((e: any) => e.id === employeeId);
+    if (employee) {
+      setLoggedInEmployee(employee);
+      setIsSwitchEmployeeOpen(false);
+      toast.success(`Byttet til ${employee.name}`);
+    }
+  };
 
   const addToCart = (item: CartItem) => {
     const existingIndex = cart.findIndex(
@@ -210,38 +235,67 @@ export default function POS() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  if (pinInput.length >= 4) {
-                    pinLoginMutation.mutate({ pin: pinInput });
-                  }
-                }}
-                className="space-y-4"
-              >
-                <div>
-                  <Input
-                    type="password"
-                    inputMode="numeric"
-                    maxLength={6}
-                    value={pinInput}
-                    onChange={(e) => {
-                      const value = e.target.value.replace(/\D/g, '');
-                      setPinInput(value);
+              {!showEmployeeSelect ? (
+                <form onSubmit={handlePinSubmit} className="space-y-4">
+                  <div>
+                    <Input
+                      type="password"
+                      inputMode="numeric"
+                      maxLength={6}
+                      value={pinInput}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, '');
+                        setPinInput(value);
+                      }}
+                      placeholder="Skriv inn PIN"
+                      className="text-center text-2xl tracking-widest"
+                      autoFocus
+                    />
+                  </div>
+                  <Button
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-purple-600 to-amber-600 hover:from-purple-700 hover:to-amber-700"
+                    disabled={pinInput.length < 4}
+                  >
+                    Neste
+                  </Button>
+                </form>
+              ) : (
+                <div className="space-y-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setShowEmployeeSelect(false);
+                      setPinInput("");
                     }}
-                    placeholder="Skriv inn PIN"
-                    className="text-center text-2xl tracking-widest"
-                    autoFocus
-                  />
+                    className="mb-4"
+                  >
+                    Tilbake
+                  </Button>
+                  <div className="grid grid-cols-1 gap-3 max-h-96 overflow-y-auto">
+                    {activeEmployees.map((employee: any) => (
+                      <Button
+                        key={employee.id}
+                        variant="outline"
+                        className="h-20 text-left justify-start hover:bg-purple-50 hover:border-purple-300"
+                        onClick={() => handleEmployeeSelect(employee.id)}
+                        disabled={pinLoginMutation.isPending}
+                      >
+                        <div className="flex items-center gap-3 w-full">
+                          <div className="h-12 w-12 rounded-full bg-gradient-to-br from-purple-400 to-amber-400 flex items-center justify-center text-white font-bold text-lg">
+                            {employee.name?.charAt(0) || "?"}
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-semibold text-base">{employee.name}</p>
+                            <p className="text-sm text-gray-500 capitalize">{employee.role}</p>
+                          </div>
+                        </div>
+                      </Button>
+                    ))}
+                  </div>
                 </div>
-                <Button
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-purple-600 to-amber-600 hover:from-purple-700 hover:to-amber-700"
-                  disabled={pinInput.length < 4 || pinLoginMutation.isPending}
-                >
-                  {pinLoginMutation.isPending ? "Logger inn..." : "Logg inn"}
-                </Button>
-              </form>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -267,14 +321,22 @@ export default function POS() {
             <Button
               variant="outline"
               size="sm"
+              onClick={() => setIsSwitchEmployeeOpen(true)}
+              className="border-purple-300 text-purple-600 hover:bg-purple-50"
+            >
+              Bytt ansatt
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => {
                 setIsPinLoginOpen(true);
                 setLoggedInEmployee(null);
                 setPinInput("");
               }}
-              className="border-purple-300 text-purple-600 hover:bg-purple-50"
+              className="border-red-300 text-red-600 hover:bg-red-50"
             >
-              Bytt bruker
+              Logg ut
             </Button>
           </div>
         </div>
@@ -698,6 +760,46 @@ export default function POS() {
             <Button onClick={printReceipt}>
               <Printer className="h-4 w-4 mr-2" />
               Skriv ut
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Switch Employee Dialog */}
+      <Dialog open={isSwitchEmployeeOpen} onOpenChange={setIsSwitchEmployeeOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Bytt ansatt</DialogTitle>
+            <DialogDescription>
+              Velg en ansatt å bytte til. Dette påvirker ikke tidsstempling.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-1 gap-3 max-h-96 overflow-y-auto py-4">
+            {activeEmployees.map((employee: any) => (
+              <Button
+                key={employee.id}
+                variant="outline"
+                className="h-20 text-left justify-start hover:bg-purple-50 hover:border-purple-300"
+                onClick={() => handleSwitchEmployee(employee.id)}
+              >
+                <div className="flex items-center gap-3 w-full">
+                  <div className="h-12 w-12 rounded-full bg-gradient-to-br from-purple-400 to-amber-400 flex items-center justify-center text-white font-bold text-lg">
+                    {employee.name?.charAt(0) || "?"}
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-semibold text-base">{employee.name}</p>
+                    <p className="text-sm text-gray-500 capitalize">{employee.role}</p>
+                  </div>
+                  {loggedInEmployee?.id === employee.id && (
+                    <Badge variant="default" className="bg-purple-600">Aktiv</Badge>
+                  )}
+                </div>
+              </Button>
+            ))}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsSwitchEmployeeOpen(false)}>
+              Avbryt
             </Button>
           </DialogFooter>
         </DialogContent>

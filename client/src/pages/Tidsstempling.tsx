@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { Clock, LogIn, LogOut, Users, TrendingUp } from "lucide-react";
+import { Clock, LogIn, LogOut, Users, TrendingUp, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
 import { nb } from "date-fns/locale";
 import { toast } from "sonner";
@@ -12,15 +12,19 @@ import { Layout } from "@/components/Layout";
 export default function Tidsstempling() {
   const [pin, setPin] = useState("");
   const [mode, setMode] = useState<"clockIn" | "clockOut">("clockIn");
+  const [showEmployeeSelect, setShowEmployeeSelect] = useState(false);
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState<number | null>(null);
   
   const { data: clockedIn, refetch } = trpc.timeTracking.getClockedIn.useQuery(undefined, {
     refetchInterval: 5000, // Refresh every 5 seconds
   });
   
+  const { data: activeEmployees } = trpc.staff.listActive.useQuery();
+  
   const clockInMutation = trpc.timeTracking.clockIn.useMutation({
     onSuccess: (data) => {
       toast.success(`Velkommen ${data.employee.name}! Du er nå stemplet inn.`);
-      setPin("");
+      resetForm();
       refetch();
     },
     onError: (error) => {
@@ -35,16 +39,22 @@ export default function Tidsstempling() {
       const hours = Math.floor(totalMinutes / 60);
       const minutes = totalMinutes % 60;
       toast.success(`Du er nå stemplet ut. Arbeidstid: ${hours}t ${minutes}m`);
-      setPin("");
+      resetForm();
       refetch();
     },
     onError: (error) => {
       toast.error(error.message);
-      setPin("");
+      resetForm();
     },
   });
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const resetForm = () => {
+    setPin("");
+    setShowEmployeeSelect(false);
+    setSelectedEmployeeId(null);
+  };
+  
+  const handlePinSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (pin.length < 4) {
@@ -52,10 +62,17 @@ export default function Tidsstempling() {
       return;
     }
     
+    // Show employee selection screen
+    setShowEmployeeSelect(true);
+  };
+  
+  const handleEmployeeSelect = (employeeId: number) => {
+    setSelectedEmployeeId(employeeId);
+    
     if (mode === "clockIn") {
-      clockInMutation.mutate({ pin });
+      clockInMutation.mutate({ pin, employeeId });
     } else {
-      clockOutMutation.mutate({ pin });
+      clockOutMutation.mutate({ pin, employeeId });
     }
   };
   
@@ -66,6 +83,11 @@ export default function Tidsstempling() {
   };
   
   const handleClear = () => {
+    setPin("");
+  };
+  
+  const handleBack = () => {
+    setShowEmployeeSelect(false);
     setPin("");
   };
   
@@ -95,82 +117,126 @@ export default function Tidsstempling() {
                 {mode === "clockIn" ? "Stemple Inn" : "Stemple Ut"}
               </CardTitle>
               <CardDescription>
-                Skriv inn din PIN-kode for å {mode === "clockIn" ? "starte" : "avslutte"} arbeidsdagen
+                {showEmployeeSelect 
+                  ? "Velg din profil" 
+                  : `Skriv inn PIN-kode for å ${mode === "clockIn" ? "starte" : "avslutte"} arbeidsdagen`
+                }
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {/* Mode Toggle */}
-              <div className="flex gap-2 mb-6">
-                <Button
-                  variant={mode === "clockIn" ? "default" : "outline"}
-                  className="flex-1"
-                  onClick={() => setMode("clockIn")}
-                >
-                  <LogIn className="h-4 w-4 mr-2" />
-                  Stemple Inn
-                </Button>
-                <Button
-                  variant={mode === "clockOut" ? "default" : "outline"}
-                  className="flex-1"
-                  onClick={() => setMode("clockOut")}
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Stemple Ut
-                </Button>
-              </div>
-              
-              {/* PIN Input */}
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <Input
-                    type="password"
-                    value={pin}
-                    onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
-                    placeholder="Skriv inn PIN"
-                    className="text-center text-2xl h-16 tracking-widest"
-                    maxLength={6}
-                    autoFocus
-                  />
-                </div>
-                
-                {/* PIN Pad */}
-                <div className="grid grid-cols-3 gap-3">
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((digit) => (
+              {!showEmployeeSelect ? (
+                <>
+                  {/* Mode Toggle */}
+                  <div className="flex gap-2 mb-6">
                     <Button
-                      key={digit}
-                      type="button"
-                      variant="outline"
-                      className="h-16 text-2xl font-semibold"
-                      onClick={() => handlePinPad(digit.toString())}
+                      variant={mode === "clockIn" ? "default" : "outline"}
+                      className="flex-1"
+                      onClick={() => setMode("clockIn")}
                     >
-                      {digit}
+                      <LogIn className="h-4 w-4 mr-2" />
+                      Stemple Inn
                     </Button>
-                  ))}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="h-16 text-xl"
-                    onClick={handleClear}
-                  >
-                    Slett
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="h-16 text-2xl font-semibold"
-                    onClick={() => handlePinPad("0")}
-                  >
-                    0
-                  </Button>
-                  <Button
-                    type="submit"
-                    className="h-16 text-xl font-semibold bg-gradient-to-r from-purple-600 to-amber-600 hover:from-purple-700 hover:to-amber-700"
-                    disabled={pin.length < 4 || clockInMutation.isPending || clockOutMutation.isPending}
-                  >
-                    OK
-                  </Button>
-                </div>
-              </form>
+                    <Button
+                      variant={mode === "clockOut" ? "default" : "outline"}
+                      className="flex-1"
+                      onClick={() => setMode("clockOut")}
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Stemple Ut
+                    </Button>
+                  </div>
+                  
+                  {/* PIN Input */}
+                  <form onSubmit={handlePinSubmit} className="space-y-6">
+                    <div>
+                      <Input
+                        type="password"
+                        value={pin}
+                        onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
+                        placeholder="Skriv inn PIN"
+                        className="text-center text-2xl h-16 tracking-widest"
+                        maxLength={6}
+                        autoFocus
+                      />
+                    </div>
+                    
+                    {/* PIN Pad */}
+                    <div className="grid grid-cols-3 gap-3">
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((digit) => (
+                        <Button
+                          key={digit}
+                          type="button"
+                          variant="outline"
+                          className="h-16 text-2xl font-semibold"
+                          onClick={() => handlePinPad(digit.toString())}
+                        >
+                          {digit}
+                        </Button>
+                      ))}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="h-16 text-xl"
+                        onClick={handleClear}
+                      >
+                        Slett
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="h-16 text-2xl font-semibold"
+                        onClick={() => handlePinPad("0")}
+                      >
+                        0
+                      </Button>
+                      <Button
+                        type="submit"
+                        className="h-16 text-xl font-semibold bg-gradient-to-r from-purple-600 to-amber-600 hover:from-purple-700 hover:to-amber-700"
+                        disabled={pin.length < 4}
+                      >
+                        OK
+                      </Button>
+                    </div>
+                  </form>
+                </>
+              ) : (
+                <>
+                  {/* Employee Selection */}
+                  <div className="space-y-4">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleBack}
+                      className="mb-4"
+                    >
+                      <ArrowLeft className="h-4 w-4 mr-2" />
+                      Tilbake
+                    </Button>
+                    
+                    <div className="grid grid-cols-1 gap-3 max-h-96 overflow-y-auto">
+                      {activeEmployees?.map((employee: any) => (
+                        <Button
+                          key={employee.id}
+                          variant="outline"
+                          className="h-20 text-left justify-start hover:bg-purple-50 hover:border-purple-300"
+                          onClick={() => handleEmployeeSelect(employee.id)}
+                          disabled={clockInMutation.isPending || clockOutMutation.isPending}
+                        >
+                          <div className="flex items-center gap-3 w-full">
+                            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-purple-400 to-amber-400 flex items-center justify-center text-white font-bold text-lg">
+                              {employee.name.charAt(0)}
+                            </div>
+                            <div className="flex-1">
+                              <p className="font-semibold text-base">{employee.name}</p>
+                              <p className="text-sm text-gray-500 capitalize">{employee.role}</p>
+                            </div>
+                          </div>
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
           

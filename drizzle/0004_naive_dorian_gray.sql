@@ -1,0 +1,1 @@
+ALTER TABLE `salonSettings` ADD `universalPin` varchar(6) DEFAULT '1234';

@@ -72,6 +72,7 @@ export default function Settings() {
     vippsEnabled: false,
     requirePaymentForBooking: false,
     autoLogoutTime: "22:00",
+    universalPin: "1234",
   });
 
   // Google Calendar settings
@@ -98,6 +99,7 @@ export default function Settings() {
         vippsEnabled: settings.vippsEnabled ?? false,
         requirePaymentForBooking: settings.requirePaymentForBooking ?? false,
         autoLogoutTime: settings.autoLogoutTime || "22:00",
+        universalPin: settings.universalPin || "1234",
       });
     }
   }, [settings]);
@@ -587,6 +589,25 @@ export default function Settings() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="universalPin">Felles PIN-kode</Label>
+                    <Input
+                      id="universalPin"
+                      type="password"
+                      inputMode="numeric"
+                      maxLength={6}
+                      value={formData.universalPin}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, '');
+                        setFormData({ ...formData, universalPin: value });
+                      }}
+                      className="max-w-xs"
+                    />
+                    <p className="text-sm text-gray-500">
+                      Alle ansatte bruker samme PIN for å logge inn. Etter PIN-innlogging velger de sitt navn.
+                    </p>
+                  </div>
+                  
                   <div className="space-y-2">
                     <Label htmlFor="autoLogoutTime">Automatisk utlogging klokkeslett</Label>
                     <Input

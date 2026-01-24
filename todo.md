@@ -428,3 +428,19 @@
 - [x] Create "Alle ansatte" (All Staff) tab for staff management
 - [x] Style tabs to match reference design
 - [x] Test tab navigation and settings persistence
+
+## Unified PIN System with Employee Switching
+- [x] Analyze current PIN login system in TimeTracking page
+- [x] Change PIN system to use unified PIN for all employees
+- [x] Add employee selection screen after PIN entry
+- [x] Display all active employees for selection
+- [x] Store selected employee in session/context
+- [x] Add "Switch Employee" button in POS interface
+- [x] Implement employee switching without affecting clock-in time
+- [x] Ensure work hours remain tied to original clock-in employee
+- [x] Update time tracking calculations to use 60-minute hour system
+- [x] Display work hours in HH:MM format (60-minute based)
+- [x] Add unified PIN setting in Settings page
+- [x] Test PIN login with employee selection
+- [x] Test employee switching in POS
+- [x] Write vitest tests for PIN and time tracking logic
