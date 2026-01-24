@@ -64,6 +64,11 @@ const navItems: NavItem[] = [
     icon: Clock,
   },
   {
+    title: "Tjenester",
+    href: "/services",
+    icon: Sparkles,
+  },
+  {
     title: "Innstillinger",
     href: "/settings",
     icon: Settings,

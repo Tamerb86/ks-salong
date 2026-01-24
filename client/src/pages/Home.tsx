@@ -183,7 +183,22 @@ export default function Home() {
         <div>
           <h3 className="text-2xl font-bold text-gray-900 mb-6">Hurtighandlinger</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Link href="/appointments">
+                <Link href="/book">
+                  <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-rose-500 rounded-lg flex items-center justify-center">
+                          <Calendar className="h-6 w-6 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-lg">Book Online</h3>
+                          <p className="text-sm text-gray-600">Bestill time nå</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+                <Link href="/appointments">
               <Card className="border-2 border-transparent hover:border-purple-300 hover:shadow-xl transition-all cursor-pointer group bg-white">
                 <CardHeader>
                   <div className="flex items-center gap-4">

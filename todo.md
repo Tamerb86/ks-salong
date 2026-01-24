@@ -212,3 +212,25 @@
 - [ ] Translate all toast notifications to Norwegian
 - [ ] Translate all button labels to Norwegian
 - [ ] Translate all form labels to Norwegian
+
+## Phase 1: Online Booking System
+- [x] Build Services Management page (admin)
+  - [x] CRUD for services (name, duration, price, MVA, assigned staff)
+  - [x] Service availability toggle
+  - [ ] Staff assignment interface
+- [x] Build Public Booking page for customers
+  - [x] Service selection with details
+  - [x] Staff selection or "First Available"
+  - [x] Smart calendar with conflict prevention
+  - [x] Customer information form
+  - [x] Booking confirmation
+- [ ] Enhance Appointments page in dashboard
+  - [ ] Display all bookings in calendar view
+  - [ ] Status management (Pending/Confirmed/Checked-in/Cancelled/Completed)
+  - [ ] Booking details and editing
+  - [ ] Conflict detection and warnings
+- [ ] Testing
+  - [ ] Test complete booking flow from public page
+  - [ ] Verify calendar display in dashboard
+  - [ ] Test all booking statuses
+  - [ ] Test conflict prevention
