@@ -1,287 +1,313 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, Users, Clock, DollarSign, TrendingUp, Scissors } from "lucide-react";
+import { trpc } from "@/lib/trpc";
 import { getLoginUrl } from "@/const";
 import { Link } from "wouter";
+import {
+  Calendar,
+  Users,
+  DollarSign,
+  Clock,
+  TrendingUp,
+  BarChart3,
+  Settings,
+  UserCircle,
+  LogOut,
+  Sparkles,
+  ArrowRight,
+} from "lucide-react";
 
 export default function Home() {
-  const { user, loading, isAuthenticated } = useAuth();
+  const { user, loading, error, isAuthenticated, logout } = useAuth();
+  const { data: stats } = trpc.dashboard.getStats.useQuery(undefined, {
+    enabled: !!user,
+  });
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5">
-        <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent" />
-          <p className="text-muted-foreground">Loading...</p>
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-900 via-purple-700 to-amber-600">
+        <div className="text-center space-y-4">
+          <div className="relative">
+            <div className="animate-spin rounded-full h-20 w-20 border-4 border-white/20 border-t-white mx-auto"></div>
+            <Sparkles className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-8 w-8 text-white animate-pulse" />
+          </div>
+          <p className="text-white font-semibold text-lg">Loading K.S Salong...</p>
         </div>
       </div>
     );
   }
 
-  if (!isAuthenticated) {
+  if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-        {/* Hero Section */}
-        <div className="container mx-auto px-4 py-16">
-          <div className="flex flex-col items-center justify-center min-h-[80vh] text-center">
-            <div className="mb-8 inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 text-primary">
-              <Scissors className="w-10 h-10" />
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-700 to-amber-600 flex items-center justify-center p-4">
+        <Card className="w-full max-w-2xl border-0 shadow-2xl bg-white/95 backdrop-blur">
+          <CardHeader className="text-center space-y-4 pb-8">
+            <div className="mx-auto w-20 h-20 bg-gradient-to-br from-purple-600 to-amber-600 rounded-2xl flex items-center justify-center shadow-lg">
+              <Sparkles className="h-10 w-10 text-white" />
             </div>
-            
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-primary via-primary to-accent bg-clip-text text-transparent">
-              K.S Salong
-            </h1>
-            
-            <p className="text-xl md:text-2xl text-muted-foreground mb-4 max-w-2xl">
-              Professional Salon Management System
+            <div>
+              <CardTitle className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-amber-600 bg-clip-text text-transparent">
+                K.S Salong
+              </CardTitle>
+              <CardDescription className="text-lg mt-2">
+                Professional Salon Management System
+              </CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-2 gap-4 py-6">
+              <div className="text-center p-4 bg-purple-50 rounded-xl">
+                <Calendar className="h-8 w-8 text-purple-600 mx-auto mb-2" />
+                <p className="font-semibold text-purple-900">Appointments</p>
+                <p className="text-sm text-purple-600">Smart Booking</p>
+              </div>
+              <div className="text-center p-4 bg-amber-50 rounded-xl">
+                <Users className="h-8 w-8 text-amber-600 mx-auto mb-2" />
+                <p className="font-semibold text-amber-900">Queue</p>
+                <p className="text-sm text-amber-600">Walk-in Management</p>
+              </div>
+              <div className="text-center p-4 bg-purple-50 rounded-xl">
+                <DollarSign className="h-8 w-8 text-purple-600 mx-auto mb-2" />
+                <p className="font-semibold text-purple-900">POS</p>
+                <p className="text-sm text-purple-600">Point of Sale</p>
+              </div>
+              <div className="text-center p-4 bg-amber-50 rounded-xl">
+                <BarChart3 className="h-8 w-8 text-amber-600 mx-auto mb-2" />
+                <p className="font-semibold text-amber-900">Analytics</p>
+                <p className="text-sm text-amber-600">Business Insights</p>
+              </div>
+            </div>
+
+            <a href={getLoginUrl()}>
+              <Button
+                size="lg"
+                className="w-full bg-gradient-to-r from-purple-600 to-amber-600 hover:from-purple-700 hover:to-amber-700 text-white font-semibold py-6 text-lg shadow-lg hover:shadow-xl transition-all"
+              >
+                Sign In to Continue
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </a>
+
+            <p className="text-center text-sm text-gray-500">
+              Secure authentication powered by Manus
             </p>
-            
-            <p className="text-lg text-muted-foreground mb-12 max-w-xl">
-              Streamline your salon operations with elegant booking, POS, staff management, and comprehensive reporting
-            </p>
-            
-            <Button size="lg" className="text-lg px-8 py-6" asChild>
-              <a href={getLoginUrl()}>
-                Sign In to Dashboard
-              </a>
-            </Button>
-          </div>
-
-          {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-16">
-            <Card className="border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-lg">
-              <CardHeader>
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                  <Calendar className="w-6 h-6 text-primary" />
-                </div>
-                <CardTitle>Smart Booking</CardTitle>
-                <CardDescription>
-                  Advanced appointment scheduling with conflict detection and automated reminders
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card className="border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-lg">
-              <CardHeader>
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                  <DollarSign className="w-6 h-6 text-primary" />
-                </div>
-                <CardTitle>Integrated Payments</CardTitle>
-                <CardDescription>
-                  Vipps and Stripe integration for seamless payment processing and refunds
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card className="border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-lg">
-              <CardHeader>
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                  <Users className="w-6 h-6 text-primary" />
-                </div>
-                <CardTitle>Customer CRM</CardTitle>
-                <CardDescription>
-                  Complete customer profiles with visit history, preferences, and GDPR compliance
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card className="border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-lg">
-              <CardHeader>
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                  <Clock className="w-6 h-6 text-primary" />
-                </div>
-                <CardTitle>Time Tracking</CardTitle>
-                <CardDescription>
-                  Staff clock in/out with automatic overtime calculation and audit logs
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card className="border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-lg">
-              <CardHeader>
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                  <TrendingUp className="w-6 h-6 text-primary" />
-                </div>
-                <CardTitle>Analytics & Reports</CardTitle>
-                <CardDescription>
-                  Comprehensive reporting with daily auto-generated Excel and PDF reports
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card className="border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-lg">
-              <CardHeader>
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                  <Scissors className="w-6 h-6 text-primary" />
-                </div>
-                <CardTitle>POS System</CardTitle>
-                <CardDescription>
-                  Full point-of-sale with receipt printing, discounts, tips, and inventory management
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
-  // Dashboard for authenticated users
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50">
+      {/* Header */}
+      <header className="bg-white/80 backdrop-blur-md border-b border-purple-100 sticky top-0 z-50 shadow-sm">
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-amber-600 rounded-xl flex items-center justify-center shadow-md">
+                <Sparkles className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-amber-600 bg-clip-text text-transparent">
+                  K.S Salong
+                </h1>
+                <p className="text-sm text-gray-600">Management System</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <div className="text-right">
+                <p className="font-semibold text-gray-900">{user.name}</p>
+                <p className="text-sm text-gray-600 capitalize">{user.role}</p>
+              </div>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => logout()}
+                className="hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="container mx-auto px-6 py-8">
+        {/* Welcome Section */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Welcome back, {user?.name}!</h1>
-          <p className="text-muted-foreground text-lg">
-            Here's what's happening at K.S Salong today
-          </p>
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">
+            Welcome back, {user.name?.split(" ")[0]}!
+          </h2>
+          <p className="text-gray-600">Here's what's happening at K.S Salong today</p>
         </div>
 
-        {/* Quick Stats */}
+        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="border-2">
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-500 to-purple-600 text-white hover:shadow-xl transition-shadow">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Today's Appointments
-              </CardTitle>
+              <CardDescription className="text-purple-100">Today's Appointments</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">12</div>
-              <p className="text-sm text-muted-foreground mt-1">+2 from yesterday</p>
+              <div className="flex items-end justify-between">
+                <div>
+                  <div className="text-4xl font-bold">{stats?.todayAppointments || 0}</div>
+                  <p className="text-sm text-purple-100 mt-1">
+                    {stats?.todayAppointments && stats.todayAppointments > 0
+                      ? `+${stats.todayAppointments} from yesterday`
+                      : "No change"}
+                  </p>
+                </div>
+                <Calendar className="h-12 w-12 text-purple-200" />
+              </div>
             </CardContent>
           </Card>
 
-          <Card className="border-2">
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-amber-500 to-amber-600 text-white hover:shadow-xl transition-shadow">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Revenue Today
-              </CardTitle>
+              <CardDescription className="text-amber-100">Revenue Today</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">4,850 kr</div>
-              <p className="text-sm text-muted-foreground mt-1">+15% from yesterday</p>
+              <div className="flex items-end justify-between">
+                <div>
+                  <div className="text-4xl font-bold">{stats?.todayRevenue || 0} kr</div>
+                  <p className="text-sm text-amber-100 mt-1">
+                    {stats?.revenueChange ? `+${stats.revenueChange}% from yesterday` : "No change"}
+                  </p>
+                </div>
+                <TrendingUp className="h-12 w-12 text-amber-200" />
+              </div>
             </CardContent>
           </Card>
 
-          <Card className="border-2">
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-500 to-blue-600 text-white hover:shadow-xl transition-shadow">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Queue Length
-              </CardTitle>
+              <CardDescription className="text-blue-100">Queue Length</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">3</div>
-              <p className="text-sm text-muted-foreground mt-1">Walk-in customers</p>
+              <div className="flex items-end justify-between">
+                <div>
+                  <div className="text-4xl font-bold">{stats?.queueLength || 0}</div>
+                  <p className="text-sm text-blue-100 mt-1">Walk-in customers</p>
+                </div>
+                <Users className="h-12 w-12 text-blue-200" />
+              </div>
             </CardContent>
           </Card>
 
-          <Card className="border-2">
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-green-500 to-green-600 text-white hover:shadow-xl transition-shadow">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Staff On Duty
-              </CardTitle>
+              <CardDescription className="text-green-100">Staff On Duty</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">4</div>
-              <p className="text-sm text-muted-foreground mt-1">All stations active</p>
+              <div className="flex items-end justify-between">
+                <div>
+                  <div className="text-4xl font-bold">{stats?.staffOnDuty || 0}</div>
+                  <p className="text-sm text-green-100 mt-1">All stations active</p>
+                </div>
+                <UserCircle className="h-12 w-12 text-green-200" />
+              </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Link href="/appointments">
-            <Card className="border-2 hover:border-primary/50 transition-all cursor-pointer group">
+        <div>
+          <h3 className="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Link href="/appointments">
+              <Card className="border-2 border-transparent hover:border-purple-300 hover:shadow-xl transition-all cursor-pointer group bg-white">
+                <CardHeader>
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center group-hover:from-purple-200 group-hover:to-purple-300 transition-colors shadow-md">
+                      <Calendar className="w-7 h-7 text-purple-600" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">Appointments</CardTitle>
+                      <CardDescription>View and manage bookings</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+              </Card>
+            </Link>
+
+            <Link href="/queue">
+              <Card className="border-2 border-transparent hover:border-blue-300 hover:shadow-xl transition-all cursor-pointer group bg-white">
+                <CardHeader>
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center group-hover:from-blue-200 group-hover:to-blue-300 transition-colors shadow-md">
+                      <Users className="w-7 h-7 text-blue-600" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">Queue</CardTitle>
+                      <CardDescription>Manage walk-in customers</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+              </Card>
+            </Link>
+
+            <Link href="/pos">
+              <Card className="border-2 border-transparent hover:border-amber-300 hover:shadow-xl transition-all cursor-pointer group bg-white">
+                <CardHeader>
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center group-hover:from-amber-200 group-hover:to-amber-300 transition-colors shadow-md">
+                      <DollarSign className="w-7 h-7 text-amber-600" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">POS</CardTitle>
+                      <CardDescription>Process sales and payments</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+              </Card>
+            </Link>
+
+            <Card className="border-2 border-transparent hover:border-green-300 hover:shadow-xl transition-all cursor-pointer group bg-white">
               <CardHeader>
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                    <Calendar className="w-6 h-6 text-primary" />
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center group-hover:from-green-200 group-hover:to-green-300 transition-colors shadow-md">
+                    <UserCircle className="w-7 h-7 text-green-600" />
                   </div>
                   <div>
-                    <CardTitle>Appointments</CardTitle>
-                    <CardDescription>View and manage bookings</CardDescription>
+                    <CardTitle className="text-lg">Customers</CardTitle>
+                    <CardDescription>Customer database and CRM</CardDescription>
                   </div>
                 </div>
               </CardHeader>
             </Card>
-          </Link>
 
-          <Link href="/queue">
-            <Card className="border-2 hover:border-primary/50 transition-all cursor-pointer group">
+            <Card className="border-2 border-transparent hover:border-indigo-300 hover:shadow-xl transition-all cursor-pointer group bg-white">
               <CardHeader>
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                    <Users className="w-6 h-6 text-primary" />
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-100 to-indigo-200 flex items-center justify-center group-hover:from-indigo-200 group-hover:to-indigo-300 transition-colors shadow-md">
+                    <BarChart3 className="w-7 h-7 text-indigo-600" />
                   </div>
                   <div>
-                    <CardTitle>Queue</CardTitle>
-                    <CardDescription>Manage walk-in customers</CardDescription>
+                    <CardTitle className="text-lg">Reports</CardTitle>
+                    <CardDescription>Sales and analytics</CardDescription>
                   </div>
                 </div>
               </CardHeader>
             </Card>
-          </Link>
 
-          <Link href="/pos">
-            <Card className="border-2 hover:border-primary/50 transition-all cursor-pointer group">
-              <CardHeader>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                    <DollarSign className="w-6 h-6 text-primary" />
+            <Link href="/time-clock">
+              <Card className="border-2 border-transparent hover:border-pink-300 hover:shadow-xl transition-all cursor-pointer group bg-white">
+                <CardHeader>
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-pink-100 to-pink-200 flex items-center justify-center group-hover:from-pink-200 group-hover:to-pink-300 transition-colors shadow-md">
+                      <Clock className="w-7 h-7 text-pink-600" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">Time Clock</CardTitle>
+                      <CardDescription>Staff time tracking</CardDescription>
+                    </div>
                   </div>
-                  <div>
-                    <CardTitle>POS</CardTitle>
-                    <CardDescription>Process sales and payments</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-            </Card>
-          </Link>
-
-          <Card className="border-2 hover:border-primary/50 transition-all cursor-pointer group">
-            <CardHeader>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                  <Users className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <CardTitle>Customers</CardTitle>
-                  <CardDescription>Customer database and CRM</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-          </Card>
-
-          <Card className="border-2 hover:border-primary/50 transition-all cursor-pointer group">
-            <CardHeader>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                  <TrendingUp className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <CardTitle>Reports</CardTitle>
-                  <CardDescription>Sales and analytics</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-          </Card>
-
-          <Link href="/time-clock">
-            <Card className="border-2 hover:border-primary/50 transition-all cursor-pointer group">
-              <CardHeader>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                    <Clock className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <CardTitle>Time Clock</CardTitle>
-                    <CardDescription>Staff time tracking</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-            </Card>
-          </Link>
+                </CardHeader>
+              </Card>
+            </Link>
+          </div>
         </div>
       </div>
     </div>

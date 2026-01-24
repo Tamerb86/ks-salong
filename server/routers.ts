@@ -498,6 +498,24 @@ export const appRouter = router({
       }),
   }),
 
+  dashboard: router({
+    getStats: protectedProcedure.query(async () => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const appointments = await db.getAppointmentsByDate(today);
+      const staff = await db.getAllStaff();
+      
+      return {
+        todayAppointments: appointments.length,
+        todayRevenue: 4850, // Mock data
+        queueLength: 3, // Mock data
+        staffOnDuty: staff.filter((s: any) => s.isActive).length,
+        revenueChange: 15,
+      };
+    }),
+  }),
+
   settings: router({
     get: protectedProcedure.query(async () => {
       return await db.getSalonSettings();

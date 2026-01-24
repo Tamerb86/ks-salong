@@ -177,3 +177,17 @@
 - [x] Build daily timesheet view
 - [ ] Add export functionality
 - [ ] Add automatic logout at end of workday (configurable)
+
+## UI/UX Improvements
+- [x] Enhance home page design with better visual hierarchy
+- [x] Improve color scheme and gradients
+- [x] Add animations and transitions
+- [x] Enhance card designs with better shadows and borders
+- [x] Improve typography and spacing
+- [x] Add icons and visual elements
+- [ ] Enhance Appointments page layout
+- [ ] Improve Queue page design
+- [ ] Polish POS interface
+- [ ] Refine Time Clock page
+- [ ] Add loading states and skeletons
+- [ ] Improve mobile responsiveness
