@@ -28,6 +28,12 @@ interface CartItem {
 
 export default function POS() {
   const { user, loading: authLoading } = useAuth();
+  
+  // Employee login state
+  const [loggedInEmployee, setLoggedInEmployee] = useState<any>(null);
+  const [isPinLoginOpen, setIsPinLoginOpen] = useState(true);
+  const [pinInput, setPinInput] = useState("");
+  
   const [cart, setCart] = useState<CartItem[]>([]);
   const [customerId, setCustomerId] = useState<number | null>(null);
   const [customerSearch, setCustomerSearch] = useState("");
@@ -60,6 +66,19 @@ export default function POS() {
     },
     onError: (error: any) => {
       toast.error(error.message || "Kunne ikke opprette ordre");
+    },
+  });
+  
+  const pinLoginMutation = trpc.timeTracking.clockIn.useMutation({
+    onSuccess: (data) => {
+      setLoggedInEmployee(data.employee);
+      setIsPinLoginOpen(false);
+      setPinInput("");
+      toast.success(`Velkommen, ${data.employee.name}!`);
+    },
+    onError: () => {
+      toast.error("Ugyldig PIN");
+      setPinInput("");
     },
   });
 
@@ -148,6 +167,8 @@ export default function POS() {
       discountAmount: calculateDiscount() > 0 ? calculateDiscount().toString() : undefined,
       tipAmount: tip > 0 ? tip.toString() : undefined,
       total: calculateTotal().toString(),
+      employeeId: loggedInEmployee?.id,
+      employeeName: loggedInEmployee?.name,
     });
   };
 
@@ -176,14 +197,86 @@ export default function POS() {
     );
   }
 
+  // PIN Login Dialog
+  if (isPinLoginOpen) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center min-h-[80vh]">
+          <Card className="w-96">
+            <CardHeader>
+              <CardTitle className="text-center">Logg inn med PIN</CardTitle>
+              <CardDescription className="text-center">
+                Skriv inn din PIN-kode for å få tilgang til POS
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (pinInput.length >= 4) {
+                    pinLoginMutation.mutate({ pin: pinInput });
+                  }
+                }}
+                className="space-y-4"
+              >
+                <div>
+                  <Input
+                    type="password"
+                    inputMode="numeric"
+                    maxLength={6}
+                    value={pinInput}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, '');
+                      setPinInput(value);
+                    }}
+                    placeholder="Skriv inn PIN"
+                    className="text-center text-2xl tracking-widest"
+                    autoFocus
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  className="w-full bg-gradient-to-r from-purple-600 to-amber-600 hover:from-purple-700 hover:to-amber-700"
+                  disabled={pinInput.length < 4 || pinLoginMutation.isPending}
+                >
+                  {pinLoginMutation.isPending ? "Logger inn..." : "Logg inn"}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      </Layout>
+    );
+  }
+  
   return (
     <Layout>
       <div className="p-6">
         <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">POS / Kasse</h1>
-          <p className="text-gray-600 mt-1">Behandle salg og betalinger</p>
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">POS / Kasse</h1>
+            <p className="text-gray-600 mt-1">Behandle salg og betalinger</p>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="text-right">
+              <p className="text-sm text-gray-600">Innlogget som</p>
+              <p className="font-semibold text-purple-600">{loggedInEmployee?.name}</p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setIsPinLoginOpen(true);
+                setLoggedInEmployee(null);
+                setPinInput("");
+              }}
+              className="border-purple-300 text-purple-600 hover:bg-purple-50"
+            >
+              Bytt bruker
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

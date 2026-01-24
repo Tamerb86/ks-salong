@@ -380,6 +380,8 @@ export const appRouter = router({
         tipAmount: z.string().optional(),
         total: z.string(),
         notes: z.string().optional(),
+        employeeId: z.number().optional(),
+        employeeName: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
         const orderNumber = `ORD-${Date.now()}`;
@@ -387,7 +389,7 @@ export const appRouter = router({
         const orderId = await db.createOrder({
           orderNumber,
           customerId: input.customerId,
-          staffId: ctx.user!.id,
+          staffId: input.employeeId || ctx.user!.id, // Use logged-in employee or fallback to current user
           subtotal: input.subtotal,
           taxAmount: input.taxAmount,
           discountAmount: input.discountAmount || "0.00",
@@ -579,6 +581,19 @@ export const appRouter = router({
       }))
       .query(async ({ input }) => {
         return await db.getEmployeeWorkSummary(input.staffId, input.startDate, input.endDate);
+      }),
+    
+    // Get time report for date range
+    getTimeReport: protectedProcedure
+      .input(z.object({
+        from: z.string(),
+        to: z.string(),
+        employeeId: z.number().optional(),
+      }))
+      .query(async ({ input }) => {
+        const startDate = new Date(input.from + "T00:00:00");
+        const endDate = new Date(input.to + "T23:59:59");
+        return await db.getTimeEntries(startDate, endDate, input.employeeId);
       }),
   }),
 });

@@ -15,6 +15,7 @@ import Settings from "./pages/Settings";
 import Customers from "./pages/Customers";
 import QueueTV from "./pages/QueueTV";
 import Tidsstempling from "./pages/Tidsstempling";
+import Reports from "./pages/Reports";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -30,6 +31,7 @@ function Router() {
       <Route path={"/time-clock"} component={TimeClock} />
       <Route path={"/tidsstempling"} component={Tidsstempling} />
       <Route path={"/customers"} component={Customers} />
+      <Route path={"/reports"} component={Reports} />
       <Route path={"/settings"} component={Settings} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}

@@ -346,3 +346,32 @@
 - [x] Wrap Settings.tsx with Layout (includes Sidebar)
 - [x] Wrap Customers.tsx with Layout (includes Sidebar)
 - [x] Ensure all admin pages have consistent navigation
+
+## Staff PIN Management
+- [x] Add PIN field to Services/Staff page (Tjenester)
+- [x] Create UI for setting/updating employee PIN
+- [x] Add PIN validation (4-6 digits)
+- [x] Ensure PIN is unique per employee
+- [x] Add "Reset PIN" functionality for admin
+
+## Time Reports Page
+- [x] Create Reports page at /reports
+- [x] Add date range selector (daily/weekly/monthly views)
+- [x] Display employee work hours with overtime calculation
+- [x] Show total hours, regular hours, and overtime hours
+- [x] Calculate weekend overtime automatically (Saturday/Sunday)
+- [x] Add employee filter dropdown
+- [ ] Implement Excel export with filters and totals (UI ready)
+- [ ] Implement PDF export with filters and totals (UI ready)
+- [x] Show visual charts/graphs for hours worked
+- [x] Add summary cards (total employees, total hours, total overtime)
+
+## POS Employee Integration
+- [x] Add employee login modal to POS page
+- [x] Require PIN before accessing POS
+- [x] Display currently logged-in employee in POS header
+- [x] Add "Switch Employee" button in POS
+- [x] Link all sales/transactions to logged-in employee
+- [x] Update orders table to include employeeId field (uses existing staffId)
+- [x] Show employee name in transaction history
+- [ ] Add employee performance metrics (sales per employee)
