@@ -137,3 +137,24 @@
 - [x] Build optimization
 - [x] Deployment documentation (HOSTINGER_DEPLOYMENT.md)
 - [x] Production testing guide
+
+## Phase 16: Frontend Pages Implementation
+- [x] Appointments page with interactive calendar
+- [x] Drop-in Queue management page
+- [ ] POS/Cashier checkout page
+- [ ] Customer CRM page with profiles
+- [ ] Reports and analytics dashboard
+- [ ] Settings page
+- [ ] Time tracking page for staff
+
+## Phase 17: Payment Integration
+- [ ] Vipps payment integration
+- [ ] Stripe payment integration
+- [ ] Payment webhooks
+- [ ] Refund processing
+
+## Phase 18: Notifications System
+- [ ] Email notifications (appointment reminders)
+- [ ] SMS notifications (optional)
+- [ ] Daily report generation and email
+- [ ] No-show notifications to staff

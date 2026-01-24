@@ -191,33 +191,37 @@ export default function Home() {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card className="border-2 hover:border-primary/50 transition-all cursor-pointer group">
-            <CardHeader>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                  <Calendar className="w-6 h-6 text-primary" />
+          <Link href="/appointments">
+            <Card className="border-2 hover:border-primary/50 transition-all cursor-pointer group">
+              <CardHeader>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <Calendar className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle>Appointments</CardTitle>
+                    <CardDescription>View and manage bookings</CardDescription>
+                  </div>
                 </div>
-                <div>
-                  <CardTitle>Appointments</CardTitle>
-                  <CardDescription>View and manage bookings</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-          </Card>
+              </CardHeader>
+            </Card>
+          </Link>
 
-          <Card className="border-2 hover:border-primary/50 transition-all cursor-pointer group">
-            <CardHeader>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                  <Users className="w-6 h-6 text-primary" />
+          <Link href="/queue">
+            <Card className="border-2 hover:border-primary/50 transition-all cursor-pointer group">
+              <CardHeader>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <Users className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle>Queue</CardTitle>
+                    <CardDescription>Manage walk-in customers</CardDescription>
+                  </div>
                 </div>
-                <div>
-                  <CardTitle>Queue</CardTitle>
-                  <CardDescription>Manage walk-in customers</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-          </Card>
+              </CardHeader>
+            </Card>
+          </Link>
 
           <Card className="border-2 hover:border-primary/50 transition-all cursor-pointer group">
             <CardHeader>
