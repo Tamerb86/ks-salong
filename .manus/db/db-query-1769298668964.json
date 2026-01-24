@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE salonSettings SET universalPin = '1234' WHERE id = 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZWkmDdVMGTAoV.aeceea61840d --database oUNZ2iw3V7HdbF8pGMTUk4 --execute UPDATE salonSettings SET universalPin = '1234' WHERE id = 1;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 58
+}

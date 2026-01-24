@@ -1,0 +1,14 @@
+{
+  "query": "SELECT id, universalPin FROM salonSettings LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZWkmDdVMGTAoV.aeceea61840d --database oUNZ2iw3V7HdbF8pGMTUk4 --execute SELECT id, universalPin FROM salonSettings LIMIT 1;",
+  "rows": [
+    {
+      "id": "2",
+      "universalPin": "1234"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuniversalPin\n2\t1234\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

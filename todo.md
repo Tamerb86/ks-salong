@@ -444,3 +444,9 @@
 - [x] Test PIN login with employee selection
 - [x] Test employee switching in POS
 - [x] Write vitest tests for PIN and time tracking logic
+
+## Fix Universal PIN Error
+- [x] Set default universal PIN (1234) in database
+- [x] Verify PIN validation logic in server
+- [x] Test PIN entry in Tidsstempling page
+- [x] Ensure Settings page can update universal PIN
