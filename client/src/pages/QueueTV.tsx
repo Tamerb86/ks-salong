@@ -39,16 +39,19 @@ export default function QueueTV() {
   useEffect(() => {
     if (activeQueue.length > 0) {
       const currentIds = activeQueue.map((item: any) => item.id);
-      const newIds = currentIds.filter((id: number) => !prevQueueIds.includes(id));
       
-      if (newIds.length > 0) {
-        setAnimatingIds(new Set(newIds));
-        setTimeout(() => setAnimatingIds(new Set()), 1000);
-      }
-      
-      setPrevQueueIds(currentIds);
+      setPrevQueueIds((prev) => {
+        const newIds = currentIds.filter((id: number) => !prev.includes(id));
+        
+        if (newIds.length > 0) {
+          setAnimatingIds(new Set(newIds));
+          setTimeout(() => setAnimatingIds(new Set()), 1000);
+        }
+        
+        return currentIds;
+      });
     }
-  }, [activeQueue, prevQueueIds]);
+  }, [activeQueue]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-amber-600 text-white p-12">

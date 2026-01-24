@@ -312,3 +312,8 @@
 - [x] Add pulse animation for "Now Serving" section (animate-pulse built-in)
 - [x] Add smooth transition for queue count changes (CSS transitions)
 - [x] Test animations on actual queue updates
+
+## QueueTV Bug Fix
+- [x] Fix infinite loop in useEffect (maximum update depth exceeded)
+- [x] Remove problematic dependency causing re-renders (removed prevQueueIds from deps)
+- [x] Test queue updates work correctly after fix
