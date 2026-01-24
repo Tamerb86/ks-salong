@@ -176,6 +176,15 @@ export const appRouter = router({
         return await db.getAppointmentsByDate(input.date);
       }),
     
+    listByDateRange: protectedProcedure
+      .input(z.object({ 
+        startDate: z.string(),
+        endDate: z.string()
+      }))
+      .query(async ({ input }) => {
+        return await db.getAppointmentsByDateRange(input.startDate, input.endDate);
+      }),
+    
     listByStaffAndDate: protectedProcedure
       .input(z.object({ staffId: z.number(), date: z.date() }))
       .query(async ({ input }) => {

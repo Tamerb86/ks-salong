@@ -398,3 +398,19 @@
 - [x] Implement staff delete mutation with confirmation
 - [x] Add form validation for edit dialog
 - [x] Test edit and delete operations
+
+## Monthly Calendar View for Appointments (Avtaler)
+- [x] Analyze current Appointments page structure
+- [x] Design monthly calendar grid UI component
+- [x] Add month navigation (previous/next month buttons)
+- [x] Fetch all bookings from database for selected month
+- [x] Display bookings in calendar cells by date
+- [x] Color-code appointments by status (Pending/Confirmed/Completed/Cancelled)
+- [x] Make appointments clickable to show details
+- [x] Create appointment details dialog
+- [x] Add status update functionality in dialog
+- [x] Show customer info, service, staff, time in dialog
+- [x] Add Google Calendar integration button
+- [x] Generate Google Calendar event links
+- [x] Test calendar navigation and data display
+- [x] Write vitest tests for calendar logic

@@ -236,6 +236,56 @@ export async function getAppointmentsByDate(date: Date) {
     .orderBy(asc(appointments.startTime));
 }
 
+export async function getAppointmentsByDateRange(startDate: string, endDate: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const start = new Date(startDate);
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(endDate);
+  end.setHours(23, 59, 59, 999);
+  
+  const results = await db.select({
+    id: appointments.id,
+    customerId: appointments.customerId,
+    staffId: appointments.staffId,
+    serviceId: appointments.serviceId,
+    appointmentDate: appointments.appointmentDate,
+    startTime: appointments.startTime,
+    endTime: appointments.endTime,
+    status: appointments.status,
+    notes: appointments.notes,
+    customer: {
+      id: customers.id,
+      firstName: customers.firstName,
+      lastName: customers.lastName,
+      phone: customers.phone,
+      email: customers.email,
+    },
+    staff: {
+      id: users.id,
+      name: users.name,
+    },
+    service: {
+      id: services.id,
+      name: services.name,
+      price: services.price,
+      duration: services.duration,
+    },
+  })
+  .from(appointments)
+  .leftJoin(customers, eq(appointments.customerId, customers.id))
+  .leftJoin(users, eq(appointments.staffId, users.id))
+  .leftJoin(services, eq(appointments.serviceId, services.id))
+  .where(and(
+    gte(appointments.appointmentDate, start),
+    lte(appointments.appointmentDate, end)
+  ))
+  .orderBy(asc(appointments.appointmentDate), asc(appointments.startTime));
+  
+  return results;
+}
+
 export async function getAppointmentsByStaffAndDate(staffId: number, date: Date) {
   const db = await getDb();
   if (!db) return [];
@@ -271,7 +321,42 @@ export async function updateAppointment(id: number, data: Partial<typeof appoint
 export async function getAppointmentById(id: number) {
   const db = await getDb();
   if (!db) return undefined;
-  const result = await db.select().from(appointments).where(eq(appointments.id, id)).limit(1);
+  
+  const result = await db.select({
+    id: appointments.id,
+    customerId: appointments.customerId,
+    staffId: appointments.staffId,
+    serviceId: appointments.serviceId,
+    appointmentDate: appointments.appointmentDate,
+    startTime: appointments.startTime,
+    endTime: appointments.endTime,
+    status: appointments.status,
+    notes: appointments.notes,
+    customer: {
+      id: customers.id,
+      firstName: customers.firstName,
+      lastName: customers.lastName,
+      phone: customers.phone,
+      email: customers.email,
+    },
+    staff: {
+      id: users.id,
+      name: users.name,
+    },
+    service: {
+      id: services.id,
+      name: services.name,
+      price: services.price,
+      duration: services.duration,
+    },
+  })
+  .from(appointments)
+  .leftJoin(customers, eq(appointments.customerId, customers.id))
+  .leftJoin(users, eq(appointments.staffId, users.id))
+  .leftJoin(services, eq(appointments.serviceId, services.id))
+  .where(eq(appointments.id, id))
+  .limit(1);
+  
   return result.length > 0 ? result[0] : undefined;
 }
 
