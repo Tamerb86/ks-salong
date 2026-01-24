@@ -299,3 +299,9 @@
 - [x] Replace Sparkles icon with Scissors in BookOnline.tsx
 - [x] Replace Sparkles icon with Scissors in Sidebar.tsx
 - [x] Verify consistent branding across application
+
+## Queue TV Display - Icon Size Reduction
+- [x] Reduce header logo size (Scissors icon) - from 24x24 to 16x16, icon from h-14 to h-8
+- [x] Reduce badge icons sizes (Users, Clock, Smartphone) - from 16x16 to 12x12, icons from h-10 to h-6
+- [x] Reduce QR code size for better balance - from 280px to 200px
+- [x] Test visual balance on large screen

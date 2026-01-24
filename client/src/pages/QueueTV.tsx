@@ -39,8 +39,8 @@ export default function QueueTV() {
         {/* Header */}
         <div className="flex items-center justify-between mb-16">
           <div className="flex items-center gap-6">
-            <div className="w-24 h-24 bg-white rounded-3xl flex items-center justify-center shadow-2xl">
-              <Scissors className="h-14 w-14 text-purple-600" />
+            <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center shadow-2xl">
+              <Scissors className="h-8 w-8 text-purple-600" />
             </div>
             <div>
               <h1 className="text-7xl font-bold mb-2">K.S Salong</h1>
@@ -177,8 +177,8 @@ export default function QueueTV() {
           <div className="flex items-center justify-between gap-12">
             <div className="flex-1">
               <div className="flex items-center gap-6 mb-6">
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-amber-400 rounded-full flex items-center justify-center">
-                  <Smartphone className="h-10 w-10 text-white" />
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-amber-400 rounded-full flex items-center justify-center">
+                  <Smartphone className="h-6 w-6 text-white" />
                 </div>
                 <div>
                   <h2 className="text-5xl font-bold mb-2">Bli med i køen!</h2>
@@ -194,7 +194,7 @@ export default function QueueTV() {
             <div className="bg-white p-8 rounded-3xl shadow-2xl">
               <QRCodeSVG
                 value={`${window.location.origin}/queue`}
-                size={280}
+                size={200}
                 level="H"
                 includeMargin={true}
                 fgColor="#7c3aed"
