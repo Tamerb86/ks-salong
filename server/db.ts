@@ -473,6 +473,49 @@ export async function getTimeEntriesByStaffAndDate(staffId: number, date: Date) 
     .orderBy(desc(timeEntries.clockIn));
 }
 
+export async function startBreak(entryId: number) {
+  const db = await getDb();
+  if (!db) return;
+  
+  await db.update(timeEntries).set({
+    breakStart: new Date()
+  }).where(eq(timeEntries.id, entryId));
+}
+
+export async function endBreak(entryId: number) {
+  const db = await getDb();
+  if (!db) return;
+  
+  const entry = await db.select().from(timeEntries).where(eq(timeEntries.id, entryId)).limit(1);
+  if (entry.length === 0 || !entry[0].breakStart) return;
+  
+  const breakEnd = new Date();
+  const breakStart = entry[0].breakStart;
+  const breakMinutes = Math.floor((breakEnd.getTime() - breakStart.getTime()) / 60000);
+  const totalBreakMinutes = (entry[0].totalBreakMinutes || 0) + breakMinutes;
+  
+  await db.update(timeEntries).set({
+    breakEnd,
+    totalBreakMinutes
+  }).where(eq(timeEntries.id, entryId));
+}
+
+export async function updateTimeEntry(entryId: number, data: {
+  clockInTime?: Date;
+  clockOutTime?: Date;
+  notes?: string;
+}) {
+  const db = await getDb();
+  if (!db) return;
+  
+  const updateData: any = {};
+  if (data.clockInTime) updateData.clockIn = data.clockInTime;
+  if (data.clockOutTime) updateData.clockOut = data.clockOutTime;
+  if (data.notes !== undefined) updateData.notes = data.notes;
+  
+  await db.update(timeEntries).set(updateData).where(eq(timeEntries.id, entryId));
+}
+
 /**
  * ============================================
  * SETTINGS

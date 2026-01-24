@@ -431,17 +431,70 @@ export const appRouter = router({
       return { id };
     }),
     
-    clockOut: protectedProcedure
-      .input(z.object({ entryId: z.number() }))
-      .mutation(async ({ input }) => {
-        await db.clockOut(input.entryId);
-        return { success: true };
+    clockOut: protectedProcedure.mutation(async ({ ctx }) => {
+      // Find the active entry for this user
+      const entries = await db.getTimeEntriesByStaffAndDate(ctx.user!.id, new Date());
+      const activeEntry = entries.find((e: any) => !e.clockOutTime);
+      if (activeEntry) {
+        await db.clockOut(activeEntry.id);
+      }
+      return { success: true };
+    }),
+    
+    startBreak: protectedProcedure.mutation(async ({ ctx }) => {
+      const entries = await db.getTimeEntriesByStaffAndDate(ctx.user!.id, new Date());
+      const activeEntry = entries.find((e: any) => !e.clockOutTime);
+      if (activeEntry) {
+        await db.startBreak(activeEntry.id);
+      }
+      return { success: true };
+    }),
+    
+    endBreak: protectedProcedure.mutation(async ({ ctx }) => {
+      const entries = await db.getTimeEntriesByStaffAndDate(ctx.user!.id, new Date());
+      const activeEntry = entries.find((e: any) => !e.clockOutTime);
+      if (activeEntry) {
+        await db.endBreak(activeEntry.id);
+      }
+      return { success: true };
+    }),
+    
+    getCurrentStatus: protectedProcedure.query(async ({ ctx }) => {
+      const entries = await db.getTimeEntriesByStaffAndDate(ctx.user!.id, new Date());
+      const activeEntry = entries.find((e: any) => !e.clockOutTime);
+      if (activeEntry) {
+        return {
+          isClockedIn: true,
+          clockInTime: activeEntry.clockIn,
+          isOnBreak: activeEntry.breakStart && !activeEntry.breakEnd,
+        };
+      }
+      return { isClockedIn: false };
+    }),
+    
+    getDailyLogs: protectedProcedure
+      .input(z.object({ date: z.date() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getTimeEntriesByStaffAndDate(ctx.user!.id, input.date);
       }),
     
     getByStaffAndDate: protectedProcedure
       .input(z.object({ staffId: z.number(), date: z.date() }))
       .query(async ({ input }) => {
         return await db.getTimeEntriesByStaffAndDate(input.staffId, input.date);
+      }),
+    
+    updateEntry: adminProcedure
+      .input(z.object({
+        id: z.number(),
+        clockInTime: z.date().optional(),
+        clockOutTime: z.date().optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { id, ...data } = input;
+        await db.updateTimeEntry(id, data);
+        return { success: true };
       }),
   }),
 

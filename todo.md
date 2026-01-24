@@ -145,7 +145,7 @@
 - [ ] Customer CRM page with profiles
 - [ ] Reports and analytics dashboard
 - [ ] Settings page
-- [ ] Time tracking page for staff
+- [x] Time tracking page for staff
 
 ## Phase 17: Payment Integration
 - [ ] Vipps payment integration
@@ -168,3 +168,12 @@
 - [x] Add discount and tip functionality
 - [x] Support multiple payment methods (Cash, Card, Vipps, Stripe)
 - [x] Generate receipt (Kvittering) dialog with print option
+
+## Time Tracking Implementation
+- [x] Build staff time tracking page with clock in/out
+- [x] Implement break management system
+- [x] Add overtime calculation (weekends auto-flagged)
+- [x] Create manager editing interface
+- [x] Build daily timesheet view
+- [ ] Add export functionality
+- [ ] Add automatic logout at end of workday (configurable)

@@ -267,19 +267,21 @@ export default function Home() {
             </CardHeader>
           </Card>
 
-          <Card className="border-2 hover:border-primary/50 transition-all cursor-pointer group">
-            <CardHeader>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                  <Clock className="w-6 h-6 text-primary" />
+          <Link href="/time-clock">
+            <Card className="border-2 hover:border-primary/50 transition-all cursor-pointer group">
+              <CardHeader>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <Clock className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle>Time Clock</CardTitle>
+                    <CardDescription>Staff time tracking</CardDescription>
+                  </div>
                 </div>
-                <div>
-                  <CardTitle>Time Clock</CardTitle>
-                  <CardDescription>Staff time tracking</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-          </Card>
+              </CardHeader>
+            </Card>
+          </Link>
         </div>
       </div>
     </div>
