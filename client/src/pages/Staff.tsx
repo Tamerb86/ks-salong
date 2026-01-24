@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
-import { Key, Loader2, Users } from "lucide-react";
+import { Key, Loader2, Users, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Layout } from "@/components/Layout";
@@ -28,8 +28,18 @@ export default function Staff() {
   const [isPinDialogOpen, setIsPinDialogOpen] = useState(false);
   const [editingStaff, setEditingStaff] = useState<any>(null);
   const [pinFormData, setPinFormData] = useState({ pin: "" });
+  
+  // Staff edit management
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    role: "barber" as "owner" | "manager" | "barber" | "cashier",
+    isActive: true,
+  });
 
-  const updateStaffMutation = trpc.staff.update.useMutation({
+  const updatePinMutation = trpc.staff.update.useMutation({
     onSuccess: () => {
       toast.success("PIN oppdatert!");
       setIsPinDialogOpen(false);
@@ -38,6 +48,26 @@ export default function Staff() {
     },
     onError: (error) => {
       toast.error("Feil ved oppdatering: " + error.message);
+    },
+  });
+  
+  const updateStaffMutation = trpc.staff.update.useMutation({
+    onSuccess: () => {
+      toast.success("Ansatt oppdatert!");
+      setIsEditDialogOpen(false);
+      setEditingStaff(null);
+    },
+    onError: (error) => {
+      toast.error("Feil ved oppdatering: " + error.message);
+    },
+  });
+  
+  const deleteStaffMutation = trpc.staff.delete.useMutation({
+    onSuccess: () => {
+      toast.success("Ansatt slettet!");
+    },
+    onError: (error) => {
+      toast.error("Feil ved sletting: " + error.message);
     },
   });
 
@@ -53,10 +83,40 @@ export default function Staff() {
       toast.error("PIN må være mellom 4 og 6 sifre");
       return;
     }
-    updateStaffMutation.mutate({
+    updatePinMutation.mutate({
       id: editingStaff.id,
       pin: pinFormData.pin,
     });
+  };
+  
+  const handleOpenEditDialog = (staffMember: any) => {
+    setEditingStaff(staffMember);
+    setEditFormData({
+      name: staffMember.name || "",
+      email: staffMember.email || "",
+      phone: staffMember.phone || "",
+      role: staffMember.role || "user",
+      isActive: staffMember.isActive ?? true,
+    });
+    setIsEditDialogOpen(true);
+  };
+  
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editFormData.name || !editFormData.email) {
+      toast.error("Navn og e-post er påkrevd");
+      return;
+    }
+    updateStaffMutation.mutate({
+      id: editingStaff.id,
+      ...editFormData,
+    });
+  };
+  
+  const handleDelete = (staffMember: any) => {
+    if (window.confirm(`Er du sikker på at du vil slette ${staffMember.name}?`)) {
+      deleteStaffMutation.mutate({ id: staffMember.id });
+    }
   };
 
   if (isLoading) {
@@ -97,15 +157,33 @@ export default function Staff() {
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <span>{member.name}</span>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleOpenPinDialog(member)}
-                      className="border-purple-300 text-purple-600 hover:bg-purple-50"
-                    >
-                      <Key className="h-4 w-4 mr-1" />
-                      PIN
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleOpenPinDialog(member)}
+                        className="border-purple-300 text-purple-600 hover:bg-purple-50"
+                      >
+                        <Key className="h-4 w-4 mr-1" />
+                        PIN
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleOpenEditDialog(member)}
+                        className="border-blue-300 text-blue-600 hover:bg-blue-50"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDelete(member)}
+                        className="border-red-300 text-red-600 hover:bg-red-50"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </CardTitle>
                   <CardDescription>{member.email}</CardDescription>
                 </CardHeader>
@@ -211,6 +289,108 @@ export default function Staff() {
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   )}
                   Lagre PIN
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+        
+        {/* Edit Dialog */}
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent className="sm:max-w-[500px]">
+            <form onSubmit={handleEditSubmit}>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Pencil className="h-5 w-5 text-blue-600" />
+                  Rediger {editingStaff?.name}
+                </DialogTitle>
+                <DialogDescription>
+                  Oppdater informasjon for ansatt
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-name">Navn *</Label>
+                  <Input
+                    id="edit-name"
+                    type="text"
+                    value={editFormData.name}
+                    onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+                    placeholder="Fullt navn"
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="edit-email">E-post *</Label>
+                  <Input
+                    id="edit-email"
+                    type="email"
+                    value={editFormData.email}
+                    onChange={(e) => setEditFormData({ ...editFormData, email: e.target.value })}
+                    placeholder="epost@eksempel.no"
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="edit-phone">Telefon</Label>
+                  <Input
+                    id="edit-phone"
+                    type="tel"
+                    value={editFormData.phone}
+                    onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })}
+                    placeholder="+47 xxx xx xxx"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="edit-role">Rolle</Label>
+                  <select
+                    id="edit-role"
+                    value={editFormData.role}
+                    onChange={(e) => setEditFormData({ ...editFormData, role: e.target.value as any })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  >
+                    <option value="barber">Frisør</option>
+                    <option value="manager">Manager</option>
+                    <option value="cashier">Kasserer</option>
+                    <option value="owner">Eier</option>
+                  </select>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <input
+                    id="edit-active"
+                    type="checkbox"
+                    checked={editFormData.isActive}
+                    onChange={(e) => setEditFormData({ ...editFormData, isActive: e.target.checked })}
+                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                  />
+                  <Label htmlFor="edit-active" className="cursor-pointer">
+                    Aktiv ansatt
+                  </Label>
+                </div>
+              </div>
+
+              <div className="flex gap-3 justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsEditDialogOpen(false)}
+                >
+                  Avbryt
+                </Button>
+                <Button
+                  type="submit"
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                  disabled={updateStaffMutation.isPending}
+                >
+                  {updateStaffMutation.isPending && (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  )}
+                  Lagre endringer
                 </Button>
               </div>
             </form>

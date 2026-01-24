@@ -390,3 +390,11 @@
 - [x] Add "Ansatte" link to Sidebar navigation
 - [x] Keep Services.tsx for services only
 - [x] Test staff PIN management in new page
+
+## Staff Edit/Delete Functionality
+- [x] Add Edit and Delete buttons to each staff card
+- [x] Create edit dialog with form fields (name, email, phone, role, isActive)
+- [x] Implement staff update mutation
+- [x] Implement staff delete mutation with confirmation
+- [x] Add form validation for edit dialog
+- [x] Test edit and delete operations

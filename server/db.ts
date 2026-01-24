@@ -131,6 +131,12 @@ export async function updateUser(id: number, data: Partial<InsertUser>) {
   await db.update(users).set(data).where(eq(users.id, id));
 }
 
+export async function deleteUser(id: number) {
+  const db = await getDb();
+  if (!db) return;
+  await db.delete(users).where(eq(users.id, id));
+}
+
 /**
  * ============================================
  * SERVICES & PRODUCTS
