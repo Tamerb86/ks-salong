@@ -278,8 +278,22 @@ export async function getAppointmentById(id: number) {
 export async function getActiveQueue() {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(dropInQueue)
-    .where(eq(dropInQueue.status, 'waiting'))
+  return await db.select({
+    id: dropInQueue.id,
+    customerName: dropInQueue.customerName,
+    customerPhone: dropInQueue.customerPhone,
+    serviceId: dropInQueue.serviceId,
+    serviceName: services.name,
+    preferredStaffId: dropInQueue.preferredStaffId,
+    position: dropInQueue.position,
+    status: dropInQueue.status,
+    estimatedWaitTime: dropInQueue.estimatedWaitTime,
+    convertedToAppointmentId: dropInQueue.convertedToAppointmentId,
+    createdAt: dropInQueue.createdAt,
+    updatedAt: dropInQueue.updatedAt,
+  })
+    .from(dropInQueue)
+    .leftJoin(services, eq(dropInQueue.serviceId, services.id))
     .orderBy(asc(dropInQueue.position));
 }
 

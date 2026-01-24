@@ -273,3 +273,15 @@
 - [ ] Add customer tags (VIP, Regular, New)
 - [ ] Implement customer notes and alerts
 - [ ] Add GDPR compliance features (data export/delete)
+
+## Queue TV Display Implementation
+- [x] Create TV display page at /queue-tv
+- [x] Show current queue with large, readable fonts
+- [x] Display customer name and estimated wait time
+- [x] Add auto-refresh every 10 seconds
+- [x] Show "Now Serving" section prominently
+- [x] Add "Next in Line" section
+- [x] Display salon branding and logo
+- [x] Add fullscreen mode support (F11 browser feature)
+- [x] Show current time and date
+- [x] Add smooth animations for queue updates

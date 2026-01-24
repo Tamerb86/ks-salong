@@ -13,6 +13,7 @@ import POS from "./pages/POS";
 import TimeClock from "./pages/TimeClock";
 import Settings from "./pages/Settings";
 import Customers from "./pages/Customers";
+import QueueTV from "./pages/QueueTV";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -23,6 +24,7 @@ function Router() {
       <Route path={"/book"} component={BookOnline} />
       <Route path={"/appointments"} component={Appointments} />
       <Route path={"/queue"} component={Queue} />
+      <Route path={"/queue-tv"} component={QueueTV} />
       <Route path={"/pos"} component={POS} />
       <Route path={"/time-clock"} component={TimeClock} />
       <Route path={"/customers"} component={Customers} />
