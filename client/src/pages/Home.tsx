@@ -15,7 +15,7 @@ import {
   Settings,
   UserCircle,
   LogOut,
-  Sparkles,
+  Scissors,
   ArrowRight,
 } from "lucide-react";
 
@@ -31,7 +31,7 @@ export default function Home() {
         <div className="text-center space-y-4">
           <div className="relative">
             <div className="animate-spin rounded-full h-20 w-20 border-4 border-white/20 border-t-white mx-auto"></div>
-            <Sparkles className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-8 w-8 text-white animate-pulse" />
+            <Scissors className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-8 w-8 text-white animate-pulse" />
           </div>
           <p className="text-white font-semibold text-lg">Laster K.S Salong...</p>
         </div>
@@ -45,7 +45,7 @@ export default function Home() {
         <Card className="w-full max-w-2xl border-0 shadow-2xl bg-white/95 backdrop-blur">
           <CardHeader className="text-center space-y-4 pb-8">
             <div className="mx-auto w-20 h-20 bg-gradient-to-br from-purple-600 to-amber-600 rounded-2xl flex items-center justify-center shadow-lg">
-              <Sparkles className="h-10 w-10 text-white" />
+              <Scissors className="h-10 w-10 text-white" />
             </div>
             <div>
               <CardTitle className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-amber-600 bg-clip-text text-transparent">

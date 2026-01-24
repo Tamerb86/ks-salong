@@ -11,7 +11,7 @@ import {
   BarChart3,
   Settings,
   LogOut,
-  Sparkles,
+  Scissors,
   Home,
   UserCircle,
   ChevronLeft,
@@ -66,7 +66,7 @@ const navItems: NavItem[] = [
   {
     title: "Tjenester",
     href: "/services",
-    icon: Sparkles,
+    icon: Scissors,
   },
   {
     title: "Innstillinger",
@@ -111,7 +111,7 @@ export function Sidebar() {
               <Link href="/">
                 <div className="flex items-center gap-3 cursor-pointer">
                   <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <Sparkles className="h-5 w-5 text-white" />
+                    <Scissors className="h-5 w-5 text-white" />
                   </div>
                   <div>
                     <h1 className="text-lg font-bold">K.S Salong</h1>
@@ -122,7 +122,7 @@ export function Sidebar() {
             )}
             {isCollapsed && (
               <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl flex items-center justify-center shadow-lg mx-auto">
-                <Sparkles className="h-5 w-5 text-white" />
+                <Scissors className="h-5 w-5 text-white" />
               </div>
             )}
             <Button

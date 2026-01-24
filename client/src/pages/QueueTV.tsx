@@ -1,7 +1,7 @@
 import { trpc } from "@/lib/trpc";
 import { format } from "date-fns";
 import { nb } from "date-fns/locale";
-import { Clock, Sparkles, Users, Smartphone } from "lucide-react";
+import { Clock, Scissors, Users, Smartphone } from "lucide-react";
 import { useEffect, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 
@@ -40,7 +40,7 @@ export default function QueueTV() {
         <div className="flex items-center justify-between mb-16">
           <div className="flex items-center gap-6">
             <div className="w-24 h-24 bg-white rounded-3xl flex items-center justify-center shadow-2xl">
-              <Sparkles className="h-14 w-14 text-purple-600" />
+              <Scissors className="h-14 w-14 text-purple-600" />
             </div>
             <div>
               <h1 className="text-7xl font-bold mb-2">K.S Salong</h1>

@@ -292,3 +292,10 @@
 - [x] Position QR code prominently on screen
 - [x] Add instructional text in Norwegian
 - [x] Test QR code scanning with mobile devices
+
+## Icon Update - Scissors Branding
+- [x] Replace Sparkles icon with Scissors in QueueTV.tsx
+- [x] Replace Sparkles icon with Scissors in Home.tsx
+- [x] Replace Sparkles icon with Scissors in BookOnline.tsx
+- [x] Replace Sparkles icon with Scissors in Sidebar.tsx
+- [x] Verify consistent branding across application

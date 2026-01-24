@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { Calendar, Clock, Loader2, MapPin, Phone, Sparkles, User } from "lucide-react";
+import { Calendar, Clock, Loader2, MapPin, Phone, Scissors, User } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -158,7 +158,7 @@ export default function BookOnline() {
         <div className="container mx-auto px-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center">
-              <Sparkles className="h-8 w-8 text-purple-600" />
+              <Scissors className="h-8 w-8 text-purple-600" />
             </div>
             <div>
               <h1 className="text-4xl font-bold">K.S Salong</h1>
@@ -468,7 +468,7 @@ export default function BookOnline() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="h-6 w-6 text-purple-600" />
+                  <Scissors className="h-6 w-6 text-purple-600" />
                   Betaling
                 </CardTitle>
                 <CardDescription>
