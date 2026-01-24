@@ -7,6 +7,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import Appointments from "./pages/Appointments";
 import Queue from "./pages/Queue";
+import POS from "./pages/POS";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -15,6 +16,7 @@ function Router() {
       <Route path={"/"} component={Home} />
       <Route path={"/appointments"} component={Appointments} />
       <Route path={"/queue"} component={Queue} />
+      <Route path={"/pos"} component={POS} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

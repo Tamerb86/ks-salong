@@ -223,19 +223,21 @@ export default function Home() {
             </Card>
           </Link>
 
-          <Card className="border-2 hover:border-primary/50 transition-all cursor-pointer group">
-            <CardHeader>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                  <DollarSign className="w-6 h-6 text-primary" />
+          <Link href="/pos">
+            <Card className="border-2 hover:border-primary/50 transition-all cursor-pointer group">
+              <CardHeader>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <DollarSign className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle>POS</CardTitle>
+                    <CardDescription>Process sales and payments</CardDescription>
+                  </div>
                 </div>
-                <div>
-                  <CardTitle>POS</CardTitle>
-                  <CardDescription>Process sales and payments</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-          </Card>
+              </CardHeader>
+            </Card>
+          </Link>
 
           <Card className="border-2 hover:border-primary/50 transition-all cursor-pointer group">
             <CardHeader>

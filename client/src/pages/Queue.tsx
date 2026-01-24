@@ -51,11 +51,16 @@ export default function Queue() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     
+    const preferredStaffIdValue = formData.get("preferredStaffId") as string;
+    const preferredStaffId = preferredStaffIdValue && preferredStaffIdValue !== "0" 
+      ? parseInt(preferredStaffIdValue) 
+      : undefined;
+    
     addMutation.mutate({
       customerName: formData.get("customerName") as string,
       customerPhone: formData.get("customerPhone") as string,
       serviceId: parseInt(formData.get("serviceId") as string),
-      preferredStaffId: formData.get("preferredStaffId") ? parseInt(formData.get("preferredStaffId") as string) : undefined,
+      preferredStaffId,
     });
   };
 
@@ -185,7 +190,7 @@ export default function Queue() {
                         <SelectValue placeholder="Ingen preferanse" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Ingen preferanse</SelectItem>
+                        <SelectItem value="0">Ingen preferanse</SelectItem>
                         {staff.filter(s => s.role === 'barber' || s.role === 'manager' || s.role === 'owner').map((member) => (
                           <SelectItem key={member.id} value={member.id.toString()}>
                             {member.name}

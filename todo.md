@@ -141,7 +141,7 @@
 ## Phase 16: Frontend Pages Implementation
 - [x] Appointments page with interactive calendar
 - [x] Drop-in Queue management page
-- [ ] POS/Cashier checkout page
+- [x] POS/Cashier checkout page
 - [ ] Customer CRM page with profiles
 - [ ] Reports and analytics dashboard
 - [ ] Settings page
@@ -158,3 +158,13 @@
 - [ ] SMS notifications (optional)
 - [ ] Daily report generation and email
 - [ ] No-show notifications to staff
+
+## Bugs to Fix
+- [x] Fix Select.Item empty value error in Queue page
+
+## Current Work
+- [x] Build POS/Cashier page with service/product selection
+- [x] Implement MVA tax calculation (25%)
+- [x] Add discount and tip functionality
+- [x] Support multiple payment methods (Cash, Card, Vipps, Stripe)
+- [x] Generate receipt (Kvittering) dialog with print option
