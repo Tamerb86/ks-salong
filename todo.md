@@ -234,3 +234,23 @@
   - [ ] Verify calendar display in dashboard
   - [ ] Test all booking statuses
   - [ ] Test conflict prevention
+
+## Vipps Payment Integration
+- [ ] Set up Vipps API credentials (Client ID, Client Secret, Subscription Key)
+- [ ] Create Vipps service module for API calls
+- [ ] Implement payment initiation endpoint
+- [ ] Build webhook handler for payment confirmation
+- [ ] Integrate Vipps payment flow with BookOnline page
+- [ ] Auto-confirm bookings after successful payment
+- [ ] Store payment transactions in database
+- [ ] Generate payment receipts
+- [ ] Handle payment failures and refunds
+- [ ] Test Vipps integration in test environment
+
+## Enhanced Appointments Calendar
+- [ ] Build interactive week/month calendar view
+- [ ] Add drag-and-drop rescheduling functionality
+- [ ] Implement color-coded status indicators (Pending/Confirmed/Checked-in/Completed)
+- [ ] Add quick status update from calendar
+- [ ] Add appointment details popup on click
+- [ ] Show staff availability in calendar

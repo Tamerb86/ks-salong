@@ -349,7 +349,9 @@ export const dailyReports = mysqlTable("dailyReports", {
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
-export type Permission = typeof permissions.$inferSelect;
+
+// TODO: Add your tables here
+
 export type Service = typeof services.$inferSelect;
 export type Product = typeof products.$inferSelect;
 export type Appointment = typeof appointments.$inferSelect;
