@@ -29,7 +29,8 @@ export default function QueueTV() {
       refetch();
     }, 10000);
     return () => clearInterval(interval);
-  }, [refetch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const activeQueue = queue?.filter((item: any) => item.status === "waiting") || [];
   const nowServing = queue?.find((item: any) => item.status === "in_service");
@@ -37,10 +38,17 @@ export default function QueueTV() {
 
   // Track queue changes for animations
   useEffect(() => {
-    if (activeQueue.length > 0) {
-      const currentIds = activeQueue.map((item: any) => item.id);
+    if (queue && queue.length > 0) {
+      const currentIds = queue
+        .filter((item: any) => item.status === "waiting")
+        .map((item: any) => item.id);
       
       setPrevQueueIds((prev) => {
+        // Only update if IDs actually changed
+        if (JSON.stringify(prev) === JSON.stringify(currentIds)) {
+          return prev;
+        }
+        
         const newIds = currentIds.filter((id: number) => !prev.includes(id));
         
         if (newIds.length > 0) {
@@ -51,7 +59,8 @@ export default function QueueTV() {
         return currentIds;
       });
     }
-  }, [activeQueue]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queue]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-amber-600 text-white p-12">

@@ -314,6 +314,7 @@
 - [x] Test animations on actual queue updates
 
 ## QueueTV Bug Fix
-- [x] Fix infinite loop in useEffect (maximum update depth exceeded)
-- [x] Remove problematic dependency causing re-renders (removed prevQueueIds from deps)
+- [x] Fix infinite loop in useEffect at line 36 (changed to queue dependency with JSON comparison)
+- [x] Fix infinite loop in useEffect at line 20 (removed refetch from dependencies)
+- [x] Remove all problematic dependencies causing re-renders
 - [x] Test queue updates work correctly after fix
