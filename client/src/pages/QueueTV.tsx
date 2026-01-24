@@ -7,6 +7,8 @@ import { QRCodeSVG } from "qrcode.react";
 
 export default function QueueTV() {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [prevQueueIds, setPrevQueueIds] = useState<number[]>([]);
+  const [animatingIds, setAnimatingIds] = useState<Set<number>>(new Set());
   
   // Auto-refresh every 10 seconds
   const { data: queue, refetch } = trpc.queue.list.useQuery(undefined, {
@@ -32,6 +34,21 @@ export default function QueueTV() {
   const activeQueue = queue?.filter((item: any) => item.status === "waiting") || [];
   const nowServing = queue?.find((item: any) => item.status === "in_service");
   const nextInLine = activeQueue[0];
+
+  // Track queue changes for animations
+  useEffect(() => {
+    if (activeQueue.length > 0) {
+      const currentIds = activeQueue.map((item: any) => item.id);
+      const newIds = currentIds.filter((id: number) => !prevQueueIds.includes(id));
+      
+      if (newIds.length > 0) {
+        setAnimatingIds(new Set(newIds));
+        setTimeout(() => setAnimatingIds(new Set()), 1000);
+      }
+      
+      setPrevQueueIds(currentIds);
+    }
+  }, [activeQueue, prevQueueIds]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-amber-600 text-white p-12">
@@ -62,10 +79,10 @@ export default function QueueTV() {
 
         {/* Now Serving */}
         {nowServing ? (
-          <div className="mb-16 bg-white/10 backdrop-blur-lg rounded-3xl p-12 border-4 border-white/30 shadow-2xl animate-pulse">
+          <div className="mb-16 bg-white/10 backdrop-blur-lg rounded-3xl p-12 border-4 border-green-400/50 shadow-2xl transition-all duration-500 animate-pulse">
             <div className="flex items-center gap-6 mb-6">
-              <div className="w-20 h-20 bg-green-400 rounded-full flex items-center justify-center">
-                <Users className="h-12 w-12 text-white" />
+              <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
+                <Users className="h-6 w-6 text-white" />
               </div>
               <h2 className="text-5xl font-bold">Nå betjener vi:</h2>
             </div>
@@ -95,8 +112,8 @@ export default function QueueTV() {
         {nextInLine && (
           <div className="mb-16 bg-white/10 backdrop-blur-lg rounded-3xl p-10 border-4 border-amber-400/50 shadow-2xl">
             <div className="flex items-center gap-6 mb-4">
-              <div className="w-16 h-16 bg-amber-400 rounded-full flex items-center justify-center">
-                <Users className="h-10 w-10 text-white" />
+              <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center">
+                <Users className="h-6 w-6 text-white" />
               </div>
               <h2 className="text-4xl font-bold">Neste i køen:</h2>
             </div>
@@ -116,8 +133,8 @@ export default function QueueTV() {
         {/* Queue List */}
         <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-10 border-4 border-white/30 shadow-2xl">
           <div className="flex items-center gap-6 mb-8">
-            <div className="w-16 h-16 bg-blue-400 rounded-full flex items-center justify-center">
-              <Users className="h-10 w-10 text-white" />
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
+              <Users className="h-6 w-6 text-white" />
             </div>
             <h2 className="text-4xl font-bold">
               I køen ({activeQueue.length})
@@ -126,10 +143,17 @@ export default function QueueTV() {
 
           {activeQueue.length > 0 ? (
             <div className="space-y-4">
-              {activeQueue.map((item: any, index: number) => (
+              {activeQueue.map((item: any, index: number) => {
+                const isAnimating = animatingIds.has(item.id);
+                return (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between bg-white/10 rounded-2xl p-8 border-2 border-white/20"
+                  className={`flex items-center justify-between bg-white/10 rounded-2xl p-8 border-2 border-white/20 transition-all duration-500 ${
+                    isAnimating ? 'animate-fade-in-up scale-105' : 'scale-100'
+                  }`}
+                  style={{
+                    animation: isAnimating ? 'fadeInUp 0.6s ease-out' : 'none'
+                  }}
                 >
                   <div className="flex items-center gap-8">
                     <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-amber-400 rounded-full flex items-center justify-center">
@@ -157,7 +181,8 @@ export default function QueueTV() {
                     </p>
                   </div>
                 </div>
-              ))}
+              );
+              })}
             </div>
           ) : (
             <div className="text-center py-16">

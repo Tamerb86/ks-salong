@@ -305,3 +305,10 @@
 - [x] Reduce badge icons sizes (Users, Clock, Smartphone) - from 16x16 to 12x12, icons from h-10 to h-6
 - [x] Reduce QR code size for better balance - from 280px to 200px
 - [x] Test visual balance on large screen
+
+## Queue TV Display - Update Animations
+- [x] Add fade-in animation for new queue items (fadeInUp with scale effect)
+- [x] Add slide animation when queue position changes (transition-all duration-500)
+- [x] Add pulse animation for "Now Serving" section (animate-pulse built-in)
+- [x] Add smooth transition for queue count changes (CSS transitions)
+- [x] Test animations on actual queue updates
