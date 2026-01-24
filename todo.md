@@ -207,7 +207,7 @@
 - [ ] Translate Queue page to Norwegian
 - [ ] Translate POS page to Norwegian
 - [ ] Translate TimeClock page to Norwegian
-- [ ] Translate Sidebar component to Norwegian
+- [x] Translate Sidebar component to Norwegian
 - [ ] Translate all error messages to Norwegian
 - [ ] Translate all toast notifications to Norwegian
 - [ ] Translate all button labels to Norwegian

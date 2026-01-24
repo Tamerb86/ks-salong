@@ -34,12 +34,12 @@ const navItems: NavItem[] = [
     icon: Home,
   },
   {
-    title: "Appointments",
+    title: "Avtaler",
     href: "/appointments",
     icon: Calendar,
   },
   {
-    title: "Queue",
+    title: "Kø",
     href: "/queue",
     icon: Users,
   },
@@ -49,22 +49,22 @@ const navItems: NavItem[] = [
     icon: DollarSign,
   },
   {
-    title: "Customers",
+    title: "Kunder",
     href: "/customers",
     icon: UserCircle,
   },
   {
-    title: "Reports",
+    title: "Rapporter",
     href: "/reports",
     icon: BarChart3,
   },
   {
-    title: "Time Clock",
+    title: "Tidsstempling",
     href: "/time-clock",
     icon: Clock,
   },
   {
-    title: "Settings",
+    title: "Innstillinger",
     href: "/settings",
     icon: Settings,
   },
@@ -110,7 +110,7 @@ export function Sidebar() {
                   </div>
                   <div>
                     <h1 className="text-lg font-bold">K.S Salong</h1>
-                    <p className="text-xs text-purple-200">Management</p>
+                    <p className="text-xs text-purple-200">Administrasjon</p>
                   </div>
                 </div>
               </Link>
@@ -202,7 +202,7 @@ export function Sidebar() {
               onClick={() => logout()}
             >
               <LogOut className="h-5 w-5" />
-              {!isCollapsed && <span className="ml-3">Logout</span>}
+              {!isCollapsed && <span className="ml-3">Logg ut</span>}
             </Button>
           </div>
         </div>
