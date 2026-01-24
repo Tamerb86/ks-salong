@@ -30,8 +30,9 @@ export default function Tidsstempling() {
   
   const clockOutMutation = trpc.timeTracking.clockOut.useMutation({
     onSuccess: (data) => {
-      const hours = Math.floor((data.totalMinutes || 0) / 60);
-      const minutes = (data.totalMinutes || 0) % 60;
+      const totalMinutes = ('totalMinutes' in data && data.totalMinutes) ? data.totalMinutes : 0;
+      const hours = Math.floor(totalMinutes / 60);
+      const minutes = totalMinutes % 60;
       toast.success(`Du er nå stemplet ut. Arbeidstid: ${hours}t ${minutes}m`);
       setPin("");
       refetch();

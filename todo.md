@@ -331,3 +331,9 @@
 - [ ] Link all sales/orders to logged-in employee
 - [ ] Add employee productivity reports
 - [ ] Show total hours worked and sales per employee
+
+## TimeClock Page Bug Fixes
+- [x] Fix missing API endpoints (getDailyLogs, getCurrentStatus, updateEntry)
+- [x] Fix invalid mutation calls (clockIn/clockOut expecting undefined instead of object)
+- [x] Redirect TimeClock to Tidsstempling page (simplified solution)
+- [x] Fix TypeScript errors in Tidsstempling.tsx (totalMinutes possibly undefined)
