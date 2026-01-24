@@ -33,7 +33,7 @@ export default function Home() {
             <div className="animate-spin rounded-full h-20 w-20 border-4 border-white/20 border-t-white mx-auto"></div>
             <Sparkles className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-8 w-8 text-white animate-pulse" />
           </div>
-          <p className="text-white font-semibold text-lg">Loading K.S Salong...</p>
+          <p className="text-white font-semibold text-lg">Laster K.S Salong...</p>
         </div>
       </div>
     );
@@ -52,7 +52,7 @@ export default function Home() {
                 K.S Salong
               </CardTitle>
               <CardDescription className="text-lg mt-2">
-                Professional Salon Management System
+                Profesjonelt Salong Administrasjonssystem
               </CardDescription>
             </div>
           </CardHeader>
@@ -60,23 +60,23 @@ export default function Home() {
             <div className="grid grid-cols-2 gap-4 py-6">
               <div className="text-center p-4 bg-purple-50 rounded-xl">
                 <Calendar className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-                <p className="font-semibold text-purple-900">Appointments</p>
+                <p className="font-semibold text-purple-900">Avtaler</p>
                 <p className="text-sm text-purple-600">Smart Booking</p>
               </div>
               <div className="text-center p-4 bg-amber-50 rounded-xl">
                 <Users className="h-8 w-8 text-amber-600 mx-auto mb-2" />
-                <p className="font-semibold text-amber-900">Queue</p>
-                <p className="text-sm text-amber-600">Walk-in Management</p>
+                <p className="font-semibold text-amber-900">Kø</p>
+                <p className="text-sm text-amber-600">Walk-in Håndtering</p>
               </div>
               <div className="text-center p-4 bg-purple-50 rounded-xl">
                 <DollarSign className="h-8 w-8 text-purple-600 mx-auto mb-2" />
                 <p className="font-semibold text-purple-900">POS</p>
-                <p className="text-sm text-purple-600">Point of Sale</p>
+                <p className="text-sm text-purple-600">Salgssted</p>
               </div>
               <div className="text-center p-4 bg-amber-50 rounded-xl">
                 <BarChart3 className="h-8 w-8 text-amber-600 mx-auto mb-2" />
-                <p className="font-semibold text-amber-900">Analytics</p>
-                <p className="text-sm text-amber-600">Business Insights</p>
+                <p className="font-semibold text-amber-900">Analyse</p>
+                <p className="text-sm text-amber-600">Forretningsinnsikt</p>
               </div>
             </div>
 
@@ -85,13 +85,13 @@ export default function Home() {
                 size="lg"
                 className="w-full bg-gradient-to-r from-purple-600 to-amber-600 hover:from-purple-700 hover:to-amber-700 text-white font-semibold py-6 text-lg shadow-lg hover:shadow-xl transition-all"
               >
-                Sign In to Continue
+                Logg inn for å fortsette
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </a>
 
             <p className="text-center text-sm text-gray-500">
-              Secure authentication powered by Manus
+              Sikker autentisering drevet av Manus
             </p>
           </CardContent>
         </Card>
@@ -105,16 +105,16 @@ export default function Home() {
         {/* Welcome Section */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome back, {user.name?.split(" ")[0]}!
+            Velkommen tilbake, {user.name?.split(" ")[0]}!
           </h2>
-          <p className="text-gray-600">Here's what's happening at K.S Salong today</p>
+          <p className="text-gray-600">Her er hva som skjer på K.S Salong i dag</p>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-500 to-purple-600 text-white hover:shadow-xl transition-shadow">
             <CardHeader className="pb-3">
-              <CardDescription className="text-purple-100">Today's Appointments</CardDescription>
+              <CardDescription className="text-purple-100">Dagens avtaler</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex items-end justify-between">
@@ -122,8 +122,8 @@ export default function Home() {
                   <div className="text-4xl font-bold">{stats?.todayAppointments || 0}</div>
                   <p className="text-sm text-purple-100 mt-1">
                     {stats?.todayAppointments && stats.todayAppointments > 0
-                      ? `+${stats.todayAppointments} from yesterday`
-                      : "No change"}
+                      ? `+${stats.todayAppointments} fra i går`
+                      : "Ingen endring"}
                   </p>
                 </div>
                 <Calendar className="h-12 w-12 text-purple-200" />
@@ -133,14 +133,14 @@ export default function Home() {
 
           <Card className="border-0 shadow-lg bg-gradient-to-br from-amber-500 to-amber-600 text-white hover:shadow-xl transition-shadow">
             <CardHeader className="pb-3">
-              <CardDescription className="text-amber-100">Revenue Today</CardDescription>
+              <CardDescription className="text-amber-100">Inntekt i dag</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex items-end justify-between">
                 <div>
                   <div className="text-4xl font-bold">{stats?.todayRevenue || 0} kr</div>
                   <p className="text-sm text-amber-100 mt-1">
-                    {stats?.revenueChange ? `+${stats.revenueChange}% from yesterday` : "No change"}
+                    {stats?.revenueChange ? `+${stats.revenueChange}% fra i går` : "Ingen endring"}
                   </p>
                 </div>
                 <TrendingUp className="h-12 w-12 text-amber-200" />
@@ -150,13 +150,13 @@ export default function Home() {
 
           <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-500 to-blue-600 text-white hover:shadow-xl transition-shadow">
             <CardHeader className="pb-3">
-              <CardDescription className="text-blue-100">Queue Length</CardDescription>
+              <CardDescription className="text-blue-100">Kølengde</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex items-end justify-between">
                 <div>
                   <div className="text-4xl font-bold">{stats?.queueLength || 0}</div>
-                  <p className="text-sm text-blue-100 mt-1">Walk-in customers</p>
+                  <p className="text-sm text-blue-100 mt-1">Walk-in kunder</p>
                 </div>
                 <Users className="h-12 w-12 text-blue-200" />
               </div>
@@ -165,13 +165,13 @@ export default function Home() {
 
           <Card className="border-0 shadow-lg bg-gradient-to-br from-green-500 to-green-600 text-white hover:shadow-xl transition-shadow">
             <CardHeader className="pb-3">
-              <CardDescription className="text-green-100">Staff On Duty</CardDescription>
+              <CardDescription className="text-green-100">Personale på vakt</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex items-end justify-between">
                 <div>
                   <div className="text-4xl font-bold">{stats?.staffOnDuty || 0}</div>
-                  <p className="text-sm text-green-100 mt-1">All stations active</p>
+                  <p className="text-sm text-green-100 mt-1">Alle stasjoner aktive</p>
                 </div>
                 <UserCircle className="h-12 w-12 text-green-200" />
               </div>
@@ -181,7 +181,7 @@ export default function Home() {
 
         {/* Quick Actions */}
         <div>
-          <h3 className="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h3>
+          <h3 className="text-2xl font-bold text-gray-900 mb-6">Hurtighandlinger</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <Link href="/appointments">
               <Card className="border-2 border-transparent hover:border-purple-300 hover:shadow-xl transition-all cursor-pointer group bg-white">
@@ -191,8 +191,8 @@ export default function Home() {
                       <Calendar className="w-7 h-7 text-purple-600" />
                     </div>
                     <div>
-                      <CardTitle className="text-lg">Appointments</CardTitle>
-                      <CardDescription>View and manage bookings</CardDescription>
+                      <CardTitle className="text-lg">Avtaler</CardTitle>
+                      <CardDescription>Se og administrer bookinger</CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -207,8 +207,8 @@ export default function Home() {
                       <Users className="w-7 h-7 text-blue-600" />
                     </div>
                     <div>
-                      <CardTitle className="text-lg">Queue</CardTitle>
-                      <CardDescription>Manage walk-in customers</CardDescription>
+                      <CardTitle className="text-lg">Kø</CardTitle>
+                      <CardDescription>Administrer walk-in kunder</CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -224,7 +224,7 @@ export default function Home() {
                     </div>
                     <div>
                       <CardTitle className="text-lg">POS</CardTitle>
-                      <CardDescription>Process sales and payments</CardDescription>
+                      <CardDescription>Behandle salg og betalinger</CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -238,8 +238,8 @@ export default function Home() {
                     <UserCircle className="w-7 h-7 text-green-600" />
                   </div>
                   <div>
-                    <CardTitle className="text-lg">Customers</CardTitle>
-                    <CardDescription>Customer database and CRM</CardDescription>
+                    <CardTitle className="text-lg">Kunder</CardTitle>
+                    <CardDescription>Kundedatabase og CRM</CardDescription>
                   </div>
                 </div>
               </CardHeader>
@@ -252,8 +252,8 @@ export default function Home() {
                     <BarChart3 className="w-7 h-7 text-indigo-600" />
                   </div>
                   <div>
-                    <CardTitle className="text-lg">Reports</CardTitle>
-                    <CardDescription>Sales and analytics</CardDescription>
+                    <CardTitle className="text-lg">Rapporter</CardTitle>
+                    <CardDescription>Salg og analyse</CardDescription>
                   </div>
                 </div>
               </CardHeader>
@@ -267,8 +267,8 @@ export default function Home() {
                       <Clock className="w-7 h-7 text-pink-600" />
                     </div>
                     <div>
-                      <CardTitle className="text-lg">Time Clock</CardTitle>
-                      <CardDescription>Staff time tracking</CardDescription>
+                      <CardTitle className="text-lg">Tidsstempling</CardTitle>
+                      <CardDescription>Personale tidssporing</CardDescription>
                     </div>
                   </div>
                 </CardHeader>

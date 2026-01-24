@@ -199,3 +199,16 @@
 - [x] Add user profile section in sidebar
 - [x] Update all pages to use Sidebar layout
 - [x] Make sidebar responsive (collapsible on mobile)
+
+## Norwegian Translation
+- [x] Review all pages for English text
+- [x] Translate Home page to Norwegian
+- [ ] Translate Appointments page to Norwegian
+- [ ] Translate Queue page to Norwegian
+- [ ] Translate POS page to Norwegian
+- [ ] Translate TimeClock page to Norwegian
+- [ ] Translate Sidebar component to Norwegian
+- [ ] Translate all error messages to Norwegian
+- [ ] Translate all toast notifications to Norwegian
+- [ ] Translate all button labels to Norwegian
+- [ ] Translate all form labels to Norwegian
