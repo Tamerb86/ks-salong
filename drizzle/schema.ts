@@ -276,6 +276,7 @@ export const salonSettings = mysqlTable("salonSettings", {
   vippsMerchantSerialNumber: text("vippsMerchantSerialNumber"),
   vippsSubscriptionKey: text("vippsSubscriptionKey"),
   requirePaymentForBooking: boolean("requirePaymentForBooking").default(false).notNull(), // Require payment before confirming online booking
+  autoLogoutTime: varchar("autoLogoutTime", { length: 5 }).default("22:00"), // Automatic logout time (HH:MM format)
   stripeEnabled: boolean("stripeEnabled").default(false).notNull(),
   stripePublishableKey: text("stripePublishableKey"),
   stripeSecretKey: text("stripeSecretKey"),

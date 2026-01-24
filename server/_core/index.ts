@@ -59,6 +59,11 @@ async function startServer() {
 
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
+    
+    // Start auto-logout cron job
+    import("../cron/autoLogout").then((module) => {
+      module.startAutoLogoutCron();
+    }).catch(console.error);
   });
 }
 

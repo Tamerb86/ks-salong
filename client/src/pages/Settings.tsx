@@ -39,6 +39,7 @@ export default function Settings() {
     reminder2hEnabled: true,
     vippsEnabled: false,
     requirePaymentForBooking: false,
+    autoLogoutTime: "22:00",
   });
 
   useEffect(() => {
@@ -56,6 +57,7 @@ export default function Settings() {
         reminder2hEnabled: settings.reminder2hEnabled ?? true,
         vippsEnabled: settings.vippsEnabled ?? false,
         requirePaymentForBooking: settings.requirePaymentForBooking ?? false,
+        autoLogoutTime: settings.autoLogoutTime || "22:00",
       });
     }
   }, [settings]);
@@ -257,6 +259,33 @@ export default function Settings() {
                   </p>
                 </div>
               )}
+            </CardContent>
+          </Card>
+
+          {/* Time Tracking Settings */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Tidsstempling</CardTitle>
+              <CardDescription>
+                Konfigurer automatisk utlogging for ansatte
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="autoLogoutTime">Automatisk utlogging klokkeslett</Label>
+                <Input
+                  id="autoLogoutTime"
+                  type="time"
+                  value={formData.autoLogoutTime}
+                  onChange={(e) =>
+                    setFormData({ ...formData, autoLogoutTime: e.target.value })
+                  }
+                  className="max-w-xs"
+                />
+                <p className="text-sm text-gray-500">
+                  Alle innloggede ansatte vil automatisk logges ut på dette tidspunktet (standard 22:00)
+                </p>
+              </div>
             </CardContent>
           </Card>
 

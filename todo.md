@@ -375,3 +375,10 @@
 - [x] Update orders table to include employeeId field (uses existing staffId)
 - [x] Show employee name in transaction history
 - [ ] Add employee performance metrics (sales per employee)
+
+## Automatic Logout Feature
+- [x] Add autoLogoutTime field to salonSettings table
+- [x] Create cron job to check and logout employees at configured time
+- [x] Add UI in Settings page to configure auto-logout time (default 22:00)
+- [x] Test automatic logout functionality
+- [ ] Add notification when employee is auto-logged out (optional enhancement)

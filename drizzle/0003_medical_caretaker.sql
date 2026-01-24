@@ -1,0 +1,1 @@
+ALTER TABLE `salonSettings` ADD `autoLogoutTime` varchar(5) DEFAULT '22:00';

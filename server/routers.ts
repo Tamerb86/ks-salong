@@ -497,6 +497,7 @@ export const appRouter = router({
         reminder2hEnabled: z.boolean().optional(),
         vippsEnabled: z.boolean().optional(),
         requirePaymentForBooking: z.boolean().optional(),
+        autoLogoutTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/).optional(), // HH:MM format
       }))
       .mutation(async ({ input }) => {
         await db.updateSalonSettings(input);
