@@ -29,11 +29,8 @@ interface CartItem {
 export default function POS() {
   const { user, loading: authLoading } = useAuth();
   
-  // Employee login state
-  const [loggedInEmployee, setLoggedInEmployee] = useState<any>(null);
-  const [isPinLoginOpen, setIsPinLoginOpen] = useState(true);
-  const [pinInput, setPinInput] = useState("");
-  const [showEmployeeSelect, setShowEmployeeSelect] = useState(false);
+  // Employee state - default to current logged-in user
+  const [activeEmployee, setActiveEmployee] = useState<any>(user);
   const [isSwitchEmployeeOpen, setIsSwitchEmployeeOpen] = useState(false);
   
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -72,36 +69,16 @@ export default function POS() {
     },
   });
   
-  const pinLoginMutation = trpc.timeTracking.clockIn.useMutation({
-    onSuccess: (data) => {
-      setLoggedInEmployee(data.employee);
-      setIsPinLoginOpen(false);
-      setShowEmployeeSelect(false);
-      setPinInput("");
-      toast.success(`Velkommen, ${data.employee.name}!`);
-    },
-    onError: () => {
-      toast.error("Ugyldig PIN");
-      setPinInput("");
-      setShowEmployeeSelect(false);
-    },
-  });
-  
-  const handlePinSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (pinInput.length >= 4) {
-      setShowEmployeeSelect(true);
-    }
-  };
-  
-  const handleEmployeeSelect = (employeeId: number) => {
-    pinLoginMutation.mutate({ pin: pinInput, employeeId });
+  const handleEmployeeSwitch = (employee: any) => {
+    setActiveEmployee(employee);
+    setIsSwitchEmployeeOpen(false);
+    toast.success(`Byttet til ${employee.name}`);
   };
   
   const handleSwitchEmployee = (employeeId: number) => {
     const employee = activeEmployees.find((e: any) => e.id === employeeId);
     if (employee) {
-      setLoggedInEmployee(employee);
+      setActiveEmployee(employee);
       setIsSwitchEmployeeOpen(false);
       toast.success(`Byttet til ${employee.name}`);
     }
@@ -192,8 +169,8 @@ export default function POS() {
       discountAmount: calculateDiscount() > 0 ? calculateDiscount().toString() : undefined,
       tipAmount: tip > 0 ? tip.toString() : undefined,
       total: calculateTotal().toString(),
-      employeeId: loggedInEmployee?.id,
-      employeeName: loggedInEmployee?.name,
+      employeeId: activeEmployee?.id,
+      employeeName: activeEmployee?.name,
     });
   };
 
@@ -222,86 +199,7 @@ export default function POS() {
     );
   }
 
-  // PIN Login Dialog
-  if (isPinLoginOpen) {
-    return (
-      <Layout>
-        <div className="flex items-center justify-center min-h-[80vh]">
-          <Card className="w-96">
-            <CardHeader>
-              <CardTitle className="text-center">Logg inn med PIN</CardTitle>
-              <CardDescription className="text-center">
-                Skriv inn din PIN-kode for å få tilgang til POS
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {!showEmployeeSelect ? (
-                <form onSubmit={handlePinSubmit} className="space-y-4">
-                  <div>
-                    <Input
-                      type="password"
-                      inputMode="numeric"
-                      maxLength={6}
-                      value={pinInput}
-                      onChange={(e) => {
-                        const value = e.target.value.replace(/\D/g, '');
-                        setPinInput(value);
-                      }}
-                      placeholder="Skriv inn PIN"
-                      className="text-center text-2xl tracking-widest"
-                      autoFocus
-                    />
-                  </div>
-                  <Button
-                    type="submit"
-                    className="w-full bg-gradient-to-r from-purple-600 to-amber-600 hover:from-purple-700 hover:to-amber-700"
-                    disabled={pinInput.length < 4}
-                  >
-                    Neste
-                  </Button>
-                </form>
-              ) : (
-                <div className="space-y-4">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setShowEmployeeSelect(false);
-                      setPinInput("");
-                    }}
-                    className="mb-4"
-                  >
-                    Tilbake
-                  </Button>
-                  <div className="grid grid-cols-1 gap-3 max-h-96 overflow-y-auto">
-                    {activeEmployees.map((employee: any) => (
-                      <Button
-                        key={employee.id}
-                        variant="outline"
-                        className="h-20 text-left justify-start hover:bg-purple-50 hover:border-purple-300"
-                        onClick={() => handleEmployeeSelect(employee.id)}
-                        disabled={pinLoginMutation.isPending}
-                      >
-                        <div className="flex items-center gap-3 w-full">
-                          <div className="h-12 w-12 rounded-full bg-gradient-to-br from-purple-400 to-amber-400 flex items-center justify-center text-white font-bold text-lg">
-                            {employee.name?.charAt(0) || "?"}
-                          </div>
-                          <div className="flex-1">
-                            <p className="font-semibold text-base">{employee.name}</p>
-                            <p className="text-sm text-gray-500 capitalize">{employee.role}</p>
-                          </div>
-                        </div>
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </Layout>
-    );
-  }
+  // Direct access - no PIN required
   
   return (
     <Layout>
@@ -316,7 +214,7 @@ export default function POS() {
           <div className="flex items-center gap-4">
             <div className="text-right">
               <p className="text-sm text-gray-600">Innlogget som</p>
-              <p className="font-semibold text-purple-600">{loggedInEmployee?.name}</p>
+              <p className="font-semibold text-purple-600">{activeEmployee?.name}</p>
             </div>
             <Button
               variant="outline"
@@ -329,11 +227,7 @@ export default function POS() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => {
-                setIsPinLoginOpen(true);
-                setLoggedInEmployee(null);
-                setPinInput("");
-              }}
+              onClick={() => setIsSwitchEmployeeOpen(true)}
               className="border-red-300 text-red-600 hover:bg-red-50"
             >
               Logg ut
@@ -790,7 +684,7 @@ export default function POS() {
                     <p className="font-semibold text-base">{employee.name}</p>
                     <p className="text-sm text-gray-500 capitalize">{employee.role}</p>
                   </div>
-                  {loggedInEmployee?.id === employee.id && (
+                  {activeEmployee?.id === employee.id && (
                     <Badge variant="default" className="bg-purple-600">Aktiv</Badge>
                   )}
                 </div>

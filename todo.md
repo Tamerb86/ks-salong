@@ -450,3 +450,11 @@
 - [x] Verify PIN validation logic in server
 - [x] Test PIN entry in Tidsstempling page
 - [x] Ensure Settings page can update universal PIN
+
+## Simplify POS Access
+- [x] Remove PIN login requirement from POS
+- [x] Allow direct access for logged-in admin users
+- [x] Add employee switcher button inside POS page
+- [x] Show current active employee in POS header
+- [x] Keep employee tracking for sales attribution
+- [x] Test POS access flow
