@@ -172,6 +172,23 @@ export const appRouter = router({
         await db.updateProduct(id, data);
         return { success: true };
       }),
+    
+    delete: adminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteProduct(input.id);
+        return { success: true };
+      }),
+    
+    updateStock: adminProcedure
+      .input(z.object({
+        id: z.number(),
+        stock: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        await db.updateProduct(input.id, { stock: input.stock });
+        return { success: true };
+      }),
   }),
 
   appointments: router({

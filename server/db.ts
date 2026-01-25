@@ -213,6 +213,12 @@ export async function updateProductStock(id: number, quantity: number) {
     .where(eq(products.id, id));
 }
 
+export async function deleteProduct(id: number) {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(products).set({ isActive: false }).where(eq(products.id, id));
+}
+
 /**
  * ============================================
  * APPOINTMENTS

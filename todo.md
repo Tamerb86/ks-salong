@@ -494,3 +494,34 @@
 - [x] Add TV button to Queue page header
 - [x] Open QueueTV page in new window when clicked
 - [x] Test TV button functionality
+
+## Products Management Page
+- [ ] Create Products page (Produkter) with list view
+- [ ] Add search and filter functionality
+- [ ] Implement add product dialog (name, SKU, price, quantity, image)
+- [ ] Implement edit product functionality
+- [ ] Implement delete product with confirmation
+- [ ] Add inventory management (increase/decrease quantity buttons)
+- [ ] Add product image upload to S3
+- [ ] Add Products link to Sidebar navigation
+- [ ] Add real-time visual indicators (Live badge, loading states)
+- [ ] Write vitest tests for product CRUD operations
+- [ ] Test all product management features
+
+## Products Management Page
+- [x] Analyze products schema in database
+- [x] Create Products page component
+- [x] Add products list view with cards
+- [x] Add search and filter functionality
+- [x] Create add product dialog with form
+- [x] Add form validation for product fields
+- [x] Implement create product mutation
+- [x] Implement edit product dialog
+- [x] Implement update product mutation
+- [x] Implement delete product with confirmation
+- [x] Add inventory management (increase/decrease quantity)
+- [x] Add stock status indicators (På lager/Lavt lager)
+- [x] Add Products link to Sidebar navigation
+- [x] Add Products route to App.tsx
+- [x] Test all product management features
+- [ ] Write vitest tests for product CRUD operations

@@ -16,6 +16,7 @@ import {
   UserCircle,
   ChevronLeft,
   Menu,
+  Package,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
@@ -72,6 +73,11 @@ const navItems: NavItem[] = [
     title: "Tjenester",
     href: "/services",
     icon: Scissors,
+  },
+  {
+    title: "Produkter",
+    href: "/products",
+    icon: Package,
   },
   {
     title: "Innstillinger",
