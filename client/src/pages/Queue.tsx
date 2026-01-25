@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import { format } from "date-fns";
-import { Clock, Plus, User, X, Check, ArrowUp, ArrowDown, Calendar } from "lucide-react";
+import { Clock, Plus, User, X, Check, ArrowUp, ArrowDown, Calendar, Tv } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -154,13 +154,22 @@ export default function Queue() {
             </div>
             <p className="text-gray-600 mt-1">Administrer walk-in kunder</p>
           </div>
-          <Dialog open={isAddCustomerOpen} onOpenChange={setIsAddCustomerOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-gradient-to-r from-purple-600 to-amber-600 hover:from-purple-700 hover:to-amber-700">
-                <Plus className="h-4 w-4 mr-2" />
-                Legg til i kø
-              </Button>
-            </DialogTrigger>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => window.open('/queue-tv', '_blank')}
+              variant="outline"
+              className="border-purple-300 text-purple-700 hover:bg-purple-50"
+            >
+              <Tv className="h-4 w-4 mr-2" />
+              TV-visning
+            </Button>
+            <Dialog open={isAddCustomerOpen} onOpenChange={setIsAddCustomerOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-gradient-to-r from-purple-600 to-amber-600 hover:from-purple-700 hover:to-amber-700">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Legg til i kø
+                </Button>
+              </DialogTrigger>
             <DialogContent className="sm:max-w-[500px]">
               <form onSubmit={handleAddToQueue}>
                 <DialogHeader>
@@ -225,6 +234,7 @@ export default function Queue() {
               </form>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
 
         {/* Queue Stats */}

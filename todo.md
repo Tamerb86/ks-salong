@@ -489,3 +489,8 @@
 - [x] Add loading states to Staff page
 - [x] Add loading states to Customers page
 - [x] Test all visual indicators
+
+## Add TV Button to Queue Page
+- [x] Add TV button to Queue page header
+- [x] Open QueueTV page in new window when clicked
+- [x] Test TV button functionality
