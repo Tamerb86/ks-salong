@@ -31,7 +31,7 @@ export default function Landing() {
         <div 
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: 'url(/images/salon-hero.png)',
+            backgroundImage: 'url(/images/salon-work.png)',
             filter: 'brightness(0.6)'
           }}
         />
@@ -139,7 +139,7 @@ export default function Landing() {
             </div>
             <div className="relative">
               <img 
-                src="/images/salon-interior.jpeg" 
+                src="/images/champion-2022.png" 
                 alt="K.S Frisør Interior" 
                 className="rounded-lg shadow-2xl"
               />
@@ -220,13 +220,13 @@ export default function Landing() {
 
           <div className="grid md:grid-cols-3 gap-6">
             <div className="relative h-64 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition">
-              <img src="/images/salon-hero.png" alt="Salon" className="w-full h-full object-cover" />
+              <img src="/images/salon-work.png" alt="Salon" className="w-full h-full object-cover" />
             </div>
             <div className="relative h-64 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition">
-              <img src="/images/barber-work.webp" alt="Barber at work" className="w-full h-full object-cover" />
+              <img src="/images/salon-gallery-1.jpeg" alt="Customer at salon" className="w-full h-full object-cover" />
             </div>
             <div className="relative h-64 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition">
-              <img src="/images/salon-interior.jpeg" alt="Interior" className="w-full h-full object-cover" />
+              <img src="/images/champion-2022.png" alt="Interior" className="w-full h-full object-cover" />
             </div>
           </div>
         </div>

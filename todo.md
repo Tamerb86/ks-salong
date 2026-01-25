@@ -824,3 +824,17 @@
 - [ ] Replace placeholder images with real salon photos from owner
 - [ ] Add SEO meta tags (title, description, keywords)
 - [ ] Test booking flow from landing page to completion
+
+## Replace Placeholder Images with Real Salon Photos
+- [x] Search K.S Frisør Facebook page for real salon photos
+- [x] Search K.S Frisør Instagram for real salon photos
+- [x] Download high-quality interior photos (salon-work.png, salon-gallery-1.jpeg)
+- [x] Download photos showing salon work/services
+- [x] Download champion photo (champion-2022.png - Norgesmester 2022)
+- [x] Replace hero background image (salon-work.png)
+- [x] Replace gallery images (3 real photos)
+- [x] Replace about section image (champion-2022.png)
+- [x] Update image alt texts for SEO
+- [x] Test image loading and responsiveness
+- [x] Test booking flow from landing page (works correctly)
+- [x] Verify all "Bestill time" buttons navigate to /book-online
