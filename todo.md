@@ -1218,3 +1218,11 @@
 - [x] Fix TypeScript errors for staffLeaves functions in routers.ts (LSP cache issue - code is correct, tsc passes)
 - [x] Add "Add Employee" button in Staff page
 - [x] Change all error messages to Norwegian in permissions system
+
+## Add Barcode Scanner Feature
+- [x] Add barcode/SKU field to products table in database (already exists)
+- [x] Update product creation/edit forms to include barcode field
+- [x] Create BarcodeScanner component with camera support
+- [x] Integrate scanner in POS page for quick product lookup
+- [x] Add manual barcode input option as fallback
+- [x] Test barcode scanning with different formats (EAN-13, UPC, Code128)

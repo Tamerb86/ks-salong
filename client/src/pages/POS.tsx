@@ -9,12 +9,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
 import { format } from "date-fns";
-import { DollarSign, Minus, Plus, Printer, Search, ShoppingCart, Trash2, X } from "lucide-react";
+import { DollarSign, Minus, Plus, Printer, Search, ShoppingCart, Trash2, X, Scan } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import "@/styles/print-receipt.css";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { BarcodeScanner } from "@/components/BarcodeScanner";
 
 interface CartItem {
   type: "service" | "product";
@@ -44,6 +45,7 @@ export default function POS() {
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "card" | "vipps" | "stripe">("cash");
   const [isReceiptOpen, setIsReceiptOpen] = useState(false);
   const [lastReceipt, setLastReceipt] = useState<any>(null);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
 
   // Fetch data
   const { data: services = [] } = trpc.services.list.useQuery(undefined, { enabled: !authLoading });
@@ -115,6 +117,25 @@ export default function POS() {
     newCart.splice(index, 1);
     setCart(newCart);
     toast.success("Fjernet fra handlekurv");
+  };
+
+  const handleBarcodeScan = (barcode: string) => {
+    // Search for product by SKU
+    const product = products.find((p: any) => p.sku === barcode);
+    
+    if (product) {
+      addToCart({
+        type: "product",
+        id: product.id,
+        name: product.name,
+        price: parseFloat(product.price),
+        cost: product.cost ? parseFloat(product.cost) : 0,
+        quantity: 1,
+      });
+      toast.success(`${product.name} lagt til i handlekurv`);
+    } else {
+      toast.error(`Produkt med strekkode ${barcode} ikke funnet`);
+    }
   };
 
   const calculateSubtotal = () => {
@@ -359,6 +380,18 @@ export default function POS() {
                   </TabsContent>
 
                   <TabsContent value="products" className="mt-4">
+                    {/* Barcode Scanner Button */}
+                    <div className="mb-4">
+                      <Button
+                        onClick={() => setIsScannerOpen(true)}
+                        className="w-full bg-gradient-to-r from-purple-600 to-amber-600 hover:from-purple-700 hover:to-amber-700"
+                        size="lg"
+                      >
+                        <Scan className="h-5 w-5 mr-2" />
+                        Skann strekkode
+                      </Button>
+                    </div>
+
                     <ScrollArea className="h-[400px]">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {products.map((product: any) => (
@@ -721,6 +754,15 @@ export default function POS() {
         </DialogContent>
       </Dialog>
       </div>
+
+      {/* Barcode Scanner Dialog */}
+      <BarcodeScanner
+        isOpen={isScannerOpen}
+        onClose={() => setIsScannerOpen(false)}
+        onScan={handleBarcodeScan}
+        title="Skann produktstrekkode"
+        description="Skann produktets strekkode for å legge det til i handlekurven"
+      />
     </Layout>
   );
 }

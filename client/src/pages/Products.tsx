@@ -28,12 +28,14 @@ import {
   Minus,
   ShoppingBag,
   AlertTriangle,
+  Scan,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { LiveBadge } from "@/components/ui/live-badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { BarcodeScanner } from "@/components/BarcodeScanner";
 
 export default function Products() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -41,6 +43,7 @@ export default function Products() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -229,12 +232,24 @@ export default function Products() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="sku">SKU</Label>
-                        <Input
-                          id="sku"
-                          value={formData.sku}
-                          onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-                        />
+                        <Label htmlFor="sku">SKU / Strekkode</Label>
+                        <div className="flex gap-2">
+                          <Input
+                            id="sku"
+                            value={formData.sku}
+                            onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                            placeholder="Skriv inn eller skann"
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => setIsScannerOpen(true)}
+                            title="Skann strekkode"
+                          >
+                            <Scan className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
                     </div>
                     <div className="space-y-2">
@@ -516,12 +531,24 @@ export default function Products() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit-sku">SKU</Label>
-                  <Input
-                    id="edit-sku"
-                    value={formData.sku}
-                    onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-                  />
+                  <Label htmlFor="edit-sku">SKU / Strekkode</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="edit-sku"
+                      value={formData.sku}
+                      onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                      placeholder="Skriv inn eller skann"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setIsScannerOpen(true)}
+                      title="Skann strekkode"
+                    >
+                      <Scan className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
               <div className="space-y-2">
@@ -620,6 +647,18 @@ export default function Products() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Barcode Scanner Dialog */}
+      <BarcodeScanner
+        isOpen={isScannerOpen}
+        onClose={() => setIsScannerOpen(false)}
+        onScan={(barcode) => {
+          setFormData({ ...formData, sku: barcode });
+          toast.success(`Strekkode skannet: ${barcode}`);
+        }}
+        title="Skann produktstrekkode"
+        description="Skann produktets strekkode for å legge den til i SKU-feltet"
+      />
     </Layout>
   );
 }
