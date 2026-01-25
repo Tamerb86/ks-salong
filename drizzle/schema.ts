@@ -213,6 +213,19 @@ export const timeEntries = mysqlTable("timeEntries", {
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
+export const staffLeaves = mysqlTable("staffLeaves", {
+  id: int("id").autoincrement().primaryKey(),
+  staffId: int("staffId").notNull(),
+  leaveType: mysqlEnum("leaveType", ["vacation", "sick", "personal", "other"]).notNull(),
+  startDate: date("startDate").notNull(), // Date only (YYYY-MM-DD)
+  endDate: date("endDate").notNull(), // Date only (YYYY-MM-DD)
+  reason: text("reason"),
+  status: mysqlEnum("status", ["pending", "approved", "rejected"]).default("approved").notNull(),
+  createdBy: int("createdBy").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
 export const auditLogs = mysqlTable("auditLogs", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("userId").notNull(),

@@ -1139,3 +1139,9 @@
 - [ ] Update backend API to handle break time updates
 - [ ] Update BookOnline to filter out break times from available slots
 - [ ] Test break time functionality with different scenarios
+
+## Add Employee Leave Management System
+- [x] Create staffLeaves table in database schema
+- [x] Add leave management UI in Staff page (view, add, edit, delete leaves)
+- [x] Update BookOnline to check leave dates and hide staff on leave
+- [x] Test leave functionality with different date ranges

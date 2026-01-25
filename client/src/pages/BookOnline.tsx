@@ -55,6 +55,24 @@ export default function BookOnline() {
     { date: selectedDate || new Date() },
     { enabled: !!selectedDate }
   );
+  
+  // Get all staff leaves to filter out staff on leave
+  const { data: allLeaves } = trpc.staff.listLeaves.useQuery({});
+  
+  // Filter staff who are on leave for the selected date
+  const getAvailableStaff = () => {
+    if (!staff || !selectedDate) return staff;
+    
+    const dateStr = format(selectedDate, "yyyy-MM-dd");
+    const staffOnLeave = allLeaves?.filter((leave: any) => {
+      const leaveStart = new Date(leave.startDate);
+      const leaveEnd = new Date(leave.endDate);
+      const checkDate = new Date(dateStr);
+      return leave.status === "approved" && checkDate >= leaveStart && checkDate <= leaveEnd;
+    }).map((leave: any) => leave.staffId) || [];
+    
+    return staff.filter((s: any) => !staffOnLeave.includes(s.id));
+  };
 
   const createBookingMutation = trpc.appointments.createWithPayment.useMutation({
     onSuccess: (data) => {
@@ -343,7 +361,7 @@ export default function BookOnline() {
             </Button>
             <h2 className="text-3xl font-bold text-center mb-8">Velg frisør</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {staff?.filter((s: any) => s.role === "barber" && s.isActive).map((member: any) => (
+              {getAvailableStaff()?.filter((s: any) => s.role === "barber" && s.isActive).map((member: any) => (
                 <Card
                   key={member.id}
                   className="hover:shadow-xl transition-all cursor-pointer border-2 hover:border-purple-300"

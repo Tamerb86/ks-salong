@@ -83,6 +83,58 @@ export const appRouter = router({
         await db.deleteUser(input.id);
         return { success: true };
       }),
+    
+    // Leave management
+    listLeaves: protectedProcedure
+      .input(z.object({ staffId: z.number().optional() }))
+      .query(async ({ input }) => {
+        return await db.getStaffLeaves(input.staffId);
+      }),
+    
+    createLeave: adminProcedure
+      .input(z.object({
+        staffId: z.number(),
+        leaveType: z.enum(["vacation", "sick", "personal", "other"]),
+        startDate: z.string(), // YYYY-MM-DD
+        endDate: z.string(), // YYYY-MM-DD
+        reason: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        await db.createStaffLeave({
+          staffId: input.staffId,
+          leaveType: input.leaveType,
+          startDate: new Date(input.startDate),
+          endDate: new Date(input.endDate),
+          reason: input.reason,
+          createdBy: ctx.user!.id,
+        });
+        return { success: true };
+      }),
+    
+    updateLeave: adminProcedure
+      .input(z.object({
+        id: z.number(),
+        leaveType: z.enum(["vacation", "sick", "personal", "other"]).optional(),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+        reason: z.string().optional(),
+        status: z.enum(["pending", "approved", "rejected"]).optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { id, startDate, endDate, ...rest } = input;
+        const updateData: any = { ...rest };
+        if (startDate) updateData.startDate = new Date(startDate);
+        if (endDate) updateData.endDate = new Date(endDate);
+        await db.updateStaffLeave(id, updateData);
+        return { success: true };
+      }),
+    
+    deleteLeave: adminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteStaffLeave(input.id);
+        return { success: true };
+      }),
   }),
 
   services: router({

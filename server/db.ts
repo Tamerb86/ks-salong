@@ -5,7 +5,7 @@ import {
   appointments, dropInQueue, payments, orders, orderItems, timeEntries,
   customers, salonSettings, businessHours, holidays, notificationTemplates,
   dailyReports, auditLogs, terminalReaders, fikenSyncLogs, dashboardAccessLogs,
-  customerNotes, customerTags
+  customerNotes, customerTags, staffLeaves
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -1511,3 +1511,57 @@ export async function deleteCustomerData(customerId: number) {
     return { success: false, error: String(error) };
   }
 }
+
+/**
+ * ============================================
+ * STAFF LEAVE MANAGEMENT
+ * ============================================
+ */
+
+export async function getStaffLeaves(staffId?: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  if (staffId) {
+    return await db.select().from(staffLeaves)
+      .where(eq(staffLeaves.staffId, staffId))
+      .orderBy(desc(staffLeaves.startDate));
+  }
+  
+  return await db.select().from(staffLeaves)
+    .orderBy(desc(staffLeaves.startDate));
+}
+
+export async function createStaffLeave(data: typeof staffLeaves.$inferInsert) {
+  const db = await getDb();
+  if (!db) return;
+  const result = await db.insert(staffLeaves).values(data);
+  return Number(result[0].insertId);
+}
+
+export async function updateStaffLeave(id: number, data: Partial<typeof staffLeaves.$inferInsert>) {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(staffLeaves).set(data).where(eq(staffLeaves.id, id));
+}
+
+export async function deleteStaffLeave(id: number) {
+  const db = await getDb();
+  if (!db) return;
+  await db.delete(staffLeaves).where(eq(staffLeaves.id, id));
+}
+
+export async function getStaffLeavesForDate(staffId: number, date: Date) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  // Check if the given date falls within any leave period
+  return await db.select().from(staffLeaves)
+    .where(and(
+      eq(staffLeaves.staffId, staffId),
+      eq(staffLeaves.status, "approved"),
+      lte(staffLeaves.startDate, date),
+      gte(staffLeaves.endDate, date)
+    ));
+}
+

@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
-import { Key, Loader2, Users, Pencil, Trash2 } from "lucide-react";
+import { Key, Loader2, Users, Pencil, Trash2, Calendar } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Layout } from "@/components/Layout";
@@ -47,6 +47,17 @@ export default function Staff() {
     breakStartTime: "",
     breakEndTime: "",
   });
+  
+  // Leave management
+  const [isLeavesDialogOpen, setIsLeavesDialogOpen] = useState(false);
+  const [selectedStaffForLeaves, setSelectedStaffForLeaves] = useState<any>(null);
+  const [isAddLeaveDialogOpen, setIsAddLeaveDialogOpen] = useState(false);
+  const [leaveFormData, setLeaveFormData] = useState({
+    leaveType: "vacation" as "vacation" | "sick" | "personal" | "other",
+    startDate: "",
+    endDate: "",
+    reason: "",
+  });
 
   const updatePinMutation = trpc.staff.update.useMutation({
     onSuccess: () => {
@@ -74,6 +85,32 @@ export default function Staff() {
   const deleteStaffMutation = trpc.staff.delete.useMutation({
     onSuccess: () => {
       toast.success("Ansatt slettet!");
+    },
+    onError: (error) => {
+      toast.error("Feil ved sletting: " + error.message);
+    },
+  });
+  
+  // Leave management mutations
+  const createLeaveMutation = trpc.staff.createLeave.useMutation({
+    onSuccess: () => {
+      toast.success("Ferie registrert!");
+      setIsAddLeaveDialogOpen(false);
+      setLeaveFormData({
+        leaveType: "vacation",
+        startDate: "",
+        endDate: "",
+        reason: "",
+      });
+    },
+    onError: (error) => {
+      toast.error("Feil ved registrering: " + error.message);
+    },
+  });
+  
+  const deleteLeaveMutation = trpc.staff.deleteLeave.useMutation({
+    onSuccess: () => {
+      toast.success("Ferie slettet!");
     },
     onError: (error) => {
       toast.error("Feil ved sletting: " + error.message);
@@ -125,6 +162,29 @@ export default function Staff() {
       id: editingStaff.id,
       ...editFormData,
     });
+  };
+  
+  const handleOpenLeavesDialog = (staffMember: any) => {
+    setSelectedStaffForLeaves(staffMember);
+    setIsLeavesDialogOpen(true);
+  };
+  
+  const handleAddLeave = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!leaveFormData.startDate || !leaveFormData.endDate) {
+      toast.error("Start- og sluttdato er påkrevd");
+      return;
+    }
+    createLeaveMutation.mutate({
+      staffId: selectedStaffForLeaves.id,
+      ...leaveFormData,
+    });
+  };
+  
+  const handleDeleteLeave = (leaveId: number) => {
+    if (confirm("Er du sikker på at du vil slette denne ferien?")) {
+      deleteLeaveMutation.mutate({ id: leaveId });
+    }
   };
   
   const handleDelete = (staffMember: any) => {
@@ -183,6 +243,15 @@ export default function Staff() {
                       >
                         <Key className="h-4 w-4 mr-1" />
                         PIN
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleOpenLeavesDialog(member)}
+                        className="border-green-300 text-green-600 hover:bg-green-50"
+                        title="Administrer feriedager"
+                      >
+                        <Calendar className="h-4 w-4" />
                       </Button>
                       <Button
                         size="sm"
@@ -516,7 +585,196 @@ export default function Staff() {
             </form>
           </DialogContent>
         </Dialog>
+        
+        {/* Leaves Management Dialog */}
+        <Dialog open={isLeavesDialogOpen} onOpenChange={setIsLeavesDialogOpen}>
+          <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-green-600" />
+                Feriedager for {selectedStaffForLeaves?.name}
+              </DialogTitle>
+              <DialogDescription>
+                Administrer feriedager, sykemelding og andre fraværsperioder
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4 py-4">
+              <Button
+                onClick={() => setIsAddLeaveDialogOpen(true)}
+                className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700"
+              >
+                <Calendar className="h-4 w-4 mr-2" />
+                Legg til ny ferie
+              </Button>
+              
+              <div className="space-y-2">
+                <LeavesList 
+                  staffId={selectedStaffForLeaves?.id} 
+                  onDelete={handleDeleteLeave}
+                />
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+        
+        {/* Add Leave Dialog */}
+        <Dialog open={isAddLeaveDialogOpen} onOpenChange={setIsAddLeaveDialogOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            <form onSubmit={handleAddLeave}>
+              <DialogHeader>
+                <DialogTitle>Registrer ny ferie</DialogTitle>
+                <DialogDescription>
+                  Legg til en ny ferieperiode for {selectedStaffForLeaves?.name}
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="leave-type">Type</Label>
+                  <select
+                    id="leave-type"
+                    value={leaveFormData.leaveType}
+                    onChange={(e) => setLeaveFormData({ ...leaveFormData, leaveType: e.target.value as any })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    <option value="vacation">Ferie</option>
+                    <option value="sick">Sykmelding</option>
+                    <option value="personal">Personlig</option>
+                    <option value="other">Annet</option>
+                  </select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="start-date">Startdato</Label>
+                  <Input
+                    id="start-date"
+                    type="date"
+                    value={leaveFormData.startDate}
+                    onChange={(e) => setLeaveFormData({ ...leaveFormData, startDate: e.target.value })}
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="end-date">Sluttdato</Label>
+                  <Input
+                    id="end-date"
+                    type="date"
+                    value={leaveFormData.endDate}
+                    onChange={(e) => setLeaveFormData({ ...leaveFormData, endDate: e.target.value })}
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="reason">Årsak (valgfritt)</Label>
+                  <Input
+                    id="reason"
+                    type="text"
+                    value={leaveFormData.reason}
+                    onChange={(e) => setLeaveFormData({ ...leaveFormData, reason: e.target.value })}
+                    placeholder="F.eks. Sommerferie"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex gap-3 justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsAddLeaveDialogOpen(false)}
+                >
+                  Avbryt
+                </Button>
+                <Button
+                  type="submit"
+                  className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700"
+                  disabled={createLeaveMutation.isPending}
+                >
+                  {createLeaveMutation.isPending && (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  )}
+                  Registrer ferie
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     </Layout>
+  );
+}
+
+// LeavesList component to display staff leaves
+function LeavesList({ staffId, onDelete }: { staffId?: number; onDelete: (id: number) => void }) {
+  const { data: leaves, isLoading } = trpc.staff.listLeaves.useQuery(
+    { staffId },
+    { enabled: !!staffId }
+  );
+  
+  if (isLoading) {
+    return <div className="text-center py-4"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></div>;
+  }
+  
+  if (!leaves || leaves.length === 0) {
+    return (
+      <div className="text-center py-8 text-gray-500">
+        <Calendar className="h-12 w-12 mx-auto mb-2 opacity-50" />
+        <p>Ingen feriedager registrert</p>
+      </div>
+    );
+  }
+  
+  const getLeaveTypeLabel = (type: string) => {
+    switch (type) {
+      case "vacation": return "Ferie";
+      case "sick": return "Sykmelding";
+      case "personal": return "Personlig";
+      case "other": return "Annet";
+      default: return type;
+    }
+  };
+  
+  const getLeaveTypeColor = (type: string) => {
+    switch (type) {
+      case "vacation": return "bg-green-100 text-green-800";
+      case "sick": return "bg-red-100 text-red-800";
+      case "personal": return "bg-blue-100 text-blue-800";
+      case "other": return "bg-gray-100 text-gray-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
+  
+  return (
+    <div className="space-y-2">
+      {leaves.map((leave: any) => (
+        <Card key={leave.id} className="p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getLeaveTypeColor(leave.leaveType)}`}>
+                  {getLeaveTypeLabel(leave.leaveType)}
+                </span>
+              </div>
+              <p className="text-sm font-medium">
+                {new Date(leave.startDate).toLocaleDateString("no-NO")} - {new Date(leave.endDate).toLocaleDateString("no-NO")}
+              </p>
+              {leave.reason && (
+                <p className="text-xs text-gray-600 mt-1">{leave.reason}</p>
+              )}
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => onDelete(leave.id)}
+              className="border-red-300 text-red-600 hover:bg-red-50"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        </Card>
+      ))}
+    </div>
   );
 }
