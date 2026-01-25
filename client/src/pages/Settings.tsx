@@ -78,6 +78,7 @@ export default function Settings() {
     requirePaymentForBooking: false,
     autoLogoutTime: "22:00",
     universalPin: "1234",
+    customBookingUrl: "",
   });
 
   // Google Calendar settings
@@ -105,6 +106,7 @@ export default function Settings() {
         requirePaymentForBooking: settings.requirePaymentForBooking ?? false,
         autoLogoutTime: settings.autoLogoutTime || "22:00",
         universalPin: settings.universalPin || "1234",
+        customBookingUrl: settings.customBookingUrl || "",
       });
     }
   }, [settings]);
@@ -507,28 +509,51 @@ export default function Settings() {
                       </Label>
                     </div>
                     <p className="text-sm text-gray-600 mb-3">
-                      Del denne lenken med kundene dine for online booking
+                      Tilpass booking-lenken din. La stå tom for å bruke standard lenke.
                     </p>
-                    <div className="flex gap-2">
+                    
+                    {/* Custom URL Input */}
+                    <div className="space-y-2 mb-4">
+                      <Label htmlFor="customBookingUrl" className="text-sm font-medium">
+                        Egendefinert lenke (valgfritt)
+                      </Label>
                       <Input
-                        value={`${window.location.origin}/book-online`}
-                        readOnly
+                        id="customBookingUrl"
+                        value={formData.customBookingUrl}
+                        onChange={(e) => setFormData({ ...formData, customBookingUrl: e.target.value })}
+                        placeholder="https://booking.ks-salong.no eller book.ks-salong.no"
                         className="bg-white font-mono text-sm"
                       />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => {
-                          navigator.clipboard.writeText(`${window.location.origin}/book-online`);
-                          toast.success("Lenke kopiert!");
-                        }}
-                        className="shrink-0"
-                      >
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                        </svg>
-                        <span className="ml-2">Kopier</span>
-                      </Button>
+                      <p className="text-xs text-gray-500">
+                        Eksempel: https://booking.ks-salong.no eller book.ks-salong.no
+                      </p>
+                    </div>
+
+                    {/* Current Active Link */}
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Aktiv booking-lenke</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          value={formData.customBookingUrl || `${window.location.origin}/book-online`}
+                          readOnly
+                          className="bg-white font-mono text-sm"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => {
+                            const linkToCopy = formData.customBookingUrl || `${window.location.origin}/book-online`;
+                            navigator.clipboard.writeText(linkToCopy);
+                            toast.success("Lenke kopiert!");
+                          }}
+                          className="shrink-0"
+                        >
+                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                          <span className="ml-2">Kopier</span>
+                        </Button>
+                      </div>
                     </div>
                   </div>
 

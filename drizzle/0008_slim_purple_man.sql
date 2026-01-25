@@ -1,0 +1,1 @@
+ALTER TABLE `salonSettings` ADD `customBookingUrl` varchar(500);

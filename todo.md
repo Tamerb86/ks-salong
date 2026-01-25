@@ -661,3 +661,12 @@
 - [ ] Add QR code generator for the booking link
 - [ ] Add social media sharing buttons (Facebook, Instagram, WhatsApp)
 - [ ] Show booking link statistics (clicks, conversions)
+
+## Custom Booking URL Configuration
+- [x] Add customBookingUrl field to salonSettings schema
+- [x] Backend automatically saves custom booking URL with settings.update
+- [x] Make booking URL field editable in Settings > Booking tab
+- [x] Show preview of active URL (custom or default)
+- [ ] Add validation for URL format (subdomain or full URL)
+- [ ] Update BookOnline route to support custom subdomain redirect
+- [ ] Add URL availability checker

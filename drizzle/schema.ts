@@ -298,6 +298,8 @@ export const salonSettings = mysqlTable("salonSettings", {
   // Stripe Terminal Integration
   stripeTerminalEnabled: boolean("stripeTerminalEnabled").default(false).notNull(),
   stripeTerminalLocationId: varchar("stripeTerminalLocationId", { length: 255 }),
+  // Custom Booking URL
+  customBookingUrl: varchar("customBookingUrl", { length: 500 }), // Custom subdomain or full URL for booking page
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
