@@ -1132,3 +1132,15 @@
 - [x] Test cancelling appointment in browser
 - [x] Verify status updates in Dashboard
 - [x] All tests passed successfully
+
+## Calendar Drag-and-Drop Enhancement
+- [x] Review existing drag-and-drop implementation in MonthlyCalendar.tsx
+- [x] Fix issues preventing smooth drag operations (replaced useSortable with useDraggable)
+- [x] Add DroppableDay component using useDroppable
+- [x] Ensure appointments can be dragged to different days
+- [x] Update appointment date/time correctly after drop
+- [x] Add visual feedback during drag (opacity on dragged item)
+- [x] Add drop zone highlighting when dragging over valid dates (purple ring)
+- [x] Test drag-and-drop in browser with real appointments
+- [x] Verify database updates after drag-and-drop (4 vitest tests passed)
+- [x] Created comprehensive test suite for drag-and-drop functionality

@@ -4,9 +4,8 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from "lucide-react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, parseISO } from "date-fns";
 import { nb } from "date-fns/locale";
-import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, closestCenter } from "@dnd-kit/core";
-import { CSS } from "@dnd-kit/utilities";
-import { useSortable } from "@dnd-kit/sortable";
+import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, closestCenter, useDroppable, useDraggable } from "@dnd-kit/core";
+
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
@@ -58,15 +57,33 @@ function AppointmentCard({ appointment, isDragging }: AppointmentCardProps) {
   );
 }
 
+function DroppableDay({ dateKey, children, isToday, isCurrentMonth }: { dateKey: string; children: React.ReactNode; isToday: boolean; isCurrentMonth: boolean }) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: dateKey,
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={`min-h-[120px] border rounded p-2 transition-colors ${
+        isToday ? "bg-purple-50 border-purple-300" : "bg-white"
+      } ${!isCurrentMonth ? "opacity-50" : ""} ${
+        isOver ? "ring-2 ring-purple-400 bg-purple-100" : ""
+      }`}
+    >
+      {children}
+    </div>
+  );
+}
+
 function DraggableAppointment({ appointment }: { appointment: Appointment }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: appointment.id.toString(),
     data: appointment,
   });
 
   const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
+    transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
   };
 
   return (
@@ -223,12 +240,11 @@ export function MonthlyCalendar() {
               const isCurrentMonth = isSameMonth(day, currentDate);
 
               return (
-                <div
+                <DroppableDay
                   key={dateKey}
-                  id={dateKey}
-                  className={`min-h-[120px] border rounded p-2 ${
-                    isToday ? "bg-purple-50 border-purple-300" : "bg-white"
-                  } ${!isCurrentMonth ? "opacity-50" : ""}`}
+                  dateKey={dateKey}
+                  isToday={isToday}
+                  isCurrentMonth={isCurrentMonth}
                 >
                   <div className={`text-sm font-semibold mb-1 ${isToday ? "text-purple-600" : ""}`}>
                     {format(day, "d")}
@@ -238,7 +254,7 @@ export function MonthlyCalendar() {
                       <DraggableAppointment key={appointment.id} appointment={appointment} />
                     ))}
                   </div>
-                </div>
+                </DroppableDay>
               );
             })}
           </div>
