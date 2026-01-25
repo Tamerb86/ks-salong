@@ -75,6 +75,11 @@ async function startServer() {
     import("../cron/autoLogout").then((module) => {
       module.startAutoLogoutCron();
     }).catch(console.error);
+    
+    // Start cancel unpaid appointments cron job
+    import("../cron/cancelUnpaidAppointments").then((module) => {
+      module.startCancelUnpaidAppointmentsCron();
+    }).catch(console.error);
   });
 }
 

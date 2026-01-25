@@ -1049,3 +1049,33 @@ export async function deleteTerminalReader(id: string) {
   
   await db.delete(terminalReaders).where(eq(terminalReaders.id, id));
 }
+
+export async function getPendingPaymentAppointments() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db
+    .select()
+    .from(appointments)
+    .leftJoin(customers, eq(appointments.customerId, customers.id))
+    .where(eq(appointments.paymentStatus, 'pending'));
+  
+  return result.map(row => ({
+    ...row.appointments,
+    customer: row.customers
+  }));
+}
+
+export async function cancelAppointment(id: number, cancellationReason: string) {
+  const db = await getDb();
+  if (!db) return;
+  
+  await db
+    .update(appointments)
+    .set({ 
+      status: 'cancelled',
+      notes: cancellationReason,
+      updatedAt: new Date()
+    })
+    .where(eq(appointments.id, id));
+}

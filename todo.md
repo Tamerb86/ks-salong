@@ -687,3 +687,13 @@
 - [x] Update appointment status after successful payment (via webhook)
 - [ ] Add filter to show only unpaid appointments
 - [x] Show payment amount in appointment details
+
+## Auto-Cancel Unpaid Appointments Cron Job
+- [x] Create cron job to run every 5 minutes
+- [x] Check for appointments with PENDING payment status
+- [x] Calculate time elapsed since appointment creation (createdAt)
+- [x] Cancel appointments older than 30 minutes with PENDING status
+- [x] Update appointment status to 'cancelled'
+- [x] Add cancellation reason "Automatisk kansellert - betaling ikke mottatt innen 30 minutter"
+- [x] Log cancelled appointments for monitoring
+- [x] Test cron job (successfully cancelled 22 old appointments on first run)
