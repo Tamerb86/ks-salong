@@ -2,8 +2,32 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Phone, MapPin, Clock, Star, Award, Users, Scissors } from "lucide-react";
 import { Link } from "wouter";
+import { useEffect } from "react";
 
 export default function Landing() {
+  useEffect(() => {
+    // Set SEO meta tags
+    document.title = "K.S Frisør - Norgesmester 2022 | Frisørsalong i Porsgrunn";
+    
+    // Update or create meta description
+    let metaDescription = document.querySelector('meta[name="description"]');
+    if (!metaDescription) {
+      metaDescription = document.createElement('meta');
+      metaDescription.setAttribute('name', 'description');
+      document.head.appendChild(metaDescription);
+    }
+    metaDescription.setAttribute('content', 'K.S Frisør - Prisbelønt frisørsalong i Porsgrunn. Norgesmester 2022. Profesjonelle tjenester for herre og dame. Book time online. 5 stjerner fra 55+ fornøyde kunder.');
+    
+    // Update or create meta keywords
+    let metaKeywords = document.querySelector('meta[name="keywords"]');
+    if (!metaKeywords) {
+      metaKeywords = document.createElement('meta');
+      metaKeywords.setAttribute('name', 'keywords');
+      document.head.appendChild(metaKeywords);
+    }
+    metaKeywords.setAttribute('content', 'frisør porsgrunn, herreklipp, dameklipp, skjegg trim, hårfarge, K.S Frisør, norgesmester frisør, beste frisør porsgrunn');
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Navigation */}
@@ -52,10 +76,12 @@ export default function Landing() {
                 Bestill time nå
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="bg-white/10 backdrop-blur-sm text-white border-white hover:bg-white/20 text-lg px-8 py-6">
-              <Phone className="mr-2 h-5 w-5" />
-              Ring oss
-            </Button>
+            <a href="tel:+4792981628">
+              <Button size="lg" variant="outline" className="bg-white/10 backdrop-blur-sm text-white border-white hover:bg-white/20 text-lg px-8 py-6">
+                <Phone className="mr-2 h-5 w-5" />
+                Ring oss
+              </Button>
+            </a>
           </div>
           <div className="mt-8 flex items-center justify-center gap-2">
             <div className="flex">
@@ -231,6 +257,96 @@ export default function Landing() {
             <div className="relative h-64 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition">
               <img src="/images/champion-2022.png" alt="Norgesmester 2022" className="w-full h-full object-cover" />
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold mb-4 text-gray-900">Hva kundene sier</h2>
+            <p className="text-xl text-gray-600">Fornøyde kunder er vår største stolthet</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Testimonial 1 */}
+            <Card className="border-2 border-purple-100 hover:border-purple-300 transition">
+              <CardContent className="pt-6">
+                <div className="flex mb-4">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star key={star} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+                  ))}
+                </div>
+                <p className="text-gray-700 mb-4 italic">
+                  "Utrolig dyktig og nøye. Veldig hyggelig mann. Utrolig jobb han gjorde med skjegget til samboeren. Rask og effektiv og så bra gjort👍"
+                </p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                    <Users className="h-5 w-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900">Sissel Skuggen</p>
+                    <p className="text-sm text-gray-500">Google anmeldelse</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Testimonial 2 */}
+            <Card className="border-2 border-purple-100 hover:border-purple-300 transition">
+              <CardContent className="pt-6">
+                <div className="flex mb-4">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star key={star} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+                  ))}
+                </div>
+                <p className="text-gray-700 mb-4 italic">
+                  "Beste frisøren i Porsgrunn! Alltid fornøyd med resultatet. Profesjonell service og hyggelig atmosfære."
+                </p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                    <Users className="h-5 w-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900">Fornøyd kunde</p>
+                    <p className="text-sm text-gray-500">Google anmeldelse</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Testimonial 3 */}
+            <Card className="border-2 border-purple-100 hover:border-purple-300 transition">
+              <CardContent className="pt-6">
+                <div className="flex mb-4">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star key={star} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+                  ))}
+                </div>
+                <p className="text-gray-700 mb-4 italic">
+                  "Utmerket håndverk og god service. Anbefales på det sterkeste! Norgesmester med god grunn."
+                </p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                    <Users className="h-5 w-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900">Lokal kunde</p>
+                    <p className="text-sm text-gray-500">Google anmeldelse</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="text-center mt-12">
+            <p className="text-gray-600 mb-4">Vil du dele din opplevelse?</p>
+            <Link href="/book-online">
+              <Button size="lg" className="bg-purple-600 hover:bg-purple-700">
+                Book din time nå
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
