@@ -1264,3 +1264,17 @@
 - [ ] Test overtime tracking when clocking in after autoLogoutTime
 - [ ] Test auto clock-out at configured time
 - [ ] Create checkpoint after testing
+
+## Stripe Terminal Integration (WisePOS E)
+- [x] Check existing Stripe Terminal fields in salonSettings table (stripeTerminalEnabled, stripeTerminalLocationId)
+- [x] Add Stripe Terminal settings section in Settings page (added in Betaling tab)
+- [x] Add input fields: Terminal Location ID with link to Stripe Dashboard
+- [x] Update settings.update endpoint to save Terminal settings (already exists in schema)
+- [x] Review existing server/stripeTerminal.ts service module (395 lines, fully functional)
+- [x] Update Terminal service to support WisePOS E reader (already supports it)
+- [x] Add Terminal reader discovery and connection functions (registerTerminalReader, listTerminalReaders, processPaymentOnReader)
+- [ ] Create payment UI component for Terminal payments in Dashboard
+- [ ] Add Terminal payment flow (create payment intent, collect payment, confirm)
+- [ ] Test Terminal connection and payment with test mode
+- [ ] Add error handling for Terminal disconnection
+- [ ] Create checkpoint after implementation

@@ -84,6 +84,8 @@ export default function Settings() {
     autoLogoutTime: "22:00",
     universalPin: "1234",
     customBookingUrl: "",
+    stripeTerminalEnabled: false,
+    stripeTerminalLocationId: "",
   });
 
   const [urlError, setUrlError] = useState("");
@@ -137,6 +139,8 @@ export default function Settings() {
         autoLogoutTime: settings.autoLogoutTime || "22:00",
         universalPin: settings.universalPin || "1234",
         customBookingUrl: settings.customBookingUrl || "",
+        stripeTerminalEnabled: settings.stripeTerminalEnabled ?? false,
+        stripeTerminalLocationId: settings.stripeTerminalLocationId || "",
       });
     }
   }, [settings]);
@@ -767,6 +771,58 @@ export default function Settings() {
                             setFormData({ ...formData, vippsSubscriptionKey: e.target.value })
                           }
                         />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Stripe Terminal Section */}
+                  <div className="flex items-center justify-between p-4 border rounded-lg mt-6">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="stripeTerminalEnabled" className="text-base">
+                        Aktiver Stripe Terminal
+                      </Label>
+                      <p className="text-sm text-gray-500">
+                        Tillat betaling med Stripe Terminal (WisePOS E)
+                      </p>
+                    </div>
+                    <Switch
+                      id="stripeTerminalEnabled"
+                      checked={formData.stripeTerminalEnabled}
+                      onCheckedChange={(checked) =>
+                        setFormData({ ...formData, stripeTerminalEnabled: checked })
+                      }
+                    />
+                  </div>
+
+                  {formData.stripeTerminalEnabled && (
+                    <div className="p-6 bg-blue-50 border border-blue-200 rounded-lg space-y-4">
+                      <h3 className="font-semibold text-lg mb-2">Stripe Terminal Innstillinger</h3>
+                      <p className="text-sm text-gray-600 mb-4">
+                        Konfigurer Stripe Terminal for å akseptere betalinger i butikken med WisePOS E reader.
+                        <a
+                          href="https://dashboard.stripe.com/terminal/locations"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline ml-1"
+                        >
+                          Åpne Stripe Dashboard →
+                        </a>
+                      </p>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="stripeTerminalLocationId">Terminal Location ID</Label>
+                        <Input
+                          id="stripeTerminalLocationId"
+                          type="text"
+                          placeholder="tml_xxxxxxxxxxxxx"
+                          value={formData.stripeTerminalLocationId || ''}
+                          onChange={(e) =>
+                            setFormData({ ...formData, stripeTerminalLocationId: e.target.value })
+                          }
+                        />
+                        <p className="text-xs text-gray-500">
+                          Finn Location ID i Stripe Dashboard under Terminal → Locations
+                        </p>
                       </div>
                     </div>
                   )}
