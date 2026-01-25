@@ -1,6 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Layout } from "@/components/Layout";
 import { MonthlyCalendar } from "@/components/MonthlyCalendar";
+import { CreateAppointmentDialog } from "@/components/CreateAppointmentDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LiveBadge } from "@/components/ui/live-badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -46,6 +47,7 @@ export default function Appointments() {
   const { user, loading: authLoading } = useAuth();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [terminalPaymentDialogOpen, setTerminalPaymentDialogOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
@@ -230,6 +232,13 @@ export default function Appointments() {
               <p className="text-gray-600 mt-1">Administrer avtaler med kalender- eller listevisning</p>
             </div>
           </div>
+            <Button
+              onClick={() => setCreateDialogOpen(true)}
+              className="bg-gradient-to-r from-purple-600 to-amber-600 hover:from-purple-700 hover:to-amber-700"
+            >
+              <CalendarIcon className="h-4 w-4 mr-2" />
+              Ny Avtale
+            </Button>
 
           {/* Tabs for different views */}
           <Tabs defaultValue="calendar" className="w-full">
@@ -530,6 +539,16 @@ export default function Appointments() {
             </DialogContent>
           </Dialog>
         </div>
+      {/* Create Appointment Dialog */}
+      <CreateAppointmentDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        onSuccess={() => {
+          refetch();
+          toast.success("Avtale opprettet og lagt til i listen!");
+        }}
+      />
+
       </div>
     </Layout>
   );

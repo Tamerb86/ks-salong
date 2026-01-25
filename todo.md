@@ -1330,3 +1330,21 @@
 - [x] Show payment statistics (total, average, count)
 - [ ] Add export to Excel/PDF functionality
 - [x] Link payments to appointments when applicable
+
+## Terminal Payment Shortcut in Settings
+- [x] Add Terminal Payment quick access button/card in Settings page
+- [x] Link button to /terminal-payment route
+- [x] Add icon and description for easy identification
+
+## Create Appointment from Avtaler
+- [x] Add "Ny Avtale" (New Appointment) button in Avtaler page header
+- [x] Create appointment creation dialog with all required fields
+- [x] Include customer selection/creation, service selection, staff selection, date/time picker
+- [x] Validate appointment availability before creation
+- [x] Refresh appointments list after successful creation
+
+## Online Bookings in Avtaler
+- [x] Verify online bookings from /book-online appear in Avtaler page
+- [x] Check appointments.list endpoint includes all appointment sources
+- [x] Test complete flow: book online → verify in Avtaler
+- [x] Ensure proper status display for online bookings

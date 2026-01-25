@@ -26,12 +26,15 @@ import {
   Calculator,
   CheckCircle,
   XCircle,
+  CreditCard,
+  ArrowRight,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Layout } from "@/components/Layout";
 import { FikenTab } from "@/components/FikenTab";
 import { QRCodeSVG } from "qrcode.react";
+import { useLocation } from "wouter";
 
 type TabId = "overview" | "google-calendar" | "notifications" | "booking" | "payment" | "staff" | "fiken" | "goals" | "workplan" | "conflicts" | "reports" | "history";
 
@@ -54,6 +57,7 @@ const tabs: Tab[] = [
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState<TabId>("overview");
+  const [, setLocation] = useLocation();
   const { data: settings, isLoading } = trpc.settings.get.useQuery();
   const updateMutation = trpc.settings.update.useMutation({
     onSuccess: () => {
@@ -795,34 +799,61 @@ export default function Settings() {
                   </div>
 
                   {formData.stripeTerminalEnabled && (
-                    <div className="p-6 bg-blue-50 border border-blue-200 rounded-lg space-y-4">
-                      <h3 className="font-semibold text-lg mb-2">Stripe Terminal Innstillinger</h3>
-                      <p className="text-sm text-gray-600 mb-4">
-                        Konfigurer Stripe Terminal for å akseptere betalinger i butikken med WisePOS E reader.
-                        <a
-                          href="https://dashboard.stripe.com/terminal/locations"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline ml-1"
-                        >
-                          Åpne Stripe Dashboard →
-                        </a>
-                      </p>
+                    <div className="space-y-4">
+                      {/* Quick Access Card */}
+                      <Card className="bg-gradient-to-br from-purple-50 to-blue-50 border-purple-200">
+                        <CardContent className="pt-6">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                              <div className="p-3 bg-purple-600 rounded-lg">
+                                <CreditCard className="h-6 w-6 text-white" />
+                              </div>
+                              <div>
+                                <h3 className="font-semibold text-lg">Terminal Betaling</h3>
+                                <p className="text-sm text-gray-600">Åpne Terminal for å ta imot betalinger med WisePOS E</p>
+                              </div>
+                            </div>
+                            <Button
+                              onClick={() => setLocation("/terminal-payment")}
+                              className="bg-purple-600 hover:bg-purple-700"
+                            >
+                              Åpne Terminal
+                              <ArrowRight className="h-4 w-4 ml-2" />
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
 
-                      <div className="space-y-2">
-                        <Label htmlFor="stripeTerminalLocationId">Terminal Location ID</Label>
-                        <Input
-                          id="stripeTerminalLocationId"
-                          type="text"
-                          placeholder="tml_xxxxxxxxxxxxx"
-                          value={formData.stripeTerminalLocationId || ''}
-                          onChange={(e) =>
-                            setFormData({ ...formData, stripeTerminalLocationId: e.target.value })
-                          }
-                        />
-                        <p className="text-xs text-gray-500">
-                          Finn Location ID i Stripe Dashboard under Terminal → Locations
+                      {/* Configuration Card */}
+                      <div className="p-6 bg-blue-50 border border-blue-200 rounded-lg space-y-4">
+                        <h3 className="font-semibold text-lg mb-2">Stripe Terminal Innstillinger</h3>
+                        <p className="text-sm text-gray-600 mb-4">
+                          Konfigurer Stripe Terminal for å akseptere betalinger i butikken med WisePOS E reader.
+                          <a
+                            href="https://dashboard.stripe.com/terminal/locations"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline ml-1"
+                          >
+                            Åpne Stripe Dashboard →
+                          </a>
                         </p>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="stripeTerminalLocationId">Terminal Location ID</Label>
+                          <Input
+                            id="stripeTerminalLocationId"
+                            type="text"
+                            placeholder="tml_xxxxxxxxxxxxx"
+                            value={formData.stripeTerminalLocationId || ''}
+                            onChange={(e) =>
+                              setFormData({ ...formData, stripeTerminalLocationId: e.target.value })
+                            }
+                          />
+                          <p className="text-xs text-gray-500">
+                            Finn Location ID i Stripe Dashboard under Terminal → Locations
+                          </p>
+                        </div>
                       </div>
                     </div>
                   )}
