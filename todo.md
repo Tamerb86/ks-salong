@@ -749,3 +749,12 @@
 - [x] Show count of unpaid appointments in button badge
 - [x] Add toggle state to switch between all/unpaid view
 - [x] Highlight unpaid appointments in the list (via payment status badge)
+
+## QR Code for Booking Link
+- [x] Install qrcode.react library (already installed for QueueTV)
+- [x] Add QR code component in Settings > Booking tab
+- [x] Display QR code for booking URL (custom or default)
+- [x] Add print button to print QR code poster
+- [x] Create print-friendly CSS for QR code poster
+- [x] Include salon name and instructions in poster
+- [ ] Test QR code scanning with mobile devices (requires user testing)

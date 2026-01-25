@@ -222,3 +222,44 @@
 .animate-count-up {
   animation: countUp 0.4s ease-out;
 }
+
+/* Print styles for QR Code Poster */
+@media print {
+  /* Hide everything except QR code section */
+  body * {
+    visibility: hidden;
+  }
+  
+  /* Show only QR code container and its children */
+  .qr-print-container,
+  .qr-print-container * {
+    visibility: visible;
+  }
+  
+  .qr-print-container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 2cm;
+    text-align: center;
+  }
+  
+  /* Hide print button during print */
+  .qr-print-container button {
+    display: none !important;
+  }
+  
+  /* Ensure QR code is centered and large */
+  .qr-print-container svg {
+    width: 300px !important;
+    height: 300px !important;
+    margin: 0 auto;
+  }
+  
+  /* Page setup */
+  @page {
+    size: A4 portrait;
+    margin: 2cm;
+  }
+}

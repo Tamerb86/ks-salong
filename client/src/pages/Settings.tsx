@@ -31,6 +31,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Layout } from "@/components/Layout";
 import { FikenTab } from "@/components/FikenTab";
+import { QRCodeSVG } from "qrcode.react";
 
 type TabId = "overview" | "google-calendar" | "notifications" | "booking" | "payment" | "staff" | "fiken" | "goals" | "workplan" | "conflicts" | "reports" | "history";
 
@@ -585,6 +586,48 @@ export default function Settings() {
                           </svg>
                           <span className="ml-2">Kopier</span>
                         </Button>
+                      </div>
+                    </div>
+                    
+                    {/* QR Code Section */}
+                    <div className="mt-4 p-4 border-2 border-amber-200 rounded-lg bg-amber-50 qr-print-container">
+                      <div className="flex items-center gap-2 mb-3">
+                        <svg className="h-5 w-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                        </svg>
+                        <Label className="text-base font-semibold text-amber-900">
+                          QR-kode for booking
+                        </Label>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-4">
+                        Skriv ut QR-koden og plasser den i salongen. Kunder kan skanne den for å booke time.
+                      </p>
+                      
+                      <div className="flex gap-4 items-start">
+                        <div className="bg-white p-4 rounded-lg border-2 border-gray-200">
+                          <QRCodeSVG 
+                            value={formData.customBookingUrl || `${window.location.origin}/book-online`}
+                            size={200}
+                            level="H"
+                            includeMargin={true}
+                          />
+                        </div>
+                        <div className="flex-1 space-y-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => window.print()}
+                            className="w-full"
+                          >
+                            <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                            </svg>
+                            Skriv ut QR-kode
+                          </Button>
+                          <p className="text-xs text-gray-500">
+                            Tips: Plasser QR-koden ved resepsjonen eller i venteområdet
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
