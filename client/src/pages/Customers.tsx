@@ -26,6 +26,7 @@ import {
   Search,
   TrendingUp,
   User,
+  UserPlus,
   Users,
 } from "lucide-react";
 import { useState } from "react";
@@ -103,19 +104,28 @@ export default function Customers() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-3 bg-gradient-to-br from-purple-600 to-amber-600 rounded-xl">
-              <Users className="h-8 w-8 text-white" />
-            </div>
-            <div>
-              <div className="flex items-center gap-3">
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-amber-600 bg-clip-text text-transparent">
-                  Kunder
-                </h1>
-                <LiveBadge text="Live" />
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-gradient-to-br from-purple-600 to-amber-600 rounded-xl">
+                <Users className="h-8 w-8 text-white" />
               </div>
-              <p className="text-gray-600">Administrer kundedatabase og CRM</p>
+              <div>
+                <div className="flex items-center gap-3">
+                  <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-amber-600 bg-clip-text text-transparent">
+                    Kunder
+                  </h1>
+                  <LiveBadge text="Live" />
+                </div>
+                <p className="text-gray-600">Administrer kundedatabase og CRM</p>
+              </div>
             </div>
+            <Button
+              onClick={() => setIsAddDialogOpen(true)}
+              className="bg-gradient-to-r from-purple-600 to-amber-600 hover:from-purple-700 hover:to-amber-700 text-white"
+            >
+              <UserPlus className="h-4 w-4 mr-2" />
+              Legg til kunde
+            </Button>
           </div>
         </div>
 

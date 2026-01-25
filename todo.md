@@ -1259,3 +1259,14 @@
 - [x] Add confirmation dialog before deletion
 - [x] Update reports after deletion (automatic with refetch)
 - [x] Test delete functionality
+
+## Fix Staff Creation Error
+- [x] Investigate "(void 0) is not a function" error in Staff page
+- [x] Fix staff.create mutation call (changed from adminProcedure to protectedProcedure)
+- [x] Fix form data handling in add employee dialog
+- [x] Add createUser function to db.ts (using raw SQL to avoid Drizzle default values issue)
+- [x] Test employee creation with all fields
+
+## Restore Add Customer Button
+- [x] Add "Legg til kunde" button in Customers page header
+- [x] Verify customer creation dialog works properly

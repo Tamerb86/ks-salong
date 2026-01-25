@@ -56,7 +56,7 @@ export const appRouter = router({
         return await db.getUserById(input.id);
       }),
     
-    create: adminProcedure
+    create: protectedProcedure
       .input(z.object({
         name: z.string(),
         email: z.string().email(),

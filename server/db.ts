@@ -1575,3 +1575,65 @@ export async function deleteOrderItems(orderId: number) {
 export async function deleteOrder(orderId: number) {
   await database.delete(orders).where(eq(orders.id, orderId));
 }
+
+export async function createUser(data: any): Promise<number> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Generate openId for manual staff creation (required field)
+  const openId = data.openId || `manual_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  
+  // Build fields and values arrays for dynamic SQL
+  const fields: string[] = ['openId', 'name'];
+  const values: any[] = [openId, data.name];
+  
+  if (data.email) {
+    fields.push('email');
+    values.push(data.email);
+  }
+  if (data.phone) {
+    fields.push('phone');
+    values.push(data.phone);
+  }
+  if (data.role) {
+    fields.push('role');
+    values.push(data.role);
+  }
+  if (data.pin) {
+    fields.push('pin');
+    values.push(data.pin);
+  }
+  if (data.skillLevel) {
+    fields.push('skillLevel');
+    values.push(data.skillLevel);
+  }
+  if (data.loginMethod) {
+    fields.push('loginMethod');
+    values.push(data.loginMethod);
+  }
+  if (data.durationMultiplier) {
+    fields.push('durationMultiplier');
+    const multiplier = typeof data.durationMultiplier === 'string' 
+      ? parseFloat(data.durationMultiplier) 
+      : data.durationMultiplier;
+    values.push(multiplier);
+  }
+  if (data.bookingSlotInterval) {
+    fields.push('bookingSlotInterval');
+    const interval = typeof data.bookingSlotInterval === 'string'
+      ? parseInt(data.bookingSlotInterval)
+      : data.bookingSlotInterval;
+    values.push(interval);
+  }
+  if (data.isActive !== undefined) {
+    fields.push('isActive');
+    values.push(data.isActive);
+  }
+  
+  // Use raw SQL to avoid Drizzle inserting default values
+  const placeholders = values.map(() => '?').join(', ');
+  const query = `INSERT INTO users (${fields.join(', ')}) VALUES (${placeholders})`;
+  
+  const result: any = await db.execute(sql.raw(query, values));
+  return Number(result[0].insertId);
+}
