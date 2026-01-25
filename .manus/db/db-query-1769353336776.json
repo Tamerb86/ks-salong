@@ -1,0 +1,17 @@
+{
+  "query": "SELECT firstName, lastName, phone, email, address FROM customers WHERE id = 28;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZWkmDdVMGTAoV.aeceea61840d --database oUNZ2iw3V7HdbF8pGMTUk4 --execute SELECT firstName, lastName, phone, email, address FROM customers WHERE id = 28;",
+  "rows": [
+    {
+      "firstName": "Maria",
+      "lastName": "Kristiansen",
+      "phone": "+47 400 00 008",
+      "email": "maria.k@email.no",
+      "address": "Storgata 123, 0182 Oslo"
+    }
+  ],
+  "messages": [],
+  "stdout": "firstName\tlastName\tphone\temail\taddress\nMaria\tKristiansen\t+47 400 00 008\tmaria.k@email.no\tStorgata 123, 0182 Oslo\n",
+  "stderr": "",
+  "execution_time_ms": 78
+}

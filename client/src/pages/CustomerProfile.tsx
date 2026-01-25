@@ -27,6 +27,7 @@ import {
   Calendar,
   Clock,
   Download,
+  Edit,
   Mail,
   Phone,
   Plus,
@@ -60,6 +61,18 @@ export default function CustomerProfile() {
   const [showAddNoteDialog, setShowAddNoteDialog] = useState(false);
   const [showAddTagDialog, setShowAddTagDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  
+  // Edit form state
+  const [editForm, setEditForm] = useState({
+    firstName: "",
+    lastName: "",
+    phone: "",
+    email: "",
+    dateOfBirth: "",
+    address: "",
+    preferences: "",
+  });
 
   const utils = trpc.useUtils();
 
@@ -107,6 +120,41 @@ export default function CustomerProfile() {
       setLocation("/customers");
     },
   });
+
+  const updateCustomerMutation = trpc.customers.update.useMutation({
+    onSuccess: () => {
+      utils.customers.getById.invalidate({ id: customerId });
+      setShowEditDialog(false);
+    },
+  });
+
+  const handleEditClick = () => {
+    if (customer) {
+      setEditForm({
+        firstName: customer.firstName,
+        lastName: customer.lastName,
+        phone: customer.phone,
+        email: customer.email || "",
+        dateOfBirth: customer.dateOfBirth ? format(new Date(customer.dateOfBirth), "yyyy-MM-dd") : "",
+        address: customer.address || "",
+        preferences: customer.preferences || "",
+      });
+      setShowEditDialog(true);
+    }
+  };
+
+  const handleSaveEdit = () => {
+    updateCustomerMutation.mutate({
+      id: customerId,
+      firstName: editForm.firstName,
+      lastName: editForm.lastName,
+      phone: editForm.phone,
+      email: editForm.email || undefined,
+      dateOfBirth: editForm.dateOfBirth ? new Date(editForm.dateOfBirth) : undefined,
+      address: editForm.address || undefined,
+      preferences: editForm.preferences || undefined,
+    });
+  };
 
   const handleAddNote = () => {
     if (!newNote.trim()) return;
@@ -188,6 +236,10 @@ export default function CustomerProfile() {
             </div>
           </div>
           <div className="flex gap-2">
+            <Button variant="outline" onClick={handleEditClick}>
+              <Edit className="mr-2 h-4 w-4" />
+              Rediger
+            </Button>
             <Button variant="outline" onClick={handleExportData}>
               <Download className="mr-2 h-4 w-4" />
               Eksporter data
@@ -467,6 +519,98 @@ export default function CustomerProfile() {
             </Card>
           </div>
         </div>
+
+        {/* Edit Customer Dialog */}
+        <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Rediger kundeinformasjon</DialogTitle>
+              <DialogDescription>
+                Oppdater kundens kontaktinformasjon og preferanser
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Fornavn *</label>
+                  <Input
+                    value={editForm.firstName}
+                    onChange={(e) => setEditForm({ ...editForm, firstName: e.target.value })}
+                    placeholder="Fornavn"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Etternavn *</label>
+                  <Input
+                    value={editForm.lastName}
+                    onChange={(e) => setEditForm({ ...editForm, lastName: e.target.value })}
+                    placeholder="Etternavn"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Telefon *</label>
+                  <Input
+                    value={editForm.phone}
+                    onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                    placeholder="+47 xxx xx xxx"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">E-post</label>
+                  <Input
+                    type="email"
+                    value={editForm.email}
+                    onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                    placeholder="epost@example.com"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Fødselsdato</label>
+                  <Input
+                    type="date"
+                    value={editForm.dateOfBirth}
+                    onChange={(e) => setEditForm({ ...editForm, dateOfBirth: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Adresse</label>
+                  <Input
+                    value={editForm.address}
+                    onChange={(e) => setEditForm({ ...editForm, address: e.target.value })}
+                    placeholder="Gateadresse"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Preferanser / Notater</label>
+                <Textarea
+                  value={editForm.preferences}
+                  onChange={(e) => setEditForm({ ...editForm, preferences: e.target.value })}
+                  placeholder="Stilpreferanser, allergier, etc."
+                  rows={3}
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setShowEditDialog(false)}>
+                Avbryt
+              </Button>
+              <Button 
+                onClick={handleSaveEdit}
+                disabled={!editForm.firstName || !editForm.lastName || !editForm.phone || updateCustomerMutation.isPending}
+              >
+                {updateCustomerMutation.isPending ? "Lagrer..." : "Lagre endringer"}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </Layout>
   );

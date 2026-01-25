@@ -1039,3 +1039,15 @@
 - [x] Write vitest tests for GDPR export/delete
 - [x] All 16 tests passing successfully
 - [ ] Test complete CRM workflow in browser (optional manual testing) profile page flow
+
+## Customer Information Editing
+- [x] Add "Edit" button in CustomerProfile page header
+- [x] Create edit customer dialog with form fields (firstName, lastName, phone, email, dateOfBirth, address, preferences)
+- [x] Implement form validation for required fields
+- [x] Connect to existing customers.update mutation
+- [x] Show success/error messages after save
+- [x] Refresh customer data after successful update
+- [x] Test editing flow in browser
+- [x] Verified address field update successfully saved to database
+- [x] Confirmed dialog closes after save
+- [x] All form fields working correctly
