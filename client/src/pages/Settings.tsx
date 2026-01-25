@@ -81,6 +81,27 @@ export default function Settings() {
     customBookingUrl: "",
   });
 
+  const [urlError, setUrlError] = useState("");
+
+  const validateBookingUrl = (url: string): boolean => {
+    if (!url || url.trim() === "") {
+      setUrlError("");
+      return true; // Empty is valid (will use default)
+    }
+
+    // Check if it's a full URL or just subdomain
+    const urlPattern = /^(https?:\/\/)([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+    const subdomainPattern = /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/i;
+
+    if (urlPattern.test(url) || subdomainPattern.test(url)) {
+      setUrlError("");
+      return true;
+    } else {
+      setUrlError("Ugyldig URL-format. Bruk enten full URL (https://...) eller subdomain (booking.domain.no)");
+      return false;
+    }
+  };
+
   // Google Calendar settings
   const [googleSyncEnabled, setGoogleSyncEnabled] = useState(false);
   const [autoSyncFrequency, setAutoSyncFrequency] = useState("15");
@@ -520,13 +541,24 @@ export default function Settings() {
                       <Input
                         id="customBookingUrl"
                         value={formData.customBookingUrl}
-                        onChange={(e) => setFormData({ ...formData, customBookingUrl: e.target.value })}
+                        onChange={(e) => {
+                          const newUrl = e.target.value;
+                          setFormData({ ...formData, customBookingUrl: newUrl });
+                          validateBookingUrl(newUrl);
+                        }}
                         placeholder="https://booking.ks-salong.no eller book.ks-salong.no"
-                        className="bg-white font-mono text-sm"
+                        className={`bg-white font-mono text-sm ${urlError ? 'border-red-500' : ''}`}
                       />
-                      <p className="text-xs text-gray-500">
-                        Eksempel: https://booking.ks-salong.no eller book.ks-salong.no
-                      </p>
+                      {urlError && (
+                        <p className="text-xs text-red-600">
+                          {urlError}
+                        </p>
+                      )}
+                      {!urlError && (
+                        <p className="text-xs text-gray-500">
+                          Eksempel: https://booking.ks-salong.no eller book.ks-salong.no
+                        </p>
+                      )}
                     </div>
 
                     {/* Current Active Link */}

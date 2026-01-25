@@ -670,3 +670,11 @@
 - [ ] Add validation for URL format (subdomain or full URL)
 - [ ] Update BookOnline route to support custom subdomain redirect
 - [ ] Add URL availability checker
+
+## URL Validation and Redirect for Custom Booking URLs
+- [x] Add URL validation in Settings UI (check format before saving)
+- [x] Show error message for invalid URLs (real-time validation)
+- [x] Create redirect middleware to handle custom booking URLs
+- [x] Redirect from custom subdomain to /book-online (301 permanent)
+- [ ] Add documentation for DNS configuration
+- [ ] Test with actual custom domain
