@@ -758,3 +758,16 @@
 - [x] Create print-friendly CSS for QR code poster
 - [x] Include salon name and instructions in poster
 - [ ] Test QR code scanning with mobile devices (requires user testing)
+
+## Excel/PDF Export for Sales Reports
+- [x] Install xlsx library for Excel generation
+- [x] Install jsPDF and jspdf-autotable for PDF generation
+- [x] Implement handleExportExcel function in Sales.tsx
+- [x] Include filtered sales data in Excel export
+- [x] Include summary statistics in Excel export (separate summary row)
+- [x] Include filter information in Excel export (separate sheet)
+- [x] Implement handleExportPDF function in Sales.tsx
+- [x] Format PDF report with header, filters, and totals
+- [x] Include sales table in PDF with proper formatting
+- [ ] Test Excel export with different filters (requires user testing)
+- [ ] Test PDF export with different filters (requires user testing)

@@ -11,6 +11,9 @@ import { nb } from "date-fns/locale";
 import { Download, FileSpreadsheet, FileText, Search, TrendingUp, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import * as XLSX from "xlsx";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LiveBadge } from "@/components/ui/live-badge";
@@ -68,13 +71,156 @@ export default function Sales() {
   );
   
   const handleExportExcel = () => {
-    // TODO: Implement Excel export
-    alert("Excel export kommer snart!");
+    // Prepare data for Excel
+    const exportData = filteredOrders.map((order: any) => ({
+      'Ordre nr.': order.orderNumber,
+      'Dato': format(new Date(order.createdAt), 'dd.MM.yyyy HH:mm', { locale: nb }),
+      'Ansatt': staff.find((s: any) => s.id === order.staffId)?.name || 'Ukjent',
+      'Betalingsmetode': order.paymentMethod === 'cash' ? 'Kontant' : 
+                         order.paymentMethod === 'card' ? 'Kort' :
+                         order.paymentMethod === 'vipps' ? 'Vipps' : order.paymentMethod,
+      'Subtotal (kr)': parseFloat(order.subtotal || '0').toFixed(2),
+      'MVA 25% (kr)': parseFloat(order.taxAmount || '0').toFixed(2),
+      'Totalt (kr)': parseFloat(order.total || '0').toFixed(2),
+      'Status': order.status === 'completed' ? 'Fullført' :
+                order.status === 'refunded' ? 'Refundert' : order.status,
+      'Notater': order.notes || ''
+    }));
+    
+    // Add summary row
+    exportData.push({} as any);
+    exportData.push({
+      'Ordre nr.': 'SAMMENDRAG',
+      'Dato': '',
+      'Ansatt': '',
+      'Betalingsmetode': '',
+      'Subtotal (kr)': '',
+      'MVA 25% (kr)': totalMVA.toFixed(2),
+      'Totalt (kr)': totalSales.toFixed(2),
+      'Status': `${totalTransactions} transaksjoner`,
+      'Notater': `Gjennomsnitt: ${averageTransaction.toFixed(2)} kr`
+    });
+    
+    // Add filter info
+    const filterInfo = [
+      { 'Filter': 'Fra dato', 'Verdi': dateFrom },
+      { 'Filter': 'Til dato', 'Verdi': dateTo },
+      { 'Filter': 'Ansatt', 'Verdi': selectedEmployee === 'all' ? 'Alle' : staff.find((s: any) => s.id === parseInt(selectedEmployee))?.name || 'Ukjent' },
+      { 'Filter': 'Betalingsmetode', 'Verdi': selectedPaymentMethod === 'all' ? 'Alle' : selectedPaymentMethod }
+    ];
+    
+    // Create workbook
+    const wb = XLSX.utils.book_new();
+    
+    // Add filter sheet
+    const wsFilter = XLSX.utils.json_to_sheet(filterInfo);
+    XLSX.utils.book_append_sheet(wb, wsFilter, 'Filtre');
+    
+    // Add sales data sheet
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    XLSX.utils.book_append_sheet(wb, ws, 'Salg');
+    
+    // Generate filename with date
+    const filename = `salg_${dateFrom}_til_${dateTo}.xlsx`;
+    
+    // Download
+    XLSX.writeFile(wb, filename);
+    toast.success('Excel-fil lastet ned!');
   };
   
   const handleExportPDF = () => {
-    // TODO: Implement PDF export
-    alert("PDF export kommer snart!");
+    const doc = new jsPDF();
+    
+    // Add header
+    doc.setFontSize(20);
+    doc.setTextColor(128, 0, 128); // Purple
+    doc.text('K.S Salong', 14, 20);
+    
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 0);
+    doc.text('Salgsrapport', 14, 30);
+    
+    // Add filter information
+    doc.setFontSize(10);
+    doc.setTextColor(100, 100, 100);
+    let yPos = 40;
+    doc.text(`Periode: ${dateFrom} til ${dateTo}`, 14, yPos);
+    yPos += 6;
+    doc.text(`Ansatt: ${selectedEmployee === 'all' ? 'Alle' : staff.find((s: any) => s.id === parseInt(selectedEmployee))?.name || 'Ukjent'}`, 14, yPos);
+    yPos += 6;
+    doc.text(`Betalingsmetode: ${selectedPaymentMethod === 'all' ? 'Alle' : selectedPaymentMethod}`, 14, yPos);
+    yPos += 10;
+    
+    // Add summary statistics
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text('Sammendrag', 14, yPos);
+    yPos += 8;
+    
+    doc.setFontSize(10);
+    doc.text(`Totalt salg: ${totalSales.toFixed(2)} kr`, 14, yPos);
+    yPos += 6;
+    doc.text(`MVA (25%): ${totalMVA.toFixed(2)} kr`, 14, yPos);
+    yPos += 6;
+    doc.text(`Antall transaksjoner: ${totalTransactions}`, 14, yPos);
+    yPos += 6;
+    doc.text(`Gjennomsnitt per transaksjon: ${averageTransaction.toFixed(2)} kr`, 14, yPos);
+    yPos += 10;
+    
+    // Prepare table data
+    const tableData = filteredOrders.map((order: any) => [
+      order.orderNumber,
+      format(new Date(order.createdAt), 'dd.MM.yyyy HH:mm', { locale: nb }),
+      staff.find((s: any) => s.id === order.staffId)?.name || 'Ukjent',
+      order.paymentMethod === 'cash' ? 'Kontant' : 
+        order.paymentMethod === 'card' ? 'Kort' :
+        order.paymentMethod === 'vipps' ? 'Vipps' : order.paymentMethod,
+      `${parseFloat(order.total || '0').toFixed(2)} kr`,
+      order.status === 'completed' ? 'Fullført' :
+        order.status === 'refunded' ? 'Refundert' : order.status
+    ]);
+    
+    // Add table
+    autoTable(doc, {
+      head: [['Ordre nr.', 'Dato', 'Ansatt', 'Betaling', 'Totalt', 'Status']],
+      body: tableData,
+      startY: yPos,
+      theme: 'grid',
+      headStyles: { fillColor: [128, 0, 128], textColor: [255, 255, 255] },
+      styles: { fontSize: 9, cellPadding: 3 },
+      columnStyles: {
+        0: { cellWidth: 30 },
+        1: { cellWidth: 35 },
+        2: { cellWidth: 30 },
+        3: { cellWidth: 25 },
+        4: { cellWidth: 30, halign: 'right' },
+        5: { cellWidth: 25 }
+      }
+    });
+    
+    // Add footer
+    const pageCount = (doc as any).internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(150, 150, 150);
+      doc.text(
+        `Side ${i} av ${pageCount}`,
+        doc.internal.pageSize.getWidth() / 2,
+        doc.internal.pageSize.getHeight() - 10,
+        { align: 'center' }
+      );
+      doc.text(
+        `Generert: ${format(new Date(), 'dd.MM.yyyy HH:mm', { locale: nb })}`,
+        14,
+        doc.internal.pageSize.getHeight() - 10
+      );
+    }
+    
+    // Generate filename and download
+    const filename = `salgsrapport_${dateFrom}_til_${dateTo}.pdf`;
+    doc.save(filename);
+    toast.success('PDF-fil lastet ned!');
   };
   
   // Early returns AFTER all hooks
