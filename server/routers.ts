@@ -878,6 +878,11 @@ export const appRouter = router({
         const result = await fiken.testFikenConnection(input.apiToken);
         return result.companies || [];
       }),
+    
+    getFikenSyncLogs: protectedProcedure.query(async () => {
+      const logs = await db.getFikenSyncLogs(100); // Get last 100 logs
+      return logs;
+    }),
   }),
 
   terminal: router({

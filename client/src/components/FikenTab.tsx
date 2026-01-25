@@ -243,6 +243,70 @@ export function FikenTab() {
         </CardContent>
       </Card>
 
+      {/* Manual Date Range Sync */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Manuell synkronisering (datoområde)</CardTitle>
+          <CardDescription>
+            Synkroniser salg for et spesifikt datoområde til Fiken
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <Label htmlFor="syncStartDate">Fra dato</Label>
+              <Input
+                id="syncStartDate"
+                type="date"
+                disabled={!fikenEnabled || !fikenApiToken || !fikenCompanySlug}
+              />
+            </div>
+            <div>
+              <Label htmlFor="syncEndDate">Til dato</Label>
+              <Input
+                id="syncEndDate"
+                type="date"
+                disabled={!fikenEnabled || !fikenApiToken || !fikenCompanySlug}
+              />
+            </div>
+            <div className="flex items-end">
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => {
+                  const startDate = (document.getElementById("syncStartDate") as HTMLInputElement)?.value;
+                  const endDate = (document.getElementById("syncEndDate") as HTMLInputElement)?.value;
+                  if (!startDate || !endDate) {
+                    toast.error("Vennligst velg både fra- og til-dato");
+                    return;
+                  }
+                  if (new Date(startDate) > new Date(endDate)) {
+                    toast.error("Fra-dato kan ikke være etter til-dato");
+                    return;
+                  }
+                  // TODO: Add manual date range sync mutation
+                  toast.info("Synkroniserer " + startDate + " til " + endDate + "...");
+                }}
+                disabled={!fikenEnabled || !fikenApiToken || !fikenCompanySlug}
+              >
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Synkroniser periode
+              </Button>
+            </div>
+          </div>
+          <div className="mt-4">
+            <Button
+              variant="link"
+              className="text-purple-600"
+              onClick={() => window.open("/fiken-sync-history", "_blank")}
+            >
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Se synkroniseringshistorikk
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Verification Section */}
       <Card>
         <CardHeader>

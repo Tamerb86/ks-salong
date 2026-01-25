@@ -1,6 +1,7 @@
 import { CronJob } from "cron";
 import * as db from "../db";
 import { syncDailySalesToFiken } from "../fiken";
+import { notifyOwner } from "../_core/notification";
 
 /**
  * Cron job to automatically sync today's sales to Fiken
@@ -40,10 +41,19 @@ export function startFikenAutoSyncCron() {
         const today = new Date();
         const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
         const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+        const syncDateStr = today.toISOString().split('T')[0]; // YYYY-MM-DD
 
         console.log(
           `[Fiken-AutoSync] Syncing sales from ${startOfDay.toISOString()} to ${endOfDay.toISOString()}`
         );
+
+        // Create sync log entry
+        const logId = await db.createFikenSyncLog({
+          syncDate: syncDateStr,
+          startTime: new Date(),
+          status: "in_progress",
+          syncType: "automatic",
+        });
 
         // Sync today's sales
         const result = await syncDailySalesToFiken(
@@ -54,6 +64,16 @@ export function startFikenAutoSyncCron() {
         );
 
         if (result.success) {
+          // Update sync log with success
+          if (logId) {
+            await db.updateFikenSyncLog(logId, {
+              endTime: new Date(),
+              status: "success",
+              salesCount: result.salesCount,
+              totalAmount: result.totalAmount.toString(),
+            });
+          }
+
           // Update last sync date
           await db.updateSalonSettings({
             fikenLastSyncDate: new Date(),
@@ -64,7 +84,24 @@ export function startFikenAutoSyncCron() {
             `Total amount: ${result.totalAmount} kr`
           );
         } else {
+          // Update sync log with failure
+          if (logId) {
+            await db.updateFikenSyncLog(logId, {
+              endTime: new Date(),
+              status: "failure",
+              salesCount: result.salesCount,
+              totalAmount: result.totalAmount.toString(),
+              errorMessage: result.error || "Unknown error",
+            });
+          }
+
           console.error(`[Fiken-AutoSync] Sync failed: ${result.error}`);
+
+          // Send notification to owner
+          await notifyOwner({
+            title: "Fiken-synkronisering feilet",
+            content: `Automatisk synkronisering av salg til Fiken feilet klokken 23:00.\n\nDato: ${syncDateStr}\nFeilmelding: ${result.error || 'Ukjent feil'}\n\nVennligst sjekk Fiken-innstillingene og prøv igjen manuelt.`,
+          });
         }
       } catch (error) {
         console.error("[Fiken-AutoSync] Cron job error:", error);

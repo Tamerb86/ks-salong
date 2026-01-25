@@ -1,5 +1,5 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, json } from "drizzle-orm/mysql-core";
-import { relations } from "drizzle-orm";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, json, date, datetime, index } from "drizzle-orm/mysql-core";
+import { relations, sql } from "drizzle-orm";
 
 /**
  * ============================================
@@ -399,3 +399,24 @@ export const terminalReaders = mysqlTable("terminalReaders", {
 });
 
 export type TerminalReader = typeof terminalReaders.$inferSelect;
+
+/**
+ * Fiken Sync Logs
+ * Tracks all Fiken sync operations (automatic and manual)
+ */
+export const fikenSyncLogs = mysqlTable("fiken_sync_logs", {
+  id: int("id").primaryKey().autoincrement(),
+  syncDate: varchar("sync_date", { length: 10 }).notNull(), // Date being synced (YYYY-MM-DD)
+  startTime: datetime("start_time").notNull(), // When sync started
+  endTime: datetime("end_time"), // When sync completed
+  status: mysqlEnum("status", ["success", "failure", "in_progress"]).notNull().default("in_progress"),
+  salesCount: int("sales_count").default(0), // Number of sales synced
+  totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).default("0.00"), // Total amount synced
+  errorMessage: text("error_message"), // Error details if failed
+  syncType: mysqlEnum("sync_type", ["automatic", "manual"]).notNull().default("automatic"),
+  createdAt: datetime("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => ({
+  syncDateIdx: index("sync_date_idx").on(table.syncDate),
+  statusIdx: index("status_idx").on(table.status),
+  createdAtIdx: index("created_at_idx").on(table.createdAt),
+}));

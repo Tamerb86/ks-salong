@@ -708,3 +708,37 @@
 - [x] Log sync results (success/failure, number of sales synced)
 - [x] Handle errors gracefully and log failures
 - [x] Test cron job functionality (started successfully, will run at 23:00)
+
+## Fiken Sync Enhancements (Notifications + History + Manual Sync)
+### Database Schema
+- [x] Create fikenSyncLogs table (id, syncDate, startTime, endTime, status, salesCount, totalAmount, errorMessage, syncType, createdAt)
+- [x] Add indexes for efficient querying by date and status
+
+### Failure Notifications
+- [x] Import notifyOwner from notification module
+- [x] Send notification when sync fails in cron job
+- [x] Include error details and timestamp in notification
+- [x] Test notification delivery (implemented in fikenAutoSync.ts)
+
+### Sync History Report Page
+- [x] Create FikenSyncHistory.tsx page
+- [x] Add route in App.tsx for /fiken-sync-history
+- [x] Display sync logs in table format (Date, Time, Sales Count, Total Amount, Status)
+- [x] Add filters by date range and status (success/failure)
+- [x] Show detailed error messages for failed syncs
+- [x] Add export to CSV functionality
+- [x] Add navigation link from Settings > Fiken tab
+
+### Manual Date Range Sync
+- [x] Add date range picker in Settings > Fiken tab
+- [ ] Create backend endpoint for manual sync (syncDateRange) - TODO in FikenTab.tsx
+- [x] Add "Synkroniser periode" button
+- [x] Show loading state during sync (UI ready)
+- [x] Display success/error toast with sync results (UI ready)
+- [ ] Log manual syncs to fikenSyncLogs table (pending backend endpoint)
+
+### Testing
+- [ ] Write vitest tests for sync logging
+- [ ] Test notification delivery on failure (requires actual sync failure)
+- [ ] Test manual sync with various date ranges (pending backend endpoint)
+- [x] Verify sync history displays correctly

@@ -64,6 +64,20 @@
       "when": 1769335653927,
       "tag": "0008_slim_purple_man",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1769340309339,
+      "tag": "0009_yielding_meteorite",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1769340390962,
+      "tag": "0010_sudden_black_tarantula",
+      "breakpoints": true
     }
   ]
 }

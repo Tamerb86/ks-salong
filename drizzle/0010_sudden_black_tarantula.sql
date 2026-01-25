@@ -1,0 +1,1 @@
+ALTER TABLE `fiken_sync_logs` MODIFY COLUMN `sync_date` varchar(10) NOT NULL;

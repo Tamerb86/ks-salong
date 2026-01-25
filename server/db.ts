@@ -4,7 +4,7 @@ import {
   InsertUser, users, permissions, services, products, serviceStaff,
   appointments, dropInQueue, payments, orders, orderItems, timeEntries,
   customers, salonSettings, businessHours, holidays, notificationTemplates,
-  dailyReports, auditLogs, terminalReaders
+  dailyReports, auditLogs, terminalReaders, fikenSyncLogs
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -1112,4 +1112,51 @@ export async function getOrdersByDateRange(startDate: string, endDate: string) {
   );
   
   return ordersWithItems;
+}
+
+export async function createFikenSyncLog(logData: typeof fikenSyncLogs.$inferInsert) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.insert(fikenSyncLogs).values(logData);
+  // Return the last inserted ID
+  const inserted = await db.select().from(fikenSyncLogs).orderBy(desc(fikenSyncLogs.id)).limit(1);
+  return inserted[0]?.id || null;
+}
+
+export async function updateFikenSyncLog(
+  logId: number,
+  updates: Partial<typeof fikenSyncLogs.$inferInsert>
+) {
+  const db = await getDb();
+  if (!db) return;
+  
+  await db.update(fikenSyncLogs).set(updates).where(eq(fikenSyncLogs.id, logId));
+}
+
+export async function getFikenSyncLogs(limit: number = 50) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db
+    .select()
+    .from(fikenSyncLogs)
+    .orderBy(desc(fikenSyncLogs.createdAt))
+    .limit(limit);
+}
+
+export async function getFikenSyncLogsByDateRange(startDate: string, endDate: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db
+    .select()
+    .from(fikenSyncLogs)
+    .where(
+      and(
+        gte(fikenSyncLogs.syncDate, startDate),
+        lte(fikenSyncLogs.syncDate, endDate)
+      )
+    )
+    .orderBy(desc(fikenSyncLogs.createdAt));
 }
