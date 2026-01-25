@@ -1408,6 +1408,10 @@ export const appRouter = router({
           throw new TRPCError({ code: "BAD_REQUEST", message: result.error });
         }
         
+        if (!result) {
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to clock out" });
+        }
+        
         return { success: true, employee: { id: employee.id, name: employee.name, role: employee.role }, totalMinutes: result.totalMinutes, overtimeMinutes: result.overtimeMinutes };
       }),
     

@@ -1433,3 +1433,13 @@
 ## Fix Customer Creation Button Bug
 - [x] Fix 'Opprett kunde' button being disabled when all fields are filled
 - [x] Test customer creation with different inputs
+
+## Remove Første ledige and Sync Staff/Services
+- [x] Remove 'Første ledige' option from online booking page
+- [x] Sync staff list with database in online booking
+- [x] Sync services list with database in online booking
+- [x] Test online booking with real staff and services
+
+## Fix TypeScript Errors
+- [x] Fix Tidsstempling.tsx employeeId missing error
+- [x] Fix routers.ts timeEntry property error

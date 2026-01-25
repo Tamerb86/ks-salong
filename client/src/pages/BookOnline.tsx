@@ -31,7 +31,7 @@ export default function BookOnline() {
   const isPublicBooking = location === "/book-online";
   const [step, setStep] = useState(1);
   const [selectedService, setSelectedService] = useState<any>(null);
-  const [selectedStaff, setSelectedStaff] = useState<string>("any");
+  const [selectedStaff, setSelectedStaff] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState("");
   const [customerInfo, setCustomerInfo] = useState({
@@ -122,7 +122,7 @@ export default function BookOnline() {
 
     createBookingMutation.mutate({
       customerId: 1, // Will be created/linked in backend
-      staffId: selectedStaff === "any" ? 1 : parseInt(selectedStaff),
+      staffId: parseInt(selectedStaff),
       serviceId: selectedService.id,
       appointmentDate: appointmentDate,
       startTime: selectedTime,
@@ -137,11 +137,9 @@ export default function BookOnline() {
 
     // Get selected staff's duration multiplier
     let durationMultiplier = 1.0;
-    if (selectedStaff !== "any") {
-      const staffMember = staff.find((s: any) => s.id === parseInt(selectedStaff));
-      if (staffMember && staffMember.durationMultiplier) {
-        durationMultiplier = parseFloat(staffMember.durationMultiplier);
-      }
+    const staffMember = staff?.find((s: any) => s.id === parseInt(selectedStaff));
+    if (staffMember && staffMember.durationMultiplier) {
+      durationMultiplier = parseFloat(staffMember.durationMultiplier);
     }
 
     // Calculate actual service duration based on staff skill
@@ -165,7 +163,7 @@ export default function BookOnline() {
 
     // Get selected staff's duration multiplier
     let durationMultiplier = 1.0;
-    if (selectedStaff !== "any") {
+    if (selectedStaff) {
       const staffMember = staff.find((s: any) => s.id === parseInt(selectedStaff));
       if (staffMember && staffMember.durationMultiplier) {
         durationMultiplier = parseFloat(staffMember.durationMultiplier);
@@ -181,7 +179,7 @@ export default function BookOnline() {
 
     return !appointments.some((apt: any) => {
       if (apt.status === "cancelled") return false;
-      if (selectedStaff !== "any" && apt.staffId !== parseInt(selectedStaff)) return false;
+      if (selectedStaff && apt.staffId !== parseInt(selectedStaff)) return false;
 
       const aptStart = new Date(apt.appointmentTime);
       const aptEnd = new Date(aptStart.getTime() + apt.duration * 60000);
@@ -307,23 +305,6 @@ export default function BookOnline() {
             </Button>
             <h2 className="text-3xl font-bold text-center mb-8">Velg frisør</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card
-                className="hover:shadow-xl transition-all cursor-pointer border-2 hover:border-purple-300"
-                onClick={() => handleStaffSelect("any")}
-              >
-                <CardHeader>
-                  <CardTitle>Første ledige</CardTitle>
-                  <CardDescription>
-                    Vi finner den første tilgjengelige frisøren for deg
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button className="w-full bg-gradient-to-r from-purple-600 to-amber-600">
-                    Fortsett
-                  </Button>
-                </CardContent>
-              </Card>
-
               {staff?.filter((s: any) => s.role === "barber" && s.isActive).map((member: any) => (
                 <Card
                   key={member.id}
