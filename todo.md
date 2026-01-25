@@ -1386,3 +1386,13 @@
 - [x] Update all page titles and headers
 - [x] Update meta tags and SEO
 - [x] Update logo text references
+
+## Production Data Cleanup
+- [x] Create script to delete all test data
+- [x] Delete all sales/orders
+- [x] Delete all appointments
+- [x] Delete all customers
+- [x] Delete all queue entries
+- [x] Delete all payments
+- [x] Delete all time entries
+- [x] Keep services and staff (will be updated with real data)
