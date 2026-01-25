@@ -1270,3 +1270,10 @@
 ## Restore Add Customer Button
 - [x] Add "Legg til kunde" button in Customers page header
 - [x] Verify customer creation dialog works properly
+
+## Add Dashboard Button to Header
+- [x] Analyze current header structure in public website (Landing.tsx)
+- [x] Add Dashboard button in header next to "Bestill time"
+- [x] Style button to match existing design (outline style with purple theme)
+- [x] Link to dashboard-login page (authentication handled there)
+- [x] Test Dashboard button navigation from landing page

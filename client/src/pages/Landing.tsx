@@ -43,11 +43,19 @@ export default function Landing() {
             <a href="#tjenester" className="text-gray-700 hover:text-purple-600 transition">Tjenester</a>
             <a href="#kontakt" className="text-gray-700 hover:text-purple-600 transition">Kontakt</a>
           </div>
-          <Link href="/book-online">
-            <Button size="lg" className="bg-purple-600 hover:bg-purple-700">
-              Bestill time
-            </Button>
-          </Link>
+          <div className="flex gap-3">
+            <Link href="/dashboard-login">
+              <Button size="lg" variant="outline" className="border-purple-600 text-purple-600 hover:bg-purple-50">
+                <Lock className="mr-2 h-4 w-4" />
+                Dashboard
+              </Button>
+            </Link>
+            <Link href="/book-online">
+              <Button size="lg" className="bg-purple-600 hover:bg-purple-700">
+                Bestill time
+              </Button>
+            </Link>
+          </div>
         </div>
       </nav>
 
