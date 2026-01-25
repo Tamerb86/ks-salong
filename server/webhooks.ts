@@ -17,22 +17,23 @@ export async function handleVippsCallback(req: Request, res: Response) {
     
     console.log("[Vipps Webhook] Received callback:", JSON.stringify(payload, null, 2));
     
-    // Extract order ID (format: APT-123 or ORD-456)
-    const orderId = payload.orderId;
-    const status = payload.transactionInfo?.status;
+    // ePayment API v1 format
+    // Extract reference (format: APT-123 or ORD-456)
+    const reference = payload.reference || payload.orderId; // Support both formats
+    const state = payload.state; // CREATED, AUTHORIZED, TERMINATED, ABORTED, EXPIRED
     
-    if (!orderId || !status) {
-      console.error("[Vipps Webhook] Missing orderId or status");
+    if (!reference || !state) {
+      console.error("[Vipps Webhook] Missing reference or state");
       return res.status(400).json({ error: "Missing required fields" });
     }
     
     // Determine if this is an appointment or order payment
-    if (orderId.startsWith("APT-")) {
-      await handleAppointmentPayment(orderId, status, payload);
-    } else if (orderId.startsWith("ORD-")) {
-      await handleOrderPayment(orderId, status, payload);
+    if (reference.startsWith("APT-")) {
+      await handleAppointmentPayment(reference, state, payload);
+    } else if (reference.startsWith("ORD-")) {
+      await handleOrderPayment(reference, state, payload);
     } else {
-      console.warn(`[Vipps Webhook] Unknown order ID format: ${orderId}`);
+      console.warn(`[Vipps Webhook] Unknown reference format: ${reference}`);
     }
     
     // Always respond with 200 OK to Vipps
@@ -49,15 +50,15 @@ export async function handleVippsCallback(req: Request, res: Response) {
  * Handle Appointment Payment Callback
  */
 async function handleAppointmentPayment(
-  orderId: string,
-  status: string,
+  reference: string,
+  state: string,
   payload: any
 ) {
-  // Extract appointment ID from order ID (APT-123 → 123)
-  const appointmentId = parseInt(orderId.replace("APT-", ""));
+  // Extract appointment ID from reference (APT-123 → 123)
+  const appointmentId = parseInt(reference.replace("APT-", ""));
   
   if (isNaN(appointmentId)) {
-    console.error(`[Vipps Webhook] Invalid appointment ID in orderId: ${orderId}`);
+    console.error(`[Vipps Webhook] Invalid appointment ID in reference: ${reference}`);
     return;
   }
   
@@ -67,12 +68,14 @@ async function handleAppointmentPayment(
     return;
   }
   
-  console.log(`[Vipps Webhook] Processing appointment ${appointmentId}, status: ${status}`);
+  console.log(`[Vipps Webhook] Processing appointment ${appointmentId}, state: ${state}`);
   
-  switch (status) {
-    case "RESERVED":
-    case "SALE":
-      // Payment successful - confirm appointment
+  // Update payment status in payments table
+  await db.updatePaymentStatus(reference, mapVippsStateToPaymentStatus(state), new Date());
+  
+  switch (state) {
+    case "AUTHORIZED":
+      // Payment authorized - confirm appointment and capture payment
       await db.updateAppointment(appointmentId, {
         paymentStatus: "paid",
         status: "confirmed",
@@ -81,24 +84,58 @@ async function handleAppointmentPayment(
       
       console.log(`[Vipps Webhook] Appointment ${appointmentId} confirmed after payment`);
       
+      // Auto-capture the payment
+      try {
+        await vipps.capturePayment(reference, payload.aggregate?.authorizedAmount?.value || 0);
+        console.log(`[Vipps Webhook] Payment captured for appointment ${appointmentId}`);
+      } catch (error: any) {
+        console.error(`[Vipps Webhook] Failed to capture payment:`, error);
+      }
+      
       // TODO: Send confirmation email/SMS to customer
       
       break;
       
-    case "CANCELLED":
-    case "REJECTED":
+    case "ABORTED":
+    case "EXPIRED":
+    case "TERMINATED":
       // Payment failed or cancelled - mark appointment
       await db.updateAppointment(appointmentId, {
         paymentStatus: "failed",
         // Keep status as pending, allow customer to retry payment
       });
       
-      console.log(`[Vipps Webhook] Appointment ${appointmentId} payment failed`);
+      console.log(`[Vipps Webhook] Appointment ${appointmentId} payment failed (${state})`);
       
       break;
       
+    case "CREATED":
+      // Payment initiated but not completed yet
+      console.log(`[Vipps Webhook] Appointment ${appointmentId} payment initiated`);
+      break;
+      
     default:
-      console.warn(`[Vipps Webhook] Unknown status: ${status}`);
+      console.warn(`[Vipps Webhook] Unknown state: ${state}`);
+  }
+}
+
+/**
+ * Map Vipps ePayment API state to payment status
+ */
+function mapVippsStateToPaymentStatus(state: string): "pending" | "initiated" | "authorized" | "captured" | "refunded" | "failed" | "cancelled" | "expired" {
+  switch (state) {
+    case "CREATED":
+      return "initiated";
+    case "AUTHORIZED":
+      return "authorized";
+    case "ABORTED":
+      return "cancelled";
+    case "EXPIRED":
+      return "expired";
+    case "TERMINATED":
+      return "failed";
+    default:
+      return "failed";
   }
 }
 
@@ -106,15 +143,15 @@ async function handleAppointmentPayment(
  * Handle Order Payment Callback (POS/Online Orders)
  */
 async function handleOrderPayment(
-  orderId: string,
-  status: string,
+  reference: string,
+  state: string,
   payload: any
 ) {
-  // Extract order ID from order ID (ORD-123 → 123)
-  const orderIdNum = parseInt(orderId.replace("ORD-", ""));
+  // Extract order ID from reference (ORD-123 → 123)
+  const orderIdNum = parseInt(reference.replace("ORD-", ""));
   
   if (isNaN(orderIdNum)) {
-    console.error(`[Vipps Webhook] Invalid order ID in orderId: ${orderId}`);
+    console.error(`[Vipps Webhook] Invalid order ID in reference: ${reference}`);
     return;
   }
   
@@ -124,25 +161,42 @@ async function handleOrderPayment(
     return;
   }
   
-  console.log(`[Vipps Webhook] Processing order ${orderIdNum}, status: ${status}`);
+  console.log(`[Vipps Webhook] Processing order ${orderIdNum}, state: ${state}`);
   
-  switch (status) {
-    case "RESERVED":
-    case "SALE":
-      // Payment successful
-      console.log(`[Vipps Webhook] Order ${orderIdNum} payment successful`);
+  // Update payment status in payments table
+  await db.updatePaymentStatus(reference, mapVippsStateToPaymentStatus(state), new Date());
+  
+  switch (state) {
+    case "AUTHORIZED":
+      // Payment authorized
+      console.log(`[Vipps Webhook] Order ${orderIdNum} payment authorized`);
+      
+      // Auto-capture the payment
+      try {
+        await vipps.capturePayment(reference, payload.aggregate?.authorizedAmount?.value || 0);
+        console.log(`[Vipps Webhook] Payment captured for order ${orderIdNum}`);
+      } catch (error: any) {
+        console.error(`[Vipps Webhook] Failed to capture payment:`, error);
+      }
+      
       // TODO: Update order status when updateOrder function is available
       break;
       
-    case "CANCELLED":
-    case "REJECTED":
+    case "ABORTED":
+    case "EXPIRED":
+    case "TERMINATED":
       // Payment failed
-      console.log(`[Vipps Webhook] Order ${orderIdNum} payment failed`);
+      console.log(`[Vipps Webhook] Order ${orderIdNum} payment failed (${state})`);
       // TODO: Update order status when updateOrder function is available
+      break;
+      
+    case "CREATED":
+      // Payment initiated
+      console.log(`[Vipps Webhook] Order ${orderIdNum} payment initiated`);
       break;
       
     default:
-      console.warn(`[Vipps Webhook] Unknown status: ${status}`);
+      console.warn(`[Vipps Webhook] Unknown state: ${state}`);
   }
 }
 

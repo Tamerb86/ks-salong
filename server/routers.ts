@@ -372,7 +372,7 @@ export const appRouter = router({
             customerPhone: customer?.phone,
             reference: `APT-${appointmentId}`,
             description: `Booking: ${service.name}`,
-            returnUrl: `${process.env.VITE_APP_URL || "http://localhost:3000"}/book-online/payment-callback`,
+            returnUrl: `${process.env.VITE_APP_URL || "http://localhost:3000"}/payment-callback`,
           });
           
           if (paymentResult.orderId && appointmentId) {

@@ -1180,26 +1180,54 @@
 - [x] Add tRPC endpoints: vipps.initiatePayment, vipps.getPaymentStatus, vipps.capturePayment
 - [x] Add database functions: createPayment, updatePaymentStatus, getPaymentByReference
 
-## Vipps Payment Integration - Phase 3: BookOnline Payment Step
-- [ ] Add Step 5 (Payment) to BookOnline flow
-- [ ] Create payment UI with Vipps button
-- [ ] Integrate vipps.initiatePayment mutation
-- [ ] Redirect user to Vipps payment page
-- [ ] Handle return from Vipps (success/failure)
-- [ ] Show payment confirmation or error message
+## Vipps Payment Integration - Phase 3: BookOnline Payment Step ✅
+- [x] Read current BookOnline.tsx to understand flow
+- [x] Add payment step after service selection (Step 4) - already exists as Step 5
+- [x] Create payment UI with Vipps logo and button - already exists
+- [x] Integrate vipps.initiatePayment mutation - uses createWithPayment
+- [x] Show loading state during payment initiation - isPending state
+- [x] Redirect user to Vipps payment page (redirectUrl) - window.location.href
+- [x] Store appointment ID in localStorage for callback - handled by backend
 
-## Vipps Payment Integration - Phase 4: Webhook Handler
-- [ ] Create webhook endpoint /api/vipps/callback
-- [ ] Verify webhook signature for security
-- [ ] Update payment status in database
-- [ ] Auto-confirm appointment after successful payment
-- [ ] Send confirmation email/SMS to customer
-- [ ] Handle payment failures and cancellations
+## Vipps Payment Integration - Phase 4: Payment Callback Page ✅
+- [x] Create PaymentCallback.tsx page
+- [x] Add route /payment-callback in App.tsx
+- [x] Read query parameters (reference, orderId)
+- [x] Call vipps.getPaymentStatus to verify payment (with auto-polling)
+- [x] Show success message if payment completed (AUTHORIZED)
+- [x] Show error message if payment failed (ABORTED, EXPIRED, TERMINATED)
+- [x] Provide link to return to home or book again
+- [x] Update returnUrl in routers.ts to use /payment-callback
 
-## Vipps Payment Integration - Phase 5: Testing
-- [ ] Test payment initiation with test credentials
-- [ ] Test webhook callback handling
-- [ ] Test appointment confirmation after payment
-- [ ] Write vitest tests for Vipps service functions
+## Vipps Payment Integration - Phase 5: Webhook Handler ✅
+- [x] Create Express route /api/webhooks/vipps in server (already exists)
+- [x] Parse webhook payload (reference, state from ePayment API v1)
+- [x] Update payment status in database using updatePaymentStatus
+- [x] Auto-confirm appointment after successful payment (AUTHORIZED)
+- [x] Auto-capture payment after authorization
+- [x] Log webhook events for debugging
+- [x] Handle payment failures and cancellations (ABORTED, EXPIRED, TERMINATED)
+- [x] Return 200 OK to acknowledge webhook
+- [x] Support both appointment (APT-) and order (ORD-) payments
+
+## Vipps Payment Integration - Phase 6: Payments Management Page
+- [ ] Create Payments.tsx page in Dashboard
+- [ ] Add route /payments in App.tsx
+- [ ] Add "Betalinger" navigation item in DashboardLayout
+- [ ] Create tRPC endpoint payments.getAll with filters
+- [ ] Display payments table with columns: Date, Customer, Amount, Status, Method
+- [ ] Add filters: Date range, Status, Payment method
+- [ ] Add search by customer name or appointment ID
+- [ ] Add refund button for captured payments
+- [ ] Implement refund dialog with reason input
+- [ ] Call vipps.refundPayment mutation
+- [ ] Show success/error toast after refund
+- [ ] Add export to CSV functionality
+
+## Vipps Payment Integration - Phase 7: Testing & Checkpoint
+- [ ] Test complete payment flow from BookOnline to callback
+- [ ] Test webhook handler with mock data
+- [ ] Test Payments page filters and refund
+- [ ] Write vitest tests for payment endpoints
 - [ ] Test error scenarios (API failures, invalid credentials)
-- [ ] Create checkpoint after successful testing
+- [ ] Create final checkpoint

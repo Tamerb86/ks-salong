@@ -9,6 +9,7 @@ import Services from "@/pages/Services";
 import Products from "@/pages/Products";
 import Sales from "@/pages/Sales";
 import BookOnline from "./pages/BookOnline";
+import PaymentCallback from "./pages/PaymentCallback";
 import Appointments from "./pages/Appointments";
 import Queue from "./pages/Queue";
 import POS from "./pages/POS";
@@ -32,6 +33,7 @@ function Router() {
       <Route path={"/dashboard-login"} component={DashboardLogin} />
       <Route path={"/dashboard"} component={Home} />
       <Route path={"/book-online"} component={BookOnline} />
+      <Route path={"/payment-callback"} component={PaymentCallback} />
       <Route path={"/services"} component={Services} />
         <Route path="/products" component={Products} />
         <Route path="/sales" component={Sales} />
