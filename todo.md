@@ -1428,4 +1428,8 @@
 - [x] Add 'Ny Kunde' button in Customers page header
 - [x] Create customer creation dialog with form fields
 - [x] Implement customer creation mutation
-- [ ] Test customer creation flow
+- [x] Test customer creation flow
+
+## Fix Customer Creation Button Bug
+- [x] Fix 'Opprett kunde' button being disabled when all fields are filled
+- [x] Test customer creation with different inputs

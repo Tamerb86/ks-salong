@@ -515,7 +515,7 @@ export const appRouter = router({
         firstName: z.string(),
         lastName: z.string(),
         phone: z.string(),
-        email: z.string().email().optional(),
+        email: z.string().email().optional().or(z.literal('')),
         dateOfBirth: z.date().optional(),
         address: z.string().optional(),
         preferredStaffId: z.number().optional(),
