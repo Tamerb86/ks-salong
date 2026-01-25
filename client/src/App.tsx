@@ -19,6 +19,7 @@ import Customers from "./pages/Customers";
 import CustomerProfile from "./pages/CustomerProfile";
 import QueueTV from "./pages/QueueTV";
 import Tidsstempling from "./pages/Tidsstempling";
+import TerminalPayment from "./pages/TerminalPayment";
 import Reports from "./pages/Reports";
 import Staff from "./pages/Staff";
 import FikenSyncHistory from "./pages/FikenSyncHistory";
@@ -44,6 +45,7 @@ function Router() {
       <Route path={"/pos"} component={POS} />
       <Route path={"/time-clock"} component={TimeClock} />
       <Route path={"/tidsstempling"} component={Tidsstempling} />
+      <Route path={"/terminal-payment"} component={TerminalPayment} />
       <Route path={"/customers"} component={Customers} />
       <Route path={"/customers/:id"} component={CustomerProfile} />
       <Route path={"/reports"} component={Reports} />

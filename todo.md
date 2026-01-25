@@ -1273,8 +1273,36 @@
 - [x] Review existing server/stripeTerminal.ts service module (395 lines, fully functional)
 - [x] Update Terminal service to support WisePOS E reader (already supports it)
 - [x] Add Terminal reader discovery and connection functions (registerTerminalReader, listTerminalReaders, processPaymentOnReader)
-- [ ] Create payment UI component for Terminal payments in Dashboard
-- [ ] Add Terminal payment flow (create payment intent, collect payment, confirm)
-- [ ] Test Terminal connection and payment with test mode
-- [ ] Add error handling for Terminal disconnection
+## Terminal Payment UI - Phase 1: Terminal Payment Page ✅
+- [x] Create TerminalPayment.tsx page in Dashboard
+- [x] Add route /terminal-payment in App.tsx
+- [x] Add "Terminal Betaling" navigation item in DashboardLayout
+- [x] Create tRPC endpoint terminal.listReaders (already exists)
+- [x] Display available readers in dropdown
+- [x] Add amount input field (NOK)
+- [x] Add "Behandle betaling" button
+- [x] Show payment status (idle, creating, processing, success, failed)
+- [x] Display receipt after successful payment with transaction details
+
+## Terminal Payment UI - Phase 2: Appointments Integration
+- [ ] Add "Betal med Terminal" button in Appointments page
+- [ ] Show button only for confirmed/completed appointments
+- [ ] Open payment dialog with pre-filled amount (service price)
+- [ ] Link payment to appointment ID
+- [ ] Update appointment status to "paid" after successful payment
+- [ ] Store payment record in payments table
+
+## Terminal Payment UI - Phase 3: tRPC Endpoints
+- [ ] Create terminal router in routers.ts
+- [ ] Add terminal.listReaders endpoint
+- [ ] Add terminal.createPaymentIntent endpoint
+- [ ] Add terminal.processPayment endpoint
+- [ ] Add terminal.cancelPayment endpoint
+- [ ] Add error handling for all endpoints
+
+## Terminal Payment UI - Phase 4: Testing & Documentation
+- [ ] Test Terminal payment flow with simulated reader
+- [ ] Test Appointments payment integration
+- [ ] Create setup guide for WisePOS E configuration
+- [ ] Add troubleshooting section for common errors
 - [ ] Create checkpoint after implementation

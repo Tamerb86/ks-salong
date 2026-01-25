@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, Calendar, Clock, Settings as SettingsIcon, BarChart3, UserCircle, ShoppingBag, Package } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, Calendar, Clock, Settings as SettingsIcon, BarChart3, UserCircle, ShoppingBag, Package, CreditCard } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -31,6 +31,7 @@ const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
   { icon: Calendar, label: "Avtaler", path: "/appointments" },
   { icon: Clock, label: "Kø", path: "/queue" },
+  { icon: CreditCard, label: "Terminal Betaling", path: "/terminal-payment" },
   { icon: Users, label: "Kunder", path: "/customers" },
   { icon: UserCircle, label: "Ansatte", path: "/staff" },
   { icon: Package, label: "Tjenester", path: "/services" },
