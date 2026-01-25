@@ -185,8 +185,12 @@ export default function BookOnline() {
     // Round down to nearest slot interval to ensure we don't skip the last valid slot
     const lastStartTime = Math.floor(rawLastStartTime / slotInterval) * slotInterval;
     
-    // Generate slots from 9:00 until lastStartTime
-    const startTime = 9 * 60; // 9:00 in minutes
+    // Get opening time from business hours
+    const openTimeStr = dayHours?.openTime || "10:00";
+    const [openHour, openMinute] = openTimeStr.split(":").map(Number);
+    const startTime = openHour * 60 + openMinute; // Convert opening time to minutes
+    
+    // Generate slots from opening time until lastStartTime
     for (let timeInMinutes = startTime; timeInMinutes <= lastStartTime; timeInMinutes += slotInterval) {
       const hour = Math.floor(timeInMinutes / 60);
       const min = timeInMinutes % 60;
@@ -207,7 +211,7 @@ export default function BookOnline() {
                         (timeInMinutes <= breakStart && slotEnd >= breakEnd);
       }
       
-      if (hour >= 9 && hour < 20 && !isDuringBreak) { // Safety check: only 9:00-19:xx and not during break
+      if (!isDuringBreak) { // Only exclude break times, no hardcoded hour limits
         slots.push(timeStr);
       }
     }

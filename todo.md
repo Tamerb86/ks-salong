@@ -1145,3 +1145,10 @@
 - [x] Add leave management UI in Staff page (view, add, edit, delete leaves)
 - [x] Update BookOnline to check leave dates and hide staff on leave
 - [x] Test leave functionality with different date ranges
+
+## Fix Booking Time Slots Display
+- [x] Investigate time slot generation logic in BookOnline page
+- [x] Fix start time to match business opening time from settings (10:00 instead of 09:00)
+- [x] Fix last available time slot to match business closing time (18:00 instead of 17:30)
+- [x] Ensure slots are generated correctly based on service duration
+- [x] Test booking flow with different opening/closing times
