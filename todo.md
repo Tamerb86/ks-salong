@@ -1366,3 +1366,17 @@
 - [x] Validate all appointments for conflicts before creation
 - [x] Show summary of created appointments after success
 - [ ] Link recurring appointments with a group ID for easy management
+
+## Render.com Deployment
+- [ ] Create render.yaml configuration file
+- [ ] Create build script for Render
+- [ ] Set up environment variables in Render dashboard
+- [ ] Configure database connection for Render
+- [ ] Deploy to Render from GitHub
+- [ ] Test deployed application
+- [ ] Configure custom domain (optional)
+
+## CRITICAL BUG - Book Online Authentication
+- [x] Remove authentication requirement from /book-online page
+- [x] Allow public access to booking page without login
+- [x] Test booking flow works for customers without account

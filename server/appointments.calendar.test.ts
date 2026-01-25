@@ -61,13 +61,18 @@ describe("Appointments Calendar - Monthly View", () => {
       isActive: true,
     });
 
-    // Create multiple appointments for testing
+    // Create multiple appointments for testing (use far future dates to avoid conflicts)
+    const baseDate = new Date();
+    baseDate.setFullYear(baseDate.getFullYear() + 5); // 5 years in future
+    baseDate.setMonth(2); // March
+    baseDate.setDate(15);
+    
     const appointments = [
       {
         customerId: testCustomerId,
         staffId: testStaffId,
         serviceId: testServiceId,
-        appointmentDate: new Date("2026-03-15") as any,
+        appointmentDate: new Date(baseDate) as any,
         startTime: "09:00",
         endTime: "09:30",
         notes: "Morning appointment",
@@ -76,7 +81,7 @@ describe("Appointments Calendar - Monthly View", () => {
         customerId: testCustomerId,
         staffId: testStaffId,
         serviceId: testServiceId,
-        appointmentDate: new Date("2026-03-15") as any,
+        appointmentDate: new Date(baseDate) as any,
         startTime: "10:00",
         endTime: "10:30",
         notes: "Mid-morning appointment",
@@ -85,7 +90,7 @@ describe("Appointments Calendar - Monthly View", () => {
         customerId: testCustomerId,
         staffId: testStaffId,
         serviceId: testServiceId,
-        appointmentDate: new Date("2026-03-16") as any,
+        appointmentDate: new Date(baseDate.getTime() + 86400000) as any, // Next day
         startTime: "14:00",
         endTime: "14:30",
         notes: "Afternoon appointment",
@@ -99,9 +104,15 @@ describe("Appointments Calendar - Monthly View", () => {
   });
 
   it("should fetch appointments for a date range (month)", async () => {
+    const baseDate = new Date();
+    baseDate.setFullYear(baseDate.getFullYear() + 5);
+    baseDate.setMonth(2);
+    const startDate = `${baseDate.getFullYear()}-03-01`;
+    const endDate = `${baseDate.getFullYear()}-03-31`;
+    
     const result = await caller.appointments.listByDateRange({
-      startDate: "2026-03-01",
-      endDate: "2026-03-31",
+      startDate,
+      endDate,
     });
 
     expect(result).toBeDefined();

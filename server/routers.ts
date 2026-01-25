@@ -1391,7 +1391,7 @@ export const appRouter = router({
           throw new TRPCError({ code: "BAD_REQUEST", message: result.error });
         }
         
-        return { success: true, employee: { id: employee.id, name: employee.name, role: employee.role } };
+        return { success: true, employee: { id: employee.id, name: employee.name, role: employee.role }, timeEntry: result?.entry || { clockIn: new Date() } };
       }),
     
     // Clock out
@@ -1418,7 +1418,7 @@ export const appRouter = router({
           throw new TRPCError({ code: "BAD_REQUEST", message: result.error });
         }
         
-        return { success: true, ...result };
+        return { success: true, employee: { id: employee.id, name: employee.name, role: employee.role }, timeEntry: result?.entry || { clockOut: new Date() } };
       }),
     
     // Get currently clocked in employees
