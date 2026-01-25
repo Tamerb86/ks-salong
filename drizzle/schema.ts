@@ -56,6 +56,7 @@ export const services = mysqlTable("services", {
   mvaTax: decimal("mvaTax", { precision: 5, scale: 2 }).default("25.00").notNull(), // Norwegian VAT
   isActive: boolean("isActive").default(true).notNull(),
   category: varchar("category", { length: 100 }),
+  imageUrl: text("imageUrl"),
   notes: text("notes"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

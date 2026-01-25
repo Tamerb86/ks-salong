@@ -103,7 +103,7 @@ export function FikenTab() {
         <CardHeader>
           <CardTitle>Fiken Regnskap Integrasjon</CardTitle>
           <CardDescription>
-            Koble Khalid Salong til Fiken.no for automatisk regnskapsføring
+            Koble K.S Salong til Fiken.no for automatisk regnskapsføring
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -312,7 +312,7 @@ export function FikenTab() {
         <CardHeader>
           <CardTitle>Verifiser totaler</CardTitle>
           <CardDescription>
-            Sammenlign salg mellom Khalid Salong og Fiken for å sikre nøyaktighet
+            Sammenlign salg mellom K.S Salong og Fiken for å sikre nøyaktighet
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -332,7 +332,7 @@ export function FikenTab() {
                 1
               </div>
               <div>
-                <p className="font-medium">Salg registreres i Khalid Salong</p>
+                <p className="font-medium">Salg registreres i K.S Salong</p>
                 <p className="text-sm text-gray-600">
                   Alle ordre fra POS-systemet lagres lokalt med MVA-beregning
                 </p>
@@ -356,7 +356,7 @@ export function FikenTab() {
               <div>
                 <p className="font-medium">Verifisering av totaler</p>
                 <p className="text-sm text-gray-600">
-                  Systemet sammenligner totaler mellom Khalid Salong og Fiken for å sikre nøyaktighet
+                  Systemet sammenligner totaler mellom K.S Salong og Fiken for å sikre nøyaktighet
                 </p>
               </div>
             </div>

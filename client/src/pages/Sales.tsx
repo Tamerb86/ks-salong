@@ -143,7 +143,7 @@ export default function Sales() {
     // Add header
     doc.setFontSize(20);
     doc.setTextColor(128, 0, 128); // Purple
-    doc.text('Khalid Salong', 14, 20);
+    doc.text('K.S Salong', 14, 20);
     
     doc.setFontSize(16);
     doc.setTextColor(0, 0, 0);

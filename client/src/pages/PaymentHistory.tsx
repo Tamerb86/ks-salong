@@ -120,7 +120,7 @@ export default function PaymentHistory() {
       </head>
       <body>
         <div class="header">
-          <h2>Khalid Salong</h2>
+          <h2>K.S Salong</h2>
           <p>Kvittering</p>
         </div>
         
@@ -160,7 +160,7 @@ export default function PaymentHistory() {
         
         <div class="footer">
           <p>Takk for besøket!</p>
-          <p>Khalid Salong - Porsgrunn</p>
+          <p>K.S Salong - Porsgrunn</p>
         </div>
       </body>
       </html>

@@ -109,7 +109,7 @@ export function VerificationSection() {
               </thead>
               <tbody>
                 <tr className="border-t">
-                  <td className="px-4 py-3 font-medium">Khalid Salong</td>
+                  <td className="px-4 py-3 font-medium">K.S Salong</td>
                   <td className="px-4 py-3 text-right font-mono">
                     {verificationResult.ksSalongTotal.toFixed(2)} kr
                   </td>
@@ -139,7 +139,7 @@ export function VerificationSection() {
               <p className="text-sm text-yellow-800">
                 <strong>⚠️ Hva betyr dette?</strong>
                 <br />
-                Det er et avvik mellom Khalid Salong og Fiken. Dette kan skyldes:
+                Det er et avvik mellom K.S Salong og Fiken. Dette kan skyldes:
               </p>
               <ul className="text-sm text-yellow-800 mt-2 space-y-1 list-disc list-inside">
                 <li>Ordre som ikke er synkronisert ennå</li>

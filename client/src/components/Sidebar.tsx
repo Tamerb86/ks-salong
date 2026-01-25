@@ -136,7 +136,7 @@ export function Sidebar() {
                     <Scissors className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <h1 className="text-lg font-bold">Khalid Salong</h1>
+                    <h1 className="text-lg font-bold">K.S Salong</h1>
                     <p className="text-xs text-purple-200">Administrasjon</p>
                   </div>
                 </div>

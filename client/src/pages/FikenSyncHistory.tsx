@@ -117,7 +117,7 @@ export default function FikenSyncHistory() {
       <div className="mb-6">
         <h1 className="text-3xl font-bold">Fiken Synkroniseringshistorikk</h1>
         <p className="text-muted-foreground mt-2">
-          Oversikt over alle synkroniseringer mellom Khalid Salong og Fiken
+          Oversikt over alle synkroniseringer mellom K.S Salong og Fiken
         </p>
       </div>
 

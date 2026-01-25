@@ -1402,3 +1402,9 @@
 - [x] Include services for men and women
 - [x] Add service durations
 - [x] Make services editable from admin panel
+
+## Service Images
+- [x] Search for professional salon service images
+- [x] Download high-quality images for all 19 services
+- [x] Update database with image URLs
+- [x] Ensure images display correctly in booking flow

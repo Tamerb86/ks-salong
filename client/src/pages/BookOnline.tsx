@@ -213,7 +213,7 @@ export default function BookOnline() {
               <Scissors className="h-8 w-8 text-purple-600" />
             </div>
             <div>
-              <h1 className="text-4xl font-bold">Khalid Salong</h1>
+              <h1 className="text-4xl font-bold">K.S Salong</h1>
               <p className="text-purple-100">Luksus OG Rimelige PRISER!</p>
             </div>
           </div>

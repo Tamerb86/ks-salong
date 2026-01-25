@@ -64,7 +64,7 @@ export default function Home() {
             <div className="animate-spin rounded-full h-20 w-20 border-4 border-white/20 border-t-white mx-auto"></div>
             <Scissors className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-8 w-8 text-white animate-pulse" />
           </div>
-          <p className="text-white font-semibold text-lg">Laster Khalid Salong...</p>
+          <p className="text-white font-semibold text-lg">Laster K.S Salong...</p>
         </div>
       </div>
     );
@@ -80,7 +80,7 @@ export default function Home() {
             </div>
             <div>
               <CardTitle className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-amber-600 bg-clip-text text-transparent">
-                Khalid Salong
+                K.S Salong
               </CardTitle>
               <CardDescription className="text-lg mt-2">
                 Profesjonelt Salong Administrasjonssystem
@@ -139,7 +139,7 @@ export default function Home() {
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
             Velkommen tilbake, {user.name?.split(" ")[0]}!
           </h2>
-          <p className="text-gray-600">Her er hva som skjer på Khalid Salong i dag</p>
+          <p className="text-gray-600">Her er hva som skjer på K.S Salong i dag</p>
         </div>
 
         {/* Stats Cards */}
