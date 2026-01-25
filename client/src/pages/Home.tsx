@@ -5,6 +5,10 @@ import { trpc } from "@/lib/trpc";
 import { getLoginUrl } from "@/const";
 import { Link } from "wouter";
 import { Layout } from "@/components/Layout";
+import { LiveBadge } from "@/components/ui/live-badge";
+import { FlashValue } from "@/components/ui/flash-value";
+import { ConnectionStatus } from "@/components/ui/connection-status";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Calendar,
   Users,
@@ -21,8 +25,9 @@ import {
 
 export default function Home() {
   const { user, loading, error, isAuthenticated, logout } = useAuth();
-  const { data: stats } = trpc.dashboard.getStats.useQuery(undefined, {
+  const { data: stats, isLoading: statsLoading } = trpc.dashboard.getStats.useQuery(undefined, {
     enabled: !!user,
+    refetchInterval: 30000, // Refetch every 30 seconds for real-time updates
   });
 
   if (loading) {
@@ -101,6 +106,7 @@ export default function Home() {
 
   return (
     <Layout>
+      <ConnectionStatus />
       <div className="container mx-auto px-6 py-8">
         {/* Welcome Section */}
         <div className="mb-8">
@@ -114,12 +120,21 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-500 to-purple-600 text-white hover:shadow-xl transition-shadow">
             <CardHeader className="pb-3">
-              <CardDescription className="text-purple-100">Dagens avtaler</CardDescription>
+              <div className="flex items-center justify-between">
+                <CardDescription className="text-purple-100">Dagens avtaler</CardDescription>
+                <LiveBadge className="bg-purple-400/30 text-purple-50" text="Live" />
+              </div>
             </CardHeader>
             <CardContent>
+              {statsLoading ? (
+                <div className="space-y-3">
+                  <Skeleton className="h-10 w-20 bg-purple-400/30" />
+                  <Skeleton className="h-4 w-32 bg-purple-400/30" />
+                </div>
+              ) : (
               <div className="flex items-end justify-between">
                 <div>
-                  <div className="text-4xl font-bold">{stats?.todayAppointments || 0}</div>
+                  <div className="text-4xl font-bold"><FlashValue value={stats?.todayAppointments || 0} /></div>
                   <p className="text-sm text-purple-100 mt-1">
                     {stats?.todayAppointments && stats.todayAppointments > 0
                       ? `+${stats.todayAppointments} fra i går`
@@ -128,53 +143,84 @@ export default function Home() {
                 </div>
                 <Calendar className="h-12 w-12 text-purple-200" />
               </div>
+              )}
             </CardContent>
           </Card>
 
           <Card className="border-0 shadow-lg bg-gradient-to-br from-amber-500 to-amber-600 text-white hover:shadow-xl transition-shadow">
             <CardHeader className="pb-3">
-              <CardDescription className="text-amber-100">Inntekt i dag</CardDescription>
+              <div className="flex items-center justify-between">
+                <CardDescription className="text-amber-100">Inntekt i dag</CardDescription>
+                <LiveBadge className="bg-amber-400/30 text-amber-50" text="Live" />
+              </div>
             </CardHeader>
             <CardContent>
+              {statsLoading ? (
+                <div className="space-y-3">
+                  <Skeleton className="h-10 w-32 bg-amber-400/30" />
+                  <Skeleton className="h-4 w-28 bg-amber-400/30" />
+                </div>
+              ) : (
               <div className="flex items-end justify-between">
                 <div>
-                  <div className="text-4xl font-bold">{stats?.todayRevenue || 0} kr</div>
+                  <div className="text-4xl font-bold"><FlashValue value={`${stats?.todayRevenue || 0} kr`} /></div>
                   <p className="text-sm text-amber-100 mt-1">
                     {stats?.revenueChange ? `+${stats.revenueChange}% fra i går` : "Ingen endring"}
                   </p>
                 </div>
                 <TrendingUp className="h-12 w-12 text-amber-200" />
               </div>
+              )}
             </CardContent>
           </Card>
 
           <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-500 to-blue-600 text-white hover:shadow-xl transition-shadow">
             <CardHeader className="pb-3">
-              <CardDescription className="text-blue-100">Kølengde</CardDescription>
+              <div className="flex items-center justify-between">
+                <CardDescription className="text-blue-100">Kølengde</CardDescription>
+                <LiveBadge className="bg-blue-400/30 text-blue-50" text="Live" />
+              </div>
             </CardHeader>
             <CardContent>
+              {statsLoading ? (
+                <div className="space-y-3">
+                  <Skeleton className="h-10 w-16 bg-blue-400/30" />
+                  <Skeleton className="h-4 w-24 bg-blue-400/30" />
+                </div>
+              ) : (
               <div className="flex items-end justify-between">
                 <div>
-                  <div className="text-4xl font-bold">{stats?.queueLength || 0}</div>
+                  <div className="text-4xl font-bold"><FlashValue value={stats?.queueLength || 0} /></div>
                   <p className="text-sm text-blue-100 mt-1">Walk-in kunder</p>
                 </div>
                 <Users className="h-12 w-12 text-blue-200" />
               </div>
+              )}
             </CardContent>
           </Card>
 
           <Card className="border-0 shadow-lg bg-gradient-to-br from-green-500 to-green-600 text-white hover:shadow-xl transition-shadow">
             <CardHeader className="pb-3">
-              <CardDescription className="text-green-100">Personale på vakt</CardDescription>
+              <div className="flex items-center justify-between">
+                <CardDescription className="text-green-100">Personale på vakt</CardDescription>
+                <LiveBadge className="bg-green-400/30 text-green-50" text="Live" />
+              </div>
             </CardHeader>
             <CardContent>
+              {statsLoading ? (
+                <div className="space-y-3">
+                  <Skeleton className="h-10 w-16 bg-green-400/30" />
+                  <Skeleton className="h-4 w-32 bg-green-400/30" />
+                </div>
+              ) : (
               <div className="flex items-end justify-between">
                 <div>
-                  <div className="text-4xl font-bold">{stats?.staffOnDuty || 0}</div>
+                  <div className="text-4xl font-bold"><FlashValue value={stats?.staffOnDuty || 0} /></div>
                   <p className="text-sm text-green-100 mt-1">Alle stasjoner aktive</p>
                 </div>
                 <UserCircle className="h-12 w-12 text-green-200" />
               </div>
+              )}
             </CardContent>
           </Card>
         </div>

@@ -30,12 +30,16 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { Layout } from "@/components/Layout";
+import { LiveBadge } from "@/components/ui/live-badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Customers() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
 
-  const { data: customers, isLoading } = trpc.customers.list.useQuery();
+  const { data: customers, isLoading } = trpc.customers.list.useQuery(undefined, {
+    refetchInterval: 30000, // Refetch every 30 seconds for real-time updates
+  });
   const { data: customerDetails } = trpc.customers.getById.useQuery(
     { id: selectedCustomerId! },
     { enabled: !!selectedCustomerId }
@@ -102,9 +106,12 @@ export default function Customers() {
               <Users className="h-8 w-8 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-amber-600 bg-clip-text text-transparent">
-                Kunder
-              </h1>
+              <div className="flex items-center gap-3">
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-amber-600 bg-clip-text text-transparent">
+                  Kunder
+                </h1>
+                <LiveBadge text="Live" />
+              </div>
               <p className="text-gray-600">Administrer kundedatabase og CRM</p>
             </div>
           </div>

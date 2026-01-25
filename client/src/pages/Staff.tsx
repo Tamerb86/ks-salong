@@ -20,9 +20,13 @@ import { Key, Loader2, Users, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Layout } from "@/components/Layout";
+import { LiveBadge } from "@/components/ui/live-badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Staff() {
-  const { data: staff, isLoading } = trpc.staff.list.useQuery();
+  const { data: staff, isLoading } = trpc.staff.list.useQuery(undefined, {
+    refetchInterval: 30000, // Refetch every 30 seconds for real-time updates
+  });
   
   // Staff PIN management
   const [isPinDialogOpen, setIsPinDialogOpen] = useState(false);
@@ -140,9 +144,12 @@ export default function Staff() {
                 <Users className="h-8 w-8 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-amber-600 bg-clip-text text-transparent">
-                  Ansatte
-                </h1>
+                <div className="flex items-center gap-3">
+                  <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-amber-600 bg-clip-text text-transparent">
+                    Ansatte
+                  </h1>
+                  <LiveBadge text="Live" />
+                </div>
                 <p className="text-gray-600 mt-1">
                   Administrer ansatte og deres PIN-koder for tidsstempling
                 </p>

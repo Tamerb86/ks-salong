@@ -1,5 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Layout } from "@/components/Layout";
+import { LiveBadge } from "@/components/ui/live-badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -19,7 +21,10 @@ export default function Queue() {
   const [selectedQueueItem, setSelectedQueueItem] = useState<any>(null);
 
   // Fetch active queue
-  const { data: queue = [], refetch } = trpc.queue.list.useQuery(undefined, { enabled: !authLoading });
+  const { data: queue = [], refetch, isLoading: queueLoading } = trpc.queue.list.useQuery(undefined, { 
+    enabled: !authLoading,
+    refetchInterval: 10000, // Refetch every 10 seconds for real-time updates
+  });
 
   // Fetch services and staff
   const { data: services = [] } = trpc.services.list.useQuery(undefined, { enabled: !authLoading });
@@ -143,7 +148,10 @@ export default function Queue() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Drop-in Kø</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-3xl font-bold text-gray-900">Drop-in Kø</h1>
+              <LiveBadge text="Live" />
+            </div>
             <p className="text-gray-600 mt-1">Administrer walk-in kunder</p>
           </div>
           <Dialog open={isAddCustomerOpen} onOpenChange={setIsAddCustomerOpen}>

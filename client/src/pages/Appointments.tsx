@@ -1,5 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Layout } from "@/components/Layout";
+import { LiveBadge } from "@/components/ui/live-badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -40,12 +42,15 @@ export default function Appointments() {
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
   
-  const { data: appointments = [], refetch } = trpc.appointments.listByDateRange.useQuery(
+  const { data: appointments = [], refetch, isLoading: appointmentsLoading } = trpc.appointments.listByDateRange.useQuery(
     {
       startDate: format(monthStart, "yyyy-MM-dd"),
       endDate: format(monthEnd, "yyyy-MM-dd"),
     },
-    { enabled: !authLoading }
+    { 
+      enabled: !authLoading,
+      refetchInterval: 30000, // Refetch every 30 seconds for real-time updates
+    }
   );
 
   // Fetch services, staff, and customers for forms
@@ -193,9 +198,12 @@ export default function Appointments() {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-amber-600 bg-clip-text text-transparent">
-                Avtaler
-              </h1>
+              <div className="flex items-center gap-3">
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-amber-600 bg-clip-text text-transparent">
+                  Avtaler
+                </h1>
+                <LiveBadge text="Live" />
+              </div>
               <p className="text-gray-600 mt-1">Månedlig kalendervisning</p>
             </div>
             <Button 

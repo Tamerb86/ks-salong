@@ -458,3 +458,34 @@
 - [x] Show current active employee in POS header
 - [x] Keep employee tracking for sales attribution
 - [x] Test POS access flow
+
+## Real-Time Visual Indicators
+- [ ] Create reusable loading skeleton components
+- [ ] Add pulse animations to data cards
+- [ ] Add "Live" badges to real-time data
+- [ ] Implement flash effects for value changes (green up, red down)
+- [ ] Add connection status indicator in header
+- [ ] Apply loading states to Dashboard statistics
+- [ ] Apply loading states to Appointments calendar
+- [ ] Apply loading states to Queue page
+- [ ] Apply loading states to POS page
+- [ ] Apply loading states to Staff page
+- [ ] Apply loading states to Customers page
+- [ ] Apply loading states to Reports page
+- [ ] Test all visual indicators across pages
+
+## Real-Time Visual Indicators
+- [x] Create reusable Skeleton loading component
+- [x] Create LiveBadge component for real-time data
+- [x] Create FlashValue component for value changes
+- [x] Create ConnectionStatus component
+- [x] Add loading skeletons to Dashboard stats cards
+- [x] Add LiveBadge to Dashboard stats
+- [x] Add FlashValue to Dashboard numbers
+- [x] Add ConnectionStatus to Layout
+- [x] Add real-time refetch intervals to all queries
+- [x] Add loading states to Appointments page
+- [x] Add loading states to Queue page
+- [x] Add loading states to Staff page
+- [x] Add loading states to Customers page
+- [x] Test all visual indicators
