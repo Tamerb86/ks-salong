@@ -649,6 +649,56 @@ export async function updatePayment(id: number, data: Partial<typeof payments.$i
 }
 
 /**
+ * Update payment status by reference (providerPaymentIntentId)
+ */
+export async function updatePaymentStatus(
+  reference: string,
+  status: "pending" | "initiated" | "authorized" | "captured" | "refunded" | "failed" | "cancelled" | "expired",
+  paidAt?: Date
+) {
+  const db = await getDb();
+  if (!db) return;
+  const updateData: any = { status, updatedAt: new Date() };
+  
+  if (paidAt) {
+    updateData.paidAt = paidAt;
+  }
+  
+  await db
+    .update(payments)
+    .set(updateData)
+    .where(eq(payments.providerPaymentIntentId, reference));
+}
+
+/**
+ * Get payment by reference
+ */
+export async function getPaymentByReference(reference: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db
+    .select()
+    .from(payments)
+    .where(eq(payments.providerPaymentIntentId, reference))
+    .limit(1);
+  
+  return result[0] || null;
+}
+
+/**
+ * Get payments by appointment ID
+ */
+export async function getPaymentsByAppointmentId(appointmentId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db
+    .select()
+    .from(payments)
+    .where(eq(payments.appointmentId, appointmentId))
+    .orderBy(desc(payments.createdAt));
+}
+
+/**
  * ============================================
  * TIME TRACKING
  * ============================================

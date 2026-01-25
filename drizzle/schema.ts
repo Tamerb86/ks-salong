@@ -142,18 +142,25 @@ export const payments = mysqlTable("payments", {
   appointmentId: int("appointmentId"),
   customerId: int("customerId"),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 3 }).default("NOK").notNull(),
   method: mysqlEnum("method", ["vipps", "stripe", "cash", "gift_card"]).notNull(),
-  status: mysqlEnum("status", ["initiated", "authorized", "captured", "refunded", "failed"]).default("initiated").notNull(),
+  status: mysqlEnum("status", ["pending", "initiated", "authorized", "captured", "refunded", "failed", "cancelled", "expired"]).default("pending").notNull(),
   provider: varchar("provider", { length: 50 }), // vipps or stripe
   providerTransactionId: varchar("providerTransactionId", { length: 255 }),
   providerPaymentIntentId: varchar("providerPaymentIntentId", { length: 255 }),
   metadata: json("metadata"),
+  paidAt: timestamp("paidAt"),
   refundedAmount: decimal("refundedAmount", { precision: 10, scale: 2 }).default("0.00"),
   refundReason: text("refundReason"),
   refundedAt: timestamp("refundedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
+}, (table) => ({
+  appointmentIdIdx: index("payment_appointment_id_idx").on(table.appointmentId),
+  providerTransactionIdIdx: index("payment_provider_transaction_id_idx").on(table.providerTransactionId),
+  statusIdx: index("payment_status_idx").on(table.status),
+  createdAtIdx: index("payment_created_at_idx").on(table.createdAt),
+}));
 
 export const orders = mysqlTable("orders", {
   id: int("id").autoincrement().primaryKey(),

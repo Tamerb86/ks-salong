@@ -1,304 +1,352 @@
-import axios from "axios";
+/**
+ * Vipps Payment Service
+ * 
+ * This module handles all Vipps ePayment API interactions including:
+ * - OAuth authentication
+ * - Payment initiation
+ * - Payment status checking
+ * - Payment capture, cancellation, and refunds
+ * 
+ * API Documentation: https://developer.vippsmobilepay.com/docs/APIs/epayment-api/
+ * 
+ * Note: This uses the new Vipps ePayment API (v1), not the legacy eCommerce API (v2)
+ */
 
-// Vipps API Configuration
-const VIPPS_BASE_URL = process.env.VIPPS_TEST_MODE === "true" 
-  ? "https://apitest.vipps.no" 
-  : "https://api.vipps.no";
+import { getDb } from "./db";
+import { salonSettings } from "../drizzle/schema";
 
-const VIPPS_CLIENT_ID = process.env.VIPPS_CLIENT_ID || "";
-const VIPPS_CLIENT_SECRET = process.env.VIPPS_CLIENT_SECRET || "";
-const VIPPS_SUBSCRIPTION_KEY = process.env.VIPPS_SUBSCRIPTION_KEY || "";
-const VIPPS_MERCHANT_SERIAL_NUMBER = process.env.VIPPS_MERCHANT_SERIAL_NUMBER || "";
-const VIPPS_CALLBACK_PREFIX = process.env.VIPPS_CALLBACK_PREFIX || "";
-const VIPPS_FALLBACK_URL = process.env.VIPPS_FALLBACK_URL || "";
-
-interface VippsAccessToken {
-  token_type: string;
-  expires_in: string;
-  access_token: string;
+interface VippsConfig {
+  clientId: string;
+  clientSecret: string;
+  merchantSerialNumber: string;
+  subscriptionKey: string;
 }
 
-interface VippsPaymentInitiation {
-  customerInfo?: {
-    mobileNumber?: string;
+interface VippsAccessTokenResponse {
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+  scope: string;
+}
+
+interface VippsPaymentRequest {
+  amount: {
+    currency: string;
+    value: number; // Amount in minor units (øre for NOK)
   };
-  merchantInfo: {
-    merchantSerialNumber: string;
-    callbackPrefix: string;
-    fallBack: string;
-    isApp: boolean;
+  paymentMethod: {
+    type: "WALLET";
   };
-  transaction: {
-    orderId: string;
-    amount: number;
-    transactionText: string;
-    timeStamp: string;
+  customer: {
+    phoneNumber?: string;
   };
+  returnUrl: string;
+  userFlow: "WEB_REDIRECT" | "NATIVE_REDIRECT";
+  paymentDescription: string;
+  reference: string; // Unique reference for this payment
 }
 
 interface VippsPaymentResponse {
-  orderId: string;
-  url: string;
+  reference: string;
+  redirectUrl: string;
+  orderId: string; // Vipps order ID (deprecated but still returned)
 }
 
 interface VippsPaymentDetails {
-  orderId: string;
-  transactionSummary: {
-    capturedAmount: number;
-    remainingAmountToCapture: number;
-    refundedAmount: number;
-    remainingAmountToRefund: number;
+  aggregate: {
+    authorizedAmount: {
+      currency: string;
+      value: number;
+    };
+    capturedAmount: {
+      currency: string;
+      value: number;
+    };
+    refundedAmount: {
+      currency: string;
+      value: number;
+    };
+    cancelledAmount: {
+      currency: string;
+      value: number;
+    };
   };
-  transactionLogHistory: Array<{
-    amount: number;
-    transactionText: string;
-    transactionId: string;
-    timeStamp: string;
-    operation: string;
-    requestId: string;
-    operationSuccess: boolean;
-  }>;
+  state: "CREATED" | "ABORTED" | "EXPIRED" | "AUTHORIZED" | "TERMINATED";
+  amount: {
+    currency: string;
+    value: number;
+  };
+  paymentMethod: {
+    type: string;
+  };
 }
 
-interface VippsCallbackPayload {
-  merchantSerialNumber: string;
-  orderId: string;
-  transactionInfo: {
-    amount: number;
-    status: "RESERVED" | "SALE" | "CANCELLED" | "REJECTED";
-    timeStamp: string;
-    transactionId: string;
-  };
-}
+const VIPPS_API_BASE_URL = "https://apitest.vipps.no"; // Test environment
+// Production: https://api.vipps.no
 
 let cachedAccessToken: string | null = null;
-let tokenExpiry: number = 0;
+let tokenExpiresAt: number = 0;
 
 /**
- * Get Vipps Access Token
+ * Get Vipps configuration from database
  */
-export async function getVippsAccessToken(): Promise<string> {
-  // Return cached token if still valid
-  if (cachedAccessToken && Date.now() < tokenExpiry) {
-    return cachedAccessToken;
+async function getVippsConfig(): Promise<VippsConfig> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  const settings = await db.select().from(salonSettings).limit(1);
+  
+  if (!settings.length) {
+    throw new Error("Salon settings not found");
   }
 
-  try {
-    const response = await axios.post<VippsAccessToken>(
-      `${VIPPS_BASE_URL}/accesstoken/get`,
-      {},
-      {
-        headers: {
-          "client_id": VIPPS_CLIENT_ID,
-          "client_secret": VIPPS_CLIENT_SECRET,
-          "Ocp-Apim-Subscription-Key": VIPPS_SUBSCRIPTION_KEY,
-        },
-      }
-    );
+  const config = settings[0];
 
-    cachedAccessToken = response.data.access_token;
-    // Set expiry to 5 minutes before actual expiry for safety
-    tokenExpiry = Date.now() + (parseInt(response.data.expires_in) - 300) * 1000;
-
-    return cachedAccessToken;
-  } catch (error: any) {
-    console.error("Failed to get Vipps access token:", error.response?.data || error.message);
-    throw new Error("Failed to authenticate with Vipps");
+  if (!config.vippsEnabled) {
+    throw new Error("Vipps is not enabled in settings");
   }
+
+  if (!config.vippsClientId || !config.vippsClientSecret || 
+      !config.vippsMerchantSerialNumber || !config.vippsSubscriptionKey) {
+    throw new Error("Vipps credentials are not configured. Please update settings.");
+  }
+
+  return {
+    clientId: config.vippsClientId,
+    clientSecret: config.vippsClientSecret,
+    merchantSerialNumber: config.vippsMerchantSerialNumber,
+    subscriptionKey: config.vippsSubscriptionKey,
+  };
 }
 
 /**
- * Initiate Vipps Payment
- * @param orderId Unique order ID
- * @param amountNOK Amount in NOK (will be converted to øre)
- * @param transactionText Description of the transaction
- * @param mobileNumber Optional customer mobile number
+ * Get OAuth access token from Vipps
+ * Tokens are cached and reused until they expire
  */
-export async function initiateVippsPayment(
-  orderId: string,
-  amountNOK: number,
-  transactionText: string,
-  mobileNumber?: string
-): Promise<VippsPaymentResponse> {
-  // Convert NOK to øre (multiply by 100)
-  const amount = Math.round(amountNOK * 100);
-  const accessToken = await getVippsAccessToken();
+export async function getAccessToken(): Promise<string> {
+  // Return cached token if still valid
+  if (cachedAccessToken && Date.now() < tokenExpiresAt) {
+    return cachedAccessToken;
+  }
 
-  const payload: VippsPaymentInitiation = {
-    merchantInfo: {
-      merchantSerialNumber: VIPPS_MERCHANT_SERIAL_NUMBER,
-      callbackPrefix: VIPPS_CALLBACK_PREFIX,
-      fallBack: VIPPS_FALLBACK_URL,
-      isApp: false,
+  const config = await getVippsConfig();
+
+  const authString = Buffer.from(`${config.clientId}:${config.clientSecret}`).toString("base64");
+
+  const response = await fetch(`${VIPPS_API_BASE_URL}/accesstoken/get`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Basic ${authString}`,
+      "Ocp-Apim-Subscription-Key": config.subscriptionKey,
+      "Merchant-Serial-Number": config.merchantSerialNumber,
+      "Content-Type": "application/json",
     },
-    transaction: {
-      orderId,
-      amount, // Amount in øre
-      transactionText,
-      timeStamp: new Date().toISOString(),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to get Vipps access token: ${response.status} ${errorText}`);
+  }
+
+  const data: VippsAccessTokenResponse = await response.json();
+
+  // Cache token with 5-minute buffer before expiry
+  cachedAccessToken = data.access_token;
+  tokenExpiresAt = Date.now() + (data.expires_in - 300) * 1000;
+
+  return data.access_token;
+}
+
+/**
+ * Initiate a Vipps payment
+ * 
+ * @param params Payment parameters
+ * @returns Vipps payment response with redirect URL
+ */
+export async function initiatePayment(params: {
+  amount: number; // Amount in NOK (will be converted to øre)
+  customerPhone?: string;
+  reference: string; // Unique reference (e.g., appointment ID)
+  description: string;
+  returnUrl: string;
+}): Promise<VippsPaymentResponse> {
+  const config = await getVippsConfig();
+  const accessToken = await getAccessToken();
+
+  // Convert NOK to øre (minor units)
+  const amountInOre = Math.round(params.amount * 100);
+
+  const paymentRequest: VippsPaymentRequest = {
+    amount: {
+      currency: "NOK",
+      value: amountInOre,
     },
+    paymentMethod: {
+      type: "WALLET",
+    },
+    customer: {
+      phoneNumber: params.customerPhone,
+    },
+    returnUrl: params.returnUrl,
+    userFlow: "WEB_REDIRECT",
+    paymentDescription: params.description,
+    reference: params.reference,
   };
 
-  if (mobileNumber) {
-    payload.customerInfo = { mobileNumber };
+  const response = await fetch(`${VIPPS_API_BASE_URL}/epayment/v1/payments`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${accessToken}`,
+      "Ocp-Apim-Subscription-Key": config.subscriptionKey,
+      "Merchant-Serial-Number": config.merchantSerialNumber,
+      "Content-Type": "application/json",
+      "Idempotency-Key": params.reference, // Prevent duplicate payments
+    },
+    body: JSON.stringify(paymentRequest),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to initiate Vipps payment: ${response.status} ${errorText}`);
   }
 
-  try {
-    const response = await axios.post<VippsPaymentResponse>(
-      `${VIPPS_BASE_URL}/ecomm/v2/payments`,
-      payload,
-      {
-        headers: {
-          "Authorization": `Bearer ${accessToken}`,
-          "Ocp-Apim-Subscription-Key": VIPPS_SUBSCRIPTION_KEY,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+  const data: VippsPaymentResponse = await response.json();
+  return data;
+}
 
-    return response.data;
-  } catch (error: any) {
-    console.error("Failed to initiate Vipps payment:", error.response?.data || error.message);
-    throw new Error("Failed to initiate payment with Vipps");
+/**
+ * Get payment status from Vipps
+ * 
+ * @param reference Payment reference (unique identifier)
+ * @returns Payment details including state and amounts
+ */
+export async function getPaymentStatus(reference: string): Promise<VippsPaymentDetails> {
+  const config = await getVippsConfig();
+  const accessToken = await getAccessToken();
+
+  const response = await fetch(`${VIPPS_API_BASE_URL}/epayment/v1/payments/${reference}`, {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${accessToken}`,
+      "Ocp-Apim-Subscription-Key": config.subscriptionKey,
+      "Merchant-Serial-Number": config.merchantSerialNumber,
+    },
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to get Vipps payment status: ${response.status} ${errorText}`);
+  }
+
+  const data: VippsPaymentDetails = await response.json();
+  return data;
+}
+
+/**
+ * Capture a payment (finalize the transaction)
+ * This should be called after the payment is authorized
+ * 
+ * @param reference Payment reference
+ * @param amount Amount to capture in NOK (optional, defaults to full authorized amount)
+ */
+export async function capturePayment(reference: string, amount?: number): Promise<void> {
+  const config = await getVippsConfig();
+  const accessToken = await getAccessToken();
+
+  const body: any = {};
+  if (amount !== undefined) {
+    body.modificationAmount = {
+      currency: "NOK",
+      value: Math.round(amount * 100), // Convert to øre
+    };
+  }
+
+  const response = await fetch(`${VIPPS_API_BASE_URL}/epayment/v1/payments/${reference}/capture`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${accessToken}`,
+      "Ocp-Apim-Subscription-Key": config.subscriptionKey,
+      "Merchant-Serial-Number": config.merchantSerialNumber,
+      "Content-Type": "application/json",
+      "Idempotency-Key": `capture-${reference}-${Date.now()}`,
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to capture Vipps payment: ${response.status} ${errorText}`);
   }
 }
 
 /**
- * Capture Vipps Payment
+ * Cancel/abort a payment
+ * Can only be done before the payment is authorized
+ * 
+ * @param reference Payment reference
  */
-export async function captureVippsPayment(
-  orderId: string,
+export async function cancelPayment(reference: string): Promise<void> {
+  const config = await getVippsConfig();
+  const accessToken = await getAccessToken();
+
+  const response = await fetch(`${VIPPS_API_BASE_URL}/epayment/v1/payments/${reference}/cancel`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${accessToken}`,
+      "Ocp-Apim-Subscription-Key": config.subscriptionKey,
+      "Merchant-Serial-Number": config.merchantSerialNumber,
+      "Content-Type": "application/json",
+      "Idempotency-Key": `cancel-${reference}-${Date.now()}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to cancel Vipps payment: ${response.status} ${errorText}`);
+  }
+}
+
+/**
+ * Refund a captured payment
+ * 
+ * @param reference Payment reference
+ * @param amount Amount to refund in NOK
+ * @param reason Reason for refund
+ */
+export async function refundPayment(
+  reference: string,
   amount: number,
-  transactionText: string
+  reason: string
 ): Promise<void> {
-  const accessToken = await getVippsAccessToken();
+  const config = await getVippsConfig();
+  const accessToken = await getAccessToken();
 
-  try {
-    await axios.post(
-      `${VIPPS_BASE_URL}/ecomm/v2/payments/${orderId}/capture`,
-      {
-        merchantInfo: {
-          merchantSerialNumber: VIPPS_MERCHANT_SERIAL_NUMBER,
-        },
-        transaction: {
-          amount,
-          transactionText,
-        },
-      },
-      {
-        headers: {
-          "Authorization": `Bearer ${accessToken}`,
-          "Ocp-Apim-Subscription-Key": VIPPS_SUBSCRIPTION_KEY,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-  } catch (error: any) {
-    console.error("Failed to capture Vipps payment:", error.response?.data || error.message);
-    throw new Error("Failed to capture payment");
+  const body = {
+    modificationAmount: {
+      currency: "NOK",
+      value: Math.round(amount * 100), // Convert to øre
+    },
+    description: reason,
+  };
+
+  const response = await fetch(`${VIPPS_API_BASE_URL}/epayment/v1/payments/${reference}/refund`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${accessToken}`,
+      "Ocp-Apim-Subscription-Key": config.subscriptionKey,
+      "Merchant-Serial-Number": config.merchantSerialNumber,
+      "Content-Type": "application/json",
+      "Idempotency-Key": `refund-${reference}-${Date.now()}`,
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to refund Vipps payment: ${response.status} ${errorText}`);
   }
 }
 
-/**
- * Cancel Vipps Payment
- */
-export async function cancelVippsPayment(
-  orderId: string,
-  transactionText: string
-): Promise<void> {
-  const accessToken = await getVippsAccessToken();
-
-  try {
-    await axios.put(
-      `${VIPPS_BASE_URL}/ecomm/v2/payments/${orderId}/cancel`,
-      {
-        merchantInfo: {
-          merchantSerialNumber: VIPPS_MERCHANT_SERIAL_NUMBER,
-        },
-        transaction: {
-          transactionText,
-        },
-      },
-      {
-        headers: {
-          "Authorization": `Bearer ${accessToken}`,
-          "Ocp-Apim-Subscription-Key": VIPPS_SUBSCRIPTION_KEY,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-  } catch (error: any) {
-    console.error("Failed to cancel Vipps payment:", error.response?.data || error.message);
-    throw new Error("Failed to cancel payment");
-  }
-}
-
-/**
- * Refund Vipps Payment
- */
-export async function refundVippsPayment(
-  orderId: string,
-  amount: number,
-  transactionText: string
-): Promise<void> {
-  const accessToken = await getVippsAccessToken();
-
-  try {
-    await axios.post(
-      `${VIPPS_BASE_URL}/ecomm/v2/payments/${orderId}/refund`,
-      {
-        merchantInfo: {
-          merchantSerialNumber: VIPPS_MERCHANT_SERIAL_NUMBER,
-        },
-        transaction: {
-          amount,
-          transactionText,
-        },
-      },
-      {
-        headers: {
-          "Authorization": `Bearer ${accessToken}`,
-          "Ocp-Apim-Subscription-Key": VIPPS_SUBSCRIPTION_KEY,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-  } catch (error: any) {
-    console.error("Failed to refund Vipps payment:", error.response?.data || error.message);
-    throw new Error("Failed to refund payment");
-  }
-}
-
-/**
- * Get Vipps Payment Details
- */
-export async function getVippsPaymentDetails(orderId: string): Promise<VippsPaymentDetails> {
-  const accessToken = await getVippsAccessToken();
-
-  try {
-    const response = await axios.get<VippsPaymentDetails>(
-      `${VIPPS_BASE_URL}/ecomm/v2/payments/${orderId}/details`,
-      {
-        headers: {
-          "Authorization": `Bearer ${accessToken}`,
-          "Ocp-Apim-Subscription-Key": VIPPS_SUBSCRIPTION_KEY,
-        },
-      }
-    );
-
-    return response.data;
-  } catch (error: any) {
-    console.error("Failed to get Vipps payment details:", error.response?.data || error.message);
-    throw new Error("Failed to get payment details");
-  }
-}
-
-/**
- * Verify Vipps Callback (optional - for added security)
- */
-export function verifyVippsCallback(payload: VippsCallbackPayload): boolean {
-  // Verify merchant serial number matches
-  return payload.merchantSerialNumber === VIPPS_MERCHANT_SERIAL_NUMBER;
-}
-
-export type { VippsCallbackPayload, VippsPaymentDetails, VippsPaymentResponse };
+// Export types for use in other modules
+export type { VippsPaymentResponse, VippsPaymentDetails, VippsConfig };

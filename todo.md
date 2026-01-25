@@ -1145,7 +1145,7 @@
 - [x] Verify database updates after drag-and-drop (4 vitest tests passed)
 - [x] Created comprehensive test suite for drag-and-drop functionality
 
-## Prevent Dragging Appointments to Past Dates
+## Prevent Dragging Appointments to Past Dates ✅
 - [x] Add date validation in handleDragEnd to check if target date is in the past
 - [x] Show error toast when user tries to drop appointment on past date
 - [x] Add visual indicator (grayed out or disabled styling) for past dates in calendar
@@ -1153,7 +1153,7 @@
 - [x] Test validation by attempting to drag appointment to yesterday
 - [x] Write vitest test for past date validation (5/5 tests passed)
 
-## Vipps Settings in Settings Page
+## Vipps Settings in Settings Page ✅
 - [x] Add Vipps fields to salonSettings table (clientId, clientSecret, subscriptionKey, merchantSerialNumber) - already exists
 - [x] Push database schema changes with pnpm db:push - not needed, fields already exist
 - [x] Create Vipps settings section in Settings.tsx
@@ -1163,15 +1163,43 @@
 - [x] Test saving and retrieving Vipps settings (successfully saved and retrieved test data)
 - [x] Add validation for required fields (fields are optional, validation handled by backend)
 
-## Vipps Payment Integration
-- [ ] Create Vipps service module (server/vipps.ts) for API calls
-- [ ] Add payment initiation endpoint (vipps.initiatePayment)
-- [ ] Build webhook handler for payment confirmation (vipps.handleCallback)
-- [ ] Add payment step to BookOnline flow (Step 5: Payment)
-- [ ] Integrate Vipps payment button in booking confirmation
-- [ ] Auto-confirm bookings after successful payment
-- [ ] Store payment transactions in database (add payments table)
-- [ ] Generate payment receipts
-- [ ] Handle payment failures and refunds
-- [ ] Test Vipps integration in test environment
-- [ ] Write vitest tests for payment flow
+## Vipps Payment Integration - Phase 1: Database Schema ✅
+- [x] Create payments table in drizzle/schema.ts (already exists)
+- [x] Add fields: id, appointmentId, amount, currency, status, providerTransactionId (for vippsOrderId)
+- [x] Add timestamps: createdAt, updatedAt, paidAt
+- [x] Add indexes for performance optimization
+- [x] Run pnpm db:push to apply schema changes (migration 0015 applied successfully)
+
+## Vipps Payment Integration - Phase 2: Service Module ✅
+- [x] Create server/vipps.ts service module (updated to use ePayment API v1)
+- [x] Implement getAccessToken() for OAuth authentication (with token caching)
+- [x] Implement initiatePayment() to create Vipps payment
+- [x] Implement getPaymentStatus() to check payment status
+- [x] Implement capturePayment(), cancelPayment(), refundPayment()
+- [x] Add error handling for API failures
+- [x] Add tRPC endpoints: vipps.initiatePayment, vipps.getPaymentStatus, vipps.capturePayment
+- [x] Add database functions: createPayment, updatePaymentStatus, getPaymentByReference
+
+## Vipps Payment Integration - Phase 3: BookOnline Payment Step
+- [ ] Add Step 5 (Payment) to BookOnline flow
+- [ ] Create payment UI with Vipps button
+- [ ] Integrate vipps.initiatePayment mutation
+- [ ] Redirect user to Vipps payment page
+- [ ] Handle return from Vipps (success/failure)
+- [ ] Show payment confirmation or error message
+
+## Vipps Payment Integration - Phase 4: Webhook Handler
+- [ ] Create webhook endpoint /api/vipps/callback
+- [ ] Verify webhook signature for security
+- [ ] Update payment status in database
+- [ ] Auto-confirm appointment after successful payment
+- [ ] Send confirmation email/SMS to customer
+- [ ] Handle payment failures and cancellations
+
+## Vipps Payment Integration - Phase 5: Testing
+- [ ] Test payment initiation with test credentials
+- [ ] Test webhook callback handling
+- [ ] Test appointment confirmation after payment
+- [ ] Write vitest tests for Vipps service functions
+- [ ] Test error scenarios (API failures, invalid credentials)
+- [ ] Create checkpoint after successful testing

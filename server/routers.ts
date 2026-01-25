@@ -367,12 +367,13 @@ export const appRouter = router({
           const vipps = await import("./vipps");
           const customer = await db.getCustomerById(input.customerId);
           
-          const paymentResult = await vipps.initiateVippsPayment(
-            `APT-${appointmentId}`,
-            Number(service.price),
-            `Booking: ${service.name}`,
-            customer?.phone
-          );
+          const paymentResult = await vipps.initiatePayment({
+            amount: Number(service.price),
+            customerPhone: customer?.phone,
+            reference: `APT-${appointmentId}`,
+            description: `Booking: ${service.name}`,
+            returnUrl: `${process.env.VITE_APP_URL || "http://localhost:3000"}/book-online/payment-callback`,
+          });
           
           if (paymentResult.orderId && appointmentId) {
             await db.updateAppointment(appointmentId, {
@@ -382,7 +383,7 @@ export const appRouter = router({
             return {
               appointmentId,
               requiresPayment: true,
-              vippsUrl: paymentResult.url,
+              vippsUrl: paymentResult.redirectUrl,
               orderId: paymentResult.orderId,
             };
           } else {
@@ -1607,6 +1608,119 @@ export const appRouter = router({
           filename: `tidsrapport_${input.from}_${input.to}.pdf`,
           mimeType: "application/pdf",
         };
+      }),
+  }),
+
+  vipps: router({
+    /**
+     * Initiate a Vipps payment
+     */
+    initiatePayment: publicProcedure
+      .input(z.object({
+        appointmentId: z.number(),
+        amount: z.number().positive(),
+        customerPhone: z.string().optional(),
+        description: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        const { initiatePayment } = await import("./vipps");
+        
+        // Generate unique reference
+        const reference = `APT-${input.appointmentId}-${Date.now()}`;
+        
+        // Get return URL (current origin + callback path)
+        const returnUrl = `${process.env.VITE_APP_URL || "http://localhost:3000"}/book-online/payment-callback`;
+        
+        try {
+          const response = await initiatePayment({
+            amount: input.amount,
+            customerPhone: input.customerPhone,
+            reference,
+            description: input.description,
+            returnUrl,
+          });
+          
+          // Store payment record in database
+          await db.createPayment({
+            appointmentId: input.appointmentId,
+            amount: input.amount.toString(),
+            currency: "NOK",
+            method: "vipps",
+            status: "initiated",
+            provider: "vipps",
+            providerTransactionId: response.orderId,
+            providerPaymentIntentId: reference,
+          });
+          
+          return {
+            success: true,
+            redirectUrl: response.redirectUrl,
+            reference,
+            orderId: response.orderId,
+          };
+        } catch (error: any) {
+          console.error("Failed to initiate Vipps payment:", error);
+          throw new TRPCError({ 
+            code: "INTERNAL_SERVER_ERROR", 
+            message: error.message || "Failed to initiate payment" 
+          });
+        }
+      }),
+    
+    /**
+     * Get payment status
+     */
+    getPaymentStatus: publicProcedure
+      .input(z.object({
+        reference: z.string(),
+      }))
+      .query(async ({ input }) => {
+        const { getPaymentStatus } = await import("./vipps");
+        
+        try {
+          const status = await getPaymentStatus(input.reference);
+          
+          return {
+            success: true,
+            state: status.state,
+            authorizedAmount: status.aggregate.authorizedAmount.value / 100, // Convert øre to NOK
+            capturedAmount: status.aggregate.capturedAmount.value / 100,
+            refundedAmount: status.aggregate.refundedAmount.value / 100,
+          };
+        } catch (error: any) {
+          console.error("Failed to get Vipps payment status:", error);
+          throw new TRPCError({ 
+            code: "INTERNAL_SERVER_ERROR", 
+            message: error.message || "Failed to get payment status" 
+          });
+        }
+      }),
+    
+    /**
+     * Capture payment (finalize transaction)
+     */
+    capturePayment: protectedProcedure
+      .input(z.object({
+        reference: z.string(),
+        amount: z.number().positive().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { capturePayment } = await import("./vipps");
+        
+        try {
+          await capturePayment(input.reference, input.amount);
+          
+          // Update payment status in database
+          await db.updatePaymentStatus(input.reference, "captured");
+          
+          return { success: true };
+        } catch (error: any) {
+          console.error("Failed to capture Vipps payment:", error);
+          throw new TRPCError({ 
+            code: "INTERNAL_SERVER_ERROR", 
+            message: error.message || "Failed to capture payment" 
+          });
+        }
       }),
   }),
 });
