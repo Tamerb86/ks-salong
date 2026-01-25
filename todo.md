@@ -1231,3 +1231,10 @@
 - [ ] Write vitest tests for payment endpoints
 - [ ] Test error scenarios (API failures, invalid credentials)
 - [ ] Create final checkpoint
+
+## Bug Fix: BookOnline charAt Error ✅
+- [x] Investigate charAt error in BookOnline component
+- [x] Identify the null value causing the error (member.name can be null)
+- [x] Add proper null checks to prevent the error (member.name?.charAt(0) || "?")
+- [x] Test the fix on /book page (works correctly)
+- [x] Create checkpoint after fix

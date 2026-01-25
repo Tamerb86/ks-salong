@@ -337,7 +337,7 @@ export default function BookOnline() {
                   <CardHeader>
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-amber-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                        {member.name.charAt(0)}
+                        {member.name?.charAt(0) || "?"}
                       </div>
                       <div>
                         <CardTitle>{member.name}</CardTitle>
