@@ -15,6 +15,7 @@ import POS from "./pages/POS";
 import TimeClock from "./pages/TimeClock";
 import Settings from "./pages/Settings";
 import Customers from "./pages/Customers";
+import CustomerProfile from "./pages/CustomerProfile";
 import QueueTV from "./pages/QueueTV";
 import Tidsstempling from "./pages/Tidsstempling";
 import Reports from "./pages/Reports";
@@ -42,6 +43,7 @@ function Router() {
       <Route path={"/time-clock"} component={TimeClock} />
       <Route path={"/tidsstempling"} component={Tidsstempling} />
       <Route path={"/customers"} component={Customers} />
+      <Route path={"/customers/:id"} component={CustomerProfile} />
       <Route path={"/reports"} component={Reports} />
       <Route path={"/staff"} component={Staff} />
       <Route path={"/fiken-sync-history"} component={FikenSyncHistory} />

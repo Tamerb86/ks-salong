@@ -4,7 +4,8 @@ import {
   InsertUser, users, permissions, services, products, serviceStaff,
   appointments, dropInQueue, payments, orders, orderItems, timeEntries,
   customers, salonSettings, businessHours, holidays, notificationTemplates,
-  dailyReports, auditLogs, terminalReaders, fikenSyncLogs, dashboardAccessLogs
+  dailyReports, auditLogs, terminalReaders, fikenSyncLogs, dashboardAccessLogs,
+  customerNotes, customerTags
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -435,20 +436,9 @@ export async function reorderQueue(updates: { id: number; position: number }[]) 
  * ============================================
  */
 
-export async function getAllCustomers() {
-  const db = await getDb();
-  if (!db) return [];
-  return await db.select().from(customers)
-    .where(eq(customers.isActive, true))
-    .orderBy(desc(customers.lastVisit));
-}
+// Removed - replaced with enhanced version below in CRM section
 
-export async function getCustomerById(id: number) {
-  const db = await getDb();
-  if (!db) return undefined;
-  const result = await db.select().from(customers).where(eq(customers.id, id)).limit(1);
-  return result.length > 0 ? result[0] : undefined;
-}
+// Removed - replaced with enhanced version below in CRM section
 
 export async function searchCustomers(query: string) {
   const db = await getDb();
@@ -1209,4 +1199,315 @@ export async function getDashboardAccessLogsByUser(userId: number, limit: number
     .where(eq(dashboardAccessLogs.userId, userId))
     .orderBy(desc(dashboardAccessLogs.loginTime))
     .limit(limit);
+}
+
+/**
+ * ============================================
+ * CUSTOMER CRM FUNCTIONS
+ * ============================================
+ */
+
+// Get all customers with pagination and search
+export async function getAllCustomers(params: {
+  search?: string;
+  tag?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  const db = await getDb();
+  if (!db) return { customers: [], total: 0 };
+
+  const { search, tag, limit = 50, offset = 0 } = params;
+
+  let query = db.select().from(customers);
+
+  // Apply search filter
+  if (search) {
+    query = query.where(
+      or(
+        like(customers.firstName, `%${search}%`),
+        like(customers.lastName, `%${search}%`),
+        like(customers.phone, `%${search}%`),
+        like(customers.email, `%${search}%`)
+      )
+    ) as any;
+  }
+
+  // Get total count
+  const countResult = await db.select({ count: sql<number>`count(*)` }).from(customers);
+  const total = Number(countResult[0]?.count || 0);
+
+  // Get paginated results
+  const results = await query
+    .orderBy(desc(customers.lastVisit), desc(customers.createdAt))
+    .limit(limit)
+    .offset(offset);
+
+  return { customers: results, total };
+}
+
+// Get customer by ID with full details
+export async function getCustomerById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db.select().from(customers).where(eq(customers.id, id)).limit(1);
+  return result[0] || null;
+}
+
+// Customer Notes Functions
+export async function addCustomerNote(data: {
+  customerId: number;
+  note: string;
+  createdBy: number;
+  createdByName: string;
+  appointmentId?: number;
+  visitDate?: Date;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db.insert(customerNotes).values({
+    customerId: data.customerId,
+    note: data.note,
+    createdBy: data.createdBy,
+    createdByName: data.createdByName,
+    appointmentId: data.appointmentId || null,
+    visitDate: data.visitDate || null,
+  });
+
+  return Number(result[0].insertId);
+}
+
+export async function getCustomerNotes(customerId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(customerNotes)
+    .where(eq(customerNotes.customerId, customerId))
+    .orderBy(desc(customerNotes.createdAt));
+}
+
+export async function updateCustomerNote(id: number, note: string) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.update(customerNotes).set({ note }).where(eq(customerNotes.id, id));
+}
+
+export async function deleteCustomerNote(id: number) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.delete(customerNotes).where(eq(customerNotes.id, id));
+}
+
+// Customer Tags Functions
+export async function addCustomerTag(data: {
+  customerId: number;
+  tag: string;
+  addedBy?: number;
+  addedByName?: string;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const result = await db.insert(customerTags).values({
+      customerId: data.customerId,
+      tag: data.tag as any,
+      addedBy: data.addedBy || null,
+      addedByName: data.addedByName || null,
+    });
+
+    return Number(result[0].insertId);
+  } catch (error) {
+    // Handle duplicate tag error
+    console.error("Error adding customer tag:", error);
+    return null;
+  }
+}
+
+export async function getCustomerTags(customerId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(customerTags)
+    .where(eq(customerTags.customerId, customerId))
+    .orderBy(desc(customerTags.createdAt));
+}
+
+export async function deleteCustomerTag(id: number) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.delete(customerTags).where(eq(customerTags.id, id));
+}
+
+export async function getCustomersByTag(tag: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const result = await db
+    .select({
+      customer: customers,
+      tag: customerTags,
+    })
+    .from(customerTags)
+    .innerJoin(customers, eq(customerTags.customerId, customers.id))
+    .where(eq(customerTags.tag, tag as any));
+
+  return result.map(r => r.customer);
+}
+
+// Find potential duplicate customers
+export async function findDuplicateCustomers() {
+  const db = await getDb();
+  if (!db) return [];
+
+  // Find customers with same phone number
+  const duplicates = await db
+    .select({
+      phone: customers.phone,
+      count: sql<number>`count(*)`,
+    })
+    .from(customers)
+    .groupBy(customers.phone)
+    .having(sql`count(*) > 1`);
+
+  const results = [];
+  for (const dup of duplicates) {
+    const matchingCustomers = await db
+      .select()
+      .from(customers)
+      .where(eq(customers.phone, dup.phone));
+    
+    if (matchingCustomers.length > 1) {
+      results.push(matchingCustomers);
+    }
+  }
+
+  return results;
+}
+
+// Merge two customer records
+export async function mergeCustomers(keepId: number, deleteId: number) {
+  const db = await getDb();
+  if (!db) return { success: false, error: "Database not available" };
+
+  try {
+    // Get both customers
+    const keepCustomer = await getCustomerById(keepId);
+    const deleteCustomer = await getCustomerById(deleteId);
+
+    if (!keepCustomer || !deleteCustomer) {
+      return { success: false, error: "One or both customers not found" };
+    }
+
+    // Update all appointments to point to keep customer
+    await db
+      .update(appointments)
+      .set({ customerId: keepId })
+      .where(eq(appointments.customerId, deleteId));
+
+    // Update all notes to point to keep customer
+    // Get all notes from delete customer
+    const notesToMerge = await getCustomerNotes(deleteId);
+    
+    // Delete notes from delete customer (they will be re-created under keep customer)
+    await db.delete(customerNotes).where(eq(customerNotes.customerId, deleteId));
+    
+    // Re-create notes under keep customer
+    for (const note of notesToMerge) {
+      await db.insert(customerNotes).values({
+        customerId: keepId,
+        appointmentId: note.appointmentId,
+        note: note.note,
+        createdBy: note.createdBy,
+        createdByName: note.createdByName,
+        visitDate: note.visitDate,
+        createdAt: note.createdAt,
+      });
+    }
+
+    // Copy tags from delete customer to keep customer
+    const tagsToMerge = await getCustomerTags(deleteId);
+    for (const tag of tagsToMerge) {
+      try {
+        await addCustomerTag({
+          customerId: keepId,
+          tag: tag.tag,
+          addedBy: tag.addedBy || undefined,
+          addedByName: tag.addedByName || undefined,
+        });
+      } catch (error) {
+        // Ignore duplicate tag errors
+        console.log(`Tag ${tag.tag} already exists for customer ${keepId}`);
+      }
+    }
+
+    // Note: Statistics (totalVisits, totalSpent) are calculated dynamically from appointments
+    // No need to manually update them
+
+    // Delete the duplicate customer
+    await db.delete(customers).where(eq(customers.id, deleteId));
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error merging customers:", error);
+    return { success: false, error: String(error) };
+  }
+}
+
+// GDPR: Export customer data
+export async function exportCustomerData(customerId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const customer = await getCustomerById(customerId);
+  if (!customer) return null;
+
+  const bookingHistory = await getCustomerBookingHistory(customerId);
+  const notes = await getCustomerNotes(customerId);
+  const tags = await getCustomerTags(customerId);
+  const stats = await getCustomerStatistics(customerId);
+
+  return {
+    customer,
+    bookingHistory,
+    notes,
+    tags,
+    statistics: stats,
+    exportDate: new Date().toISOString(),
+  };
+}
+
+// GDPR: Delete customer data
+export async function deleteCustomerData(customerId: number) {
+  const db = await getDb();
+  if (!db) return { success: false, error: "Database not available" };
+
+  try {
+    // Delete customer notes
+    await db.delete(customerNotes).where(eq(customerNotes.customerId, customerId));
+
+    // Delete customer tags
+    await db.delete(customerTags).where(eq(customerTags.customerId, customerId));
+
+    // Delete or anonymize appointments (depending on business requirements)
+    // For now, we'll delete them
+    await db.delete(appointments).where(eq(appointments.customerId, customerId));
+
+    // Delete customer record
+    await db.delete(customers).where(eq(customers.id, customerId));
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting customer data:", error);
+    return { success: false, error: String(error) };
+  }
 }

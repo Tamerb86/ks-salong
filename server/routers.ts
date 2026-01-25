@@ -460,9 +460,16 @@ export const appRouter = router({
   }),
 
   customers: router({
-    list: protectedProcedure.query(async () => {
-      return await db.getAllCustomers();
-    }),
+    list: protectedProcedure
+      .input(z.object({
+        search: z.string().optional(),
+        tag: z.string().optional(),
+        limit: z.number().optional(),
+        offset: z.number().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        return await db.getAllCustomers(input || {});
+      }),
     
     search: protectedProcedure
       .input(z.object({ query: z.string() }))
@@ -528,6 +535,102 @@ export const appRouter = router({
       .input(z.object({ customerId: z.number() }))
       .query(async ({ input }) => {
         return await db.getCustomerStatistics(input.customerId);
+      }),
+
+    // Customer Notes
+    addNote: protectedProcedure
+      .input(z.object({
+        customerId: z.number(),
+        note: z.string(),
+        appointmentId: z.number().optional(),
+        visitDate: z.date().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const id = await db.addCustomerNote({
+          ...input,
+          createdBy: ctx.user.id,
+          createdByName: ctx.user.name || 'Unknown',
+        });
+        return { id };
+      }),
+
+    getNotes: protectedProcedure
+      .input(z.object({ customerId: z.number() }))
+      .query(async ({ input }) => {
+        return await db.getCustomerNotes(input.customerId);
+      }),
+
+    updateNote: protectedProcedure
+      .input(z.object({ id: z.number(), note: z.string() }))
+      .mutation(async ({ input }) => {
+        await db.updateCustomerNote(input.id, input.note);
+        return { success: true };
+      }),
+
+    deleteNote: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteCustomerNote(input.id);
+        return { success: true };
+      }),
+
+    // Customer Tags
+    addTag: protectedProcedure
+      .input(z.object({
+        customerId: z.number(),
+        tag: z.enum(["VIP", "Regular", "New", "Inactive", "Loyal", "HighValue", "AtRisk"]),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const id = await db.addCustomerTag({
+          ...input,
+          addedBy: ctx.user.id,
+          addedByName: ctx.user.name || 'Unknown',
+        });
+        return { id };
+      }),
+
+    getTags: protectedProcedure
+      .input(z.object({ customerId: z.number() }))
+      .query(async ({ input }) => {
+        return await db.getCustomerTags(input.customerId);
+      }),
+
+    deleteTag: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteCustomerTag(input.id);
+        return { success: true };
+      }),
+
+    getByTag: protectedProcedure
+      .input(z.object({ tag: z.string() }))
+      .query(async ({ input }) => {
+        return await db.getCustomersByTag(input.tag);
+      }),
+
+    // Duplicate Management
+    findDuplicates: protectedProcedure
+      .query(async () => {
+        return await db.findDuplicateCustomers();
+      }),
+
+    merge: protectedProcedure
+      .input(z.object({ keepId: z.number(), deleteId: z.number() }))
+      .mutation(async ({ input }) => {
+        return await db.mergeCustomers(input.keepId, input.deleteId);
+      }),
+
+    // GDPR
+    exportData: protectedProcedure
+      .input(z.object({ customerId: z.number() }))
+      .query(async ({ input }) => {
+        return await db.exportCustomerData(input.customerId);
+      }),
+
+    deleteData: protectedProcedure
+      .input(z.object({ customerId: z.number() }))
+      .mutation(async ({ input }) => {
+        return await db.deleteCustomerData(input.customerId);
       }),
   }),
 

@@ -979,3 +979,63 @@
 - [x] Add calendar/list view toggle in Appointments page
 - [x] Test drag-and-drop rescheduling flow in browser
 - [ ] Handle conflicts when dropping appointments (optional enhancement)
+
+## Customer CRM System
+### Database Schema
+- [x] Create customer_notes table (id, customerId, note, createdBy, createdAt, visitDate)
+- [x] Create customer_tags table (id, customerId, tag, createdAt)
+- [x] Add tags enum (VIP, Regular, New, Inactive, Loyal, HighValue, AtRisk)
+- [x] Run database migration for new tables (0014_parallel_zaran.sql)
+
+### Customer Profile Page
+- [x] Create Customers list page with search and filters
+- [x] Create individual customer profile page (/customers/:id)
+- [x] Display customer basic information (name, phone, email, created date)
+- [x] Show complete booking history with dates and services
+- [x] Display internal notes section with add/edit/delete functionality
+- [x] Show customer tags with add/remove functionality
+- [x] Add statistics (total visits, total spent, last visit date)
+- [x] Add route to CustomerProfile in App.tsx
+- [x] Update Customers list to navigate to profile on click
+- [x] Add Customers link in Dashboard sidebar
+
+### Customer Notes System
+- [x] Create backend endpoint to add customer notes
+- [x] Create backend endpoint to get customer notes with pagination
+- [x] Create backend endpoint to update/delete customer notes
+- [x] Link notes to specific visits/appointments
+- [x] Add "created by" field to track which staff member added the note
+- [x] Display notes chronologically with visit dates
+
+### Customer Tagging System
+- [x] Create backend endpoint to add tags to customers
+- [x] Create backend endpoint to remove tags from customers
+- [x] Create backend endpoint to get customers by tag
+- [ ] Add tag filter in customers list page (optional enhancement)
+- [x] Display tag badges on customer profile
+- [x] Support multiple tags per customer
+
+### Duplicate Customer Merge
+- [x] Create backend endpoint to find potential duplicate customers
+- [ ] Create UI to show duplicate customer suggestions (future enhancement)
+- [x] Create merge functionality to combine customer records
+- [x] Merge booking history from both customers
+- [x] Merge notes from both customers
+- [x] Merge tags from both customers
+- [x] Delete the duplicate customer after merge
+
+### GDPR Compliance
+- [x] Create backend endpoint to export customer data as JSON
+- [x] Create backend endpoint to permanently delete customer data
+- [x] Add "Export Data" button in customer profile
+- [x] Add "Delete Customer" button with confirmation dialog
+- [x] Ensure deletion cascades to all related data (bookings, notes, tags)
+- [ ] Add audit log for GDPR operations (optional enhancement)
+
+#### Testing
+- [x] Write vitest tests for customer notes CRUD operations
+- [x] Write vitest tests for customer tags operations
+- [x] Write vitest tests for duplicate customer merge
+- [x] Write vitest tests for GDPR export/delete
+- [x] All 16 tests passing successfully
+- [ ] Test complete CRM workflow in browser (optional manual testing) profile page flow

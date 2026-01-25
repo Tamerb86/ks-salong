@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, json, date, datetime, index } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, json, date, datetime, index, unique } from "drizzle-orm/mysql-core";
 import { relations, sql } from "drizzle-orm";
 
 /**
@@ -443,3 +443,52 @@ export const dashboardAccessLogs = mysqlTable("dashboard_access_logs", {
   userIdIdx: index("user_id_idx").on(table.userId),
   loginTimeIdx: index("login_time_idx").on(table.loginTime),
 }));
+
+/**
+ * ============================================
+ * CUSTOMER CRM SYSTEM
+ * ============================================
+ */
+
+/**
+ * Customer Notes
+ * Internal notes for each customer visit
+ */
+export const customerNotes = mysqlTable("customer_notes", {
+  id: int("id").primaryKey().autoincrement(),
+  customerId: int("customer_id").notNull(),
+  appointmentId: int("appointment_id"), // Link to specific visit/appointment
+  note: text("note").notNull(),
+  createdBy: int("created_by").notNull(), // Staff member who created the note
+  createdByName: varchar("created_by_name", { length: 255 }), // Cache staff name for display
+  visitDate: datetime("visit_date"), // Date of the visit this note refers to
+  createdAt: datetime("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: datetime("updated_at").notNull().$onUpdate(() => sql`CURRENT_TIMESTAMP`),
+}, (table) => ({
+  customerIdIdx: index("customer_id_idx").on(table.customerId),
+  appointmentIdIdx: index("appointment_id_idx").on(table.appointmentId),
+  createdAtIdx: index("created_at_idx").on(table.createdAt),
+}));
+
+export type CustomerNote = typeof customerNotes.$inferSelect;
+export type NewCustomerNote = typeof customerNotes.$inferInsert;
+
+/**
+ * Customer Tags
+ * Tags for customer segmentation (VIP, Regular, New, etc.)
+ */
+export const customerTags = mysqlTable("customer_tags", {
+  id: int("id").primaryKey().autoincrement(),
+  customerId: int("customer_id").notNull(),
+  tag: mysqlEnum("tag", ["VIP", "Regular", "New", "Inactive", "Loyal", "HighValue", "AtRisk"]).notNull(),
+  addedBy: int("added_by"), // Staff member who added the tag
+  addedByName: varchar("added_by_name", { length: 255 }),
+  createdAt: datetime("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => ({
+  customerIdIdx: index("customer_id_idx").on(table.customerId),
+  tagIdx: index("tag_idx").on(table.tag),
+  uniqueCustomerTag: unique("unique_customer_tag").on(table.customerId, table.tag), // Prevent duplicate tags
+}));
+
+export type CustomerTag = typeof customerTags.$inferSelect;
+export type NewCustomerTag = typeof customerTags.$inferInsert;

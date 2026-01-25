@@ -29,11 +29,13 @@ import {
   Users,
 } from "lucide-react";
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { Layout } from "@/components/Layout";
 import { LiveBadge } from "@/components/ui/live-badge";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Customers() {
+  const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
 
@@ -53,7 +55,7 @@ export default function Customers() {
     { enabled: !!selectedCustomerId }
   );
 
-  const filteredCustomers = customers?.filter((customer: any) => {
+  const filteredCustomers = customers?.customers?.filter((customer: any) => {
     const query = searchQuery.toLowerCase();
     return (
       customer.firstName?.toLowerCase().includes(query) ||
@@ -140,7 +142,7 @@ export default function Customers() {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-purple-600">
-                {customers?.length || 0}
+                {customers?.total || 0}
               </div>
             </CardContent>
           </Card>
@@ -153,7 +155,7 @@ export default function Customers() {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-green-600">
-                {customers?.filter((c: any) => c.isActive).length || 0}
+                {customers?.customers?.filter((c: any) => c.isActive).length || 0}
               </div>
             </CardContent>
           </Card>
@@ -166,7 +168,7 @@ export default function Customers() {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-amber-600">
-                {customers?.filter((c: any) => {
+                {customers?.customers?.filter((c: any) => {
                   const createdDate = new Date(c.createdAt);
                   const now = new Date();
                   return (
@@ -194,7 +196,7 @@ export default function Customers() {
                   <div
                     key={customer.id}
                     className="flex items-center justify-between p-4 border rounded-lg hover:bg-purple-50 cursor-pointer transition-colors"
-                    onClick={() => setSelectedCustomerId(customer.id)}
+                    onClick={() => setLocation(`/customers/${customer.id}`)}
                   >
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-amber-500 rounded-full flex items-center justify-center">
