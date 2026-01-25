@@ -932,3 +932,12 @@
 - [ ] Add month navigation (previous/next buttons)
 - [ ] Test drag-and-drop functionality
 - [ ] Verify database updates correctly after reschedule
+
+## Landing Page Icon Update
+- [x] Change hair coloring service icon from 🎨 (paint palette) to 🌈 (rainbow) for better representation of hair coloring
+
+## Admin Button Enhancement
+- [x] Add lock icon to Admin button in Landing page footer
+- [x] Change button text from "Admin" to "كلمة سر"
+- [x] Improve button styling to make it more distinct and visible
+- [x] Use different color scheme (purple bg) to differentiate from regular links

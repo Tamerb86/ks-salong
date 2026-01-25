@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Phone, MapPin, Clock, Star, Award, Users, Scissors } from "lucide-react";
+import { Phone, MapPin, Clock, Star, Award, Users, Scissors, Lock } from "lucide-react";
 import { Link } from "wouter";
 import { useEffect } from "react";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -202,7 +202,7 @@ export default function Landing() {
               {
                 title: "Farge",
                 description: "Profesjonell hårfarge og highlights",
-                icon: "🎨"
+                icon: "💇"
               },
               {
                 title: "Skjegg trim",
@@ -462,8 +462,11 @@ export default function Landing() {
 
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm">
             <p>&copy; 2026 K.S Frisør. Alle rettigheter reservert.</p>
-            <Link href="/dashboard" className="inline-block mt-4 text-xs text-gray-600 hover:text-gray-400 transition">
-              Admin
+            <Link href="/dashboard">
+              <button className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-all shadow-md hover:shadow-lg">
+                <Lock className="h-4 w-4" />
+                كلمة سر
+              </button>
             </Link>
           </div>
         </div>
