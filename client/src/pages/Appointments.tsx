@@ -80,6 +80,43 @@ export default function Appointments() {
     },
   });
 
+  const createPaymentMutation = trpc.appointments.createWithPayment.useMutation({
+    onSuccess: (data: any) => {
+      if (data.vippsUrl) {
+        // Redirect to Vipps payment page
+        window.location.href = data.vippsUrl;
+      } else {
+        toast.error("Kunne ikke opprette betalingslenke");
+      }
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Kunne ikke starte betaling");
+    },
+  });
+
+  const handlePayNow = (appointment: any) => {
+    if (!appointment.service?.price) {
+      toast.error("Ingen pris funnet for denne tjenesten");
+      return;
+    }
+
+    // Parse appointment date
+    const aptDate = typeof appointment.appointmentDate === 'string' 
+      ? parseISO(appointment.appointmentDate) 
+      : new Date(appointment.appointmentDate);
+
+    createPaymentMutation.mutate({
+      customerId: appointment.customerId,
+      staffId: appointment.staffId,
+      serviceId: appointment.serviceId,
+      appointmentDate: aptDate,
+      startTime: appointment.startTime,
+      endTime: appointment.endTime,
+      notes: appointment.notes || '',
+      requirePayment: true,
+    });
+  };
+
   // Generate calendar grid
   const generateCalendarDays = () => {
     const start = startOfWeek(monthStart, { weekStartsOn: 1 }); // Monday
@@ -337,9 +374,30 @@ export default function Appointments() {
               <div className="space-y-4">
                 {/* Status Badge */}
                 <div className="flex items-center justify-between">
-                  <Badge className={getStatusColor(selectedAppointment.status)}>
-                    {getStatusLabel(selectedAppointment.status)}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge className={getStatusColor(selectedAppointment.status)}>
+                      {getStatusLabel(selectedAppointment.status)}
+                    </Badge>
+                    {/* Payment Status Badge */}
+                    {selectedAppointment.paymentStatus && (
+                      <Badge 
+                        className={
+                          selectedAppointment.paymentStatus === 'PAID' 
+                            ? 'bg-green-500 text-white' 
+                            : selectedAppointment.paymentStatus === 'PENDING'
+                            ? 'bg-yellow-500 text-white'
+                            : 'bg-red-500 text-white'
+                        }
+                      >
+                        {selectedAppointment.paymentStatus === 'PAID' 
+                          ? '💳 Betalt' 
+                          : selectedAppointment.paymentStatus === 'PENDING'
+                          ? '⏳ Venter betaling'
+                          : '❌ Mislyktes'
+                        }
+                      </Badge>
+                    )}
+                  </div>
                   <a
                     href={generateGoogleCalendarLink(selectedAppointment)}
                     target="_blank"
@@ -390,6 +448,31 @@ export default function Appointments() {
                   <div className="bg-amber-50 rounded-lg p-4">
                     <h3 className="font-semibold text-gray-900 mb-2">Notater</h3>
                     <p className="text-sm text-gray-700">{selectedAppointment.notes}</p>
+                  </div>
+                )}
+
+                {/* Pay Now Button for Pending Payments */}
+                {selectedAppointment.paymentStatus === 'PENDING' && (
+                  <div className="border-t pt-4">
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <h3 className="font-semibold text-gray-900 mb-1">Betaling venter</h3>
+                          <p className="text-sm text-gray-600 mb-3">
+                            Denne avtalen krever betaling. Klikk på knappen nedenfor for å betale med Vipps.
+                          </p>
+                          <p className="text-sm font-medium text-gray-900">
+                            Beløp: {selectedAppointment.service?.price} kr
+                          </p>
+                        </div>
+                      </div>
+                      <Button
+                        className="w-full mt-4 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white"
+                        onClick={() => handlePayNow(selectedAppointment)}
+                      >
+                        💳 Betal nå med Vipps
+                      </Button>
+                    </div>
                   </div>
                 )}
 

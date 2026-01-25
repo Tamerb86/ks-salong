@@ -678,3 +678,12 @@
 - [x] Redirect from custom subdomain to /book-online (301 permanent)
 - [ ] Add documentation for DNS configuration
 - [ ] Test with actual custom domain
+
+## Payment Status in Appointments Page
+- [x] Add payment status badge to appointments table (Betalt/Venter/Mislyktes)
+- [ ] Show payment method used for paid appointments
+- [x] Add "Betal nå" button for pending payment appointments
+- [x] Implement payment flow from Appointments page (redirect to Vipps)
+- [x] Update appointment status after successful payment (via webhook)
+- [ ] Add filter to show only unpaid appointments
+- [x] Show payment amount in appointment details
