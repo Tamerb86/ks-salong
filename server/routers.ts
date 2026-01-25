@@ -1109,6 +1109,10 @@ export const appRouter = router({
         reminder24hEnabled: z.boolean().optional(),
         reminder2hEnabled: z.boolean().optional(),
         vippsEnabled: z.boolean().optional(),
+        vippsClientId: z.string().optional(),
+        vippsClientSecret: z.string().optional(),
+        vippsMerchantSerialNumber: z.string().optional(),
+        vippsSubscriptionKey: z.string().optional(),
         requirePaymentForBooking: z.boolean().optional(),
         autoLogoutTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/).optional(), // HH:MM format
         universalPin: z.string().length(4).or(z.string().length(6)).optional(),

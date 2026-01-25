@@ -1152,3 +1152,26 @@
 - [x] Prevent drop zones from accepting appointments on past dates (disabled: true)
 - [x] Test validation by attempting to drag appointment to yesterday
 - [x] Write vitest test for past date validation (5/5 tests passed)
+
+## Vipps Settings in Settings Page
+- [x] Add Vipps fields to salonSettings table (clientId, clientSecret, subscriptionKey, merchantSerialNumber) - already exists
+- [x] Push database schema changes with pnpm db:push - not needed, fields already exist
+- [x] Create Vipps settings section in Settings.tsx
+- [x] Add form inputs for Vipps credentials (with password type for secrets)
+- [x] Add backend endpoint to save Vipps settings (updated settings.update input schema)
+- [x] Add backend endpoint to retrieve Vipps settings (settings.get already returns all fields)
+- [x] Test saving and retrieving Vipps settings (successfully saved and retrieved test data)
+- [x] Add validation for required fields (fields are optional, validation handled by backend)
+
+## Vipps Payment Integration
+- [ ] Create Vipps service module (server/vipps.ts) for API calls
+- [ ] Add payment initiation endpoint (vipps.initiatePayment)
+- [ ] Build webhook handler for payment confirmation (vipps.handleCallback)
+- [ ] Add payment step to BookOnline flow (Step 5: Payment)
+- [ ] Integrate Vipps payment button in booking confirmation
+- [ ] Auto-confirm bookings after successful payment
+- [ ] Store payment transactions in database (add payments table)
+- [ ] Generate payment receipts
+- [ ] Handle payment failures and refunds
+- [ ] Test Vipps integration in test environment
+- [ ] Write vitest tests for payment flow

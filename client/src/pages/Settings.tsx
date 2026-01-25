@@ -76,6 +76,10 @@ export default function Settings() {
     reminder24hEnabled: true,
     reminder2hEnabled: true,
     vippsEnabled: false,
+    vippsClientId: "",
+    vippsClientSecret: "",
+    vippsMerchantSerialNumber: "",
+    vippsSubscriptionKey: "",
     requirePaymentForBooking: false,
     autoLogoutTime: "22:00",
     universalPin: "1234",
@@ -125,6 +129,10 @@ export default function Settings() {
         reminder24hEnabled: settings.reminder24hEnabled ?? true,
         reminder2hEnabled: settings.reminder2hEnabled ?? true,
         vippsEnabled: settings.vippsEnabled ?? false,
+        vippsClientId: settings.vippsClientId || "",
+        vippsClientSecret: settings.vippsClientSecret || "",
+        vippsMerchantSerialNumber: settings.vippsMerchantSerialNumber || "",
+        vippsSubscriptionKey: settings.vippsSubscriptionKey || "",
         requirePaymentForBooking: settings.requirePaymentForBooking ?? false,
         autoLogoutTime: settings.autoLogoutTime || "22:00",
         universalPin: settings.universalPin || "1234",
@@ -699,6 +707,67 @@ export default function Settings() {
                       <p className="text-sm text-yellow-800">
                         ⚠️ Du må aktivere Vipps for å kreve betaling ved booking
                       </p>
+                    </div>
+                  )}
+
+                  {formData.vippsEnabled && (
+                    <div className="space-y-4 p-4 border rounded-lg bg-purple-50">
+                      <h3 className="font-semibold text-purple-900">Vipps API-innstillinger</h3>
+                      <p className="text-sm text-purple-700">
+                        Få disse verdiene fra <a href="https://portal.vipps.no/" target="_blank" rel="noopener noreferrer" className="underline">Vipps Developer Portal</a>
+                      </p>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="vippsClientId">Client ID</Label>
+                        <Input
+                          id="vippsClientId"
+                          type="text"
+                          placeholder="Vipps Client ID"
+                          value={formData.vippsClientId || ''}
+                          onChange={(e) =>
+                            setFormData({ ...formData, vippsClientId: e.target.value })
+                          }
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="vippsClientSecret">Client Secret</Label>
+                        <Input
+                          id="vippsClientSecret"
+                          type="password"
+                          placeholder="Vipps Client Secret"
+                          value={formData.vippsClientSecret || ''}
+                          onChange={(e) =>
+                            setFormData({ ...formData, vippsClientSecret: e.target.value })
+                          }
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="vippsMerchantSerialNumber">Merchant Serial Number (MSN)</Label>
+                        <Input
+                          id="vippsMerchantSerialNumber"
+                          type="text"
+                          placeholder="Vipps MSN"
+                          value={formData.vippsMerchantSerialNumber || ''}
+                          onChange={(e) =>
+                            setFormData({ ...formData, vippsMerchantSerialNumber: e.target.value })
+                          }
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="vippsSubscriptionKey">Subscription Key (Ocp-Apim-Subscription-Key)</Label>
+                        <Input
+                          id="vippsSubscriptionKey"
+                          type="password"
+                          placeholder="Vipps Subscription Key"
+                          value={formData.vippsSubscriptionKey || ''}
+                          onChange={(e) =>
+                            setFormData({ ...formData, vippsSubscriptionKey: e.target.value })
+                          }
+                        />
+                      </div>
                     </div>
                   )}
 
