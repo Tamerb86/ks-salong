@@ -13,13 +13,33 @@
     position: absolute;
     left: 0;
     top: 0;
+    margin: 0;
+    font-family: 'Courier New', monospace;
+    line-height: 1.4;
+  }
+  
+  /* 80mm thermal printer */
+  .receipt-print.print-80mm {
     width: 80mm;
     max-width: 80mm;
-    margin: 0;
     padding: 5mm;
-    font-family: 'Courier New', monospace;
     font-size: 12pt;
-    line-height: 1.4;
+  }
+  
+  /* A4 paper */
+  .receipt-print.print-A4 {
+    width: 210mm;
+    max-width: 210mm;
+    padding: 15mm;
+    font-size: 14pt;
+  }
+  
+  /* A5 paper */
+  .receipt-print.print-A5 {
+    width: 148mm;
+    max-width: 148mm;
+    padding: 10mm;
+    font-size: 13pt;
   }
   
   /* Hide dialog elements */

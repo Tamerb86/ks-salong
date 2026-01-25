@@ -46,6 +46,16 @@ export default function POS() {
   const [isReceiptOpen, setIsReceiptOpen] = useState(false);
   const [lastReceipt, setLastReceipt] = useState<any>(null);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
+  
+  // Print options state
+  const [printOptions, setPrintOptions] = useState({
+    paperSize: "80mm" as "80mm" | "A4" | "A5",
+    showLogo: true,
+    showVAT: true,
+    showEmployee: true,
+    copies: 1,
+    customMessage: "",
+  });
 
   // Fetch data
   const { data: services = [] } = trpc.services.list.useQuery(undefined, { enabled: !authLoading });
@@ -626,16 +636,28 @@ export default function POS() {
 
       {/* Receipt Dialog */}
       <Dialog open={isReceiptOpen} onOpenChange={setIsReceiptOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Kvittering</DialogTitle>
             <DialogDescription>Faktura #{lastReceipt?.orderNumber}</DialogDescription>
           </DialogHeader>
+          
+          <Tabs defaultValue="preview" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="preview">Forhåndsvisning</TabsTrigger>
+              <TabsTrigger value="options">Utskriftsalternativer</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="preview" className="mt-4">
           {lastReceipt && (
-            <div className="receipt-print space-y-4 py-4 print:p-4">
+            <div className={`receipt-print space-y-4 py-4 print:p-4 print-${printOptions.paperSize}`}>
               <div className="text-center border-b pb-4 print:border-dashed">
-                <h2 className="text-xl font-bold print:text-2xl">K.S Salong</h2>
-                <p className="text-sm text-gray-600">Professional Hair Salon</p>
+                {printOptions.showLogo && (
+                  <div className="mb-2">
+                    <h2 className="text-xl font-bold print:text-2xl">K.S Salong</h2>
+                    <p className="text-sm text-gray-600">Professional Hair Salon</p>
+                  </div>
+                )}
                 <p className="text-xs text-gray-500 mt-1">Adresse: [Din adresse]</p>
                 <p className="text-xs text-gray-500">Telefon: [Ditt telefonnummer]</p>
                 <p className="text-xs text-gray-500 mt-2 font-mono">
@@ -662,24 +684,30 @@ export default function POS() {
               </div>
 
               <div className="space-y-1 text-sm border-t pt-2 print:border-dashed">
-                <div className="flex justify-between">
-                  <span>Delsum (eks. MVA):</span>
-                  <span>{(calculateSubtotal() / 1.25).toFixed(2)} kr</span>
-                </div>
+                {printOptions.showVAT && (
+                  <div className="flex justify-between">
+                    <span>Delsum (eks. MVA):</span>
+                    <span>{(calculateSubtotal() / 1.25).toFixed(2)} kr</span>
+                  </div>
+                )}
                 {discount > 0 && (
                   <div className="flex justify-between text-red-600">
                     <span>Rabatt:</span>
                     <span>-{calculateDiscount().toFixed(2)} kr</span>
                   </div>
                 )}
-                <div className="flex justify-between font-medium">
-                  <span>MVA (25%):</span>
-                  <span>{calculateMVA().toFixed(2)} kr</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Delsum (inkl. MVA):</span>
-                  <span>{calculateSubtotal().toFixed(2)} kr</span>
-                </div>
+                {printOptions.showVAT && (
+                  <div className="flex justify-between font-medium">
+                    <span>MVA (25%):</span>
+                    <span>{calculateMVA().toFixed(2)} kr</span>
+                  </div>
+                )}
+                {printOptions.showVAT && (
+                  <div className="flex justify-between">
+                    <span>Delsum (inkl. MVA):</span>
+                    <span>{calculateSubtotal().toFixed(2)} kr</span>
+                  </div>
+                )}
                 {tip > 0 && (
                   <div className="flex justify-between text-green-600">
                     <span>Tips:</span>
@@ -694,14 +722,118 @@ export default function POS() {
 
               <div className="text-center text-xs text-gray-500 border-t pt-4 print:border-dashed">
                 <p className="font-medium">Betalingsmetode: {paymentMethod.toUpperCase()}</p>
-                {activeEmployee && (
+                {printOptions.showEmployee && activeEmployee && (
                   <p className="mt-1">Betjent av: {activeEmployee.name}</p>
                 )}
-                <p className="mt-3 font-medium">Takk for besøket!</p>
-                <p className="mt-1">Velkommen tilbake!</p>
+                {printOptions.customMessage ? (
+                  <p className="mt-3 font-medium">{printOptions.customMessage}</p>
+                ) : (
+                  <>
+                    <p className="mt-3 font-medium">Takk for besøket!</p>
+                    <p className="mt-1">Velkommen tilbake!</p>
+                  </>
+                )}
               </div>
             </div>
           )}
+            </TabsContent>
+            
+            <TabsContent value="options" className="mt-4 space-y-4">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Papirstørrelse</Label>
+                  <Select
+                    value={printOptions.paperSize}
+                    onValueChange={(value: "80mm" | "A4" | "A5") =>
+                      setPrintOptions({ ...printOptions, paperSize: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="80mm">80mm (Termisk skriver)</SelectItem>
+                      <SelectItem value="A4">A4 (Standard)</SelectItem>
+                      <SelectItem value="A5">A5 (Halv side)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-3">
+                  <Label>Innhold</Label>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="showLogo"
+                      checked={printOptions.showLogo}
+                      onChange={(e) =>
+                        setPrintOptions({ ...printOptions, showLogo: e.target.checked })
+                      }
+                      className="h-4 w-4"
+                    />
+                    <Label htmlFor="showLogo" className="font-normal cursor-pointer">
+                      Vis logo
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="showVAT"
+                      checked={printOptions.showVAT}
+                      onChange={(e) =>
+                        setPrintOptions({ ...printOptions, showVAT: e.target.checked })
+                      }
+                      className="h-4 w-4"
+                    />
+                    <Label htmlFor="showVAT" className="font-normal cursor-pointer">
+                      Vis MVA-detaljer
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="showEmployee"
+                      checked={printOptions.showEmployee}
+                      onChange={(e) =>
+                        setPrintOptions({ ...printOptions, showEmployee: e.target.checked })
+                      }
+                      className="h-4 w-4"
+                    />
+                    <Label htmlFor="showEmployee" className="font-normal cursor-pointer">
+                      Vis ansattinformasjon
+                    </Label>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="copies">Antall kopier</Label>
+                  <Input
+                    id="copies"
+                    type="number"
+                    min="1"
+                    max="10"
+                    value={printOptions.copies}
+                    onChange={(e) =>
+                      setPrintOptions({ ...printOptions, copies: parseInt(e.target.value) || 1 })
+                    }
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="customMessage">Tilpasset melding (valgfritt)</Label>
+                  <Input
+                    id="customMessage"
+                    placeholder="F.eks: Takk for besøket!"
+                    value={printOptions.customMessage}
+                    onChange={(e) =>
+                      setPrintOptions({ ...printOptions, customMessage: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+          
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsReceiptOpen(false)}>
               Lukk

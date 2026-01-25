@@ -1226,3 +1226,15 @@
 - [x] Integrate scanner in POS page for quick product lookup
 - [x] Add manual barcode input option as fallback
 - [x] Test barcode scanning with different formats (EAN-13, UPC, Code128)
+
+## Improve Receipt (Kvittering) Printing
+- [x] Analyze current receipt implementation in POS page
+- [x] Add print options tab in receipt dialog
+- [x] Add paper size options (80mm thermal, A4, A5)
+- [x] Add content display options (logo, VAT details, employee info)
+- [x] Add number of copies option
+- [x] Add custom message field
+- [x] Enhance receipt design with better formatting and styling
+- [x] Add company logo to receipt header
+- [x] Improve print CSS for different paper sizes
+- [x] Test printing on different browsers and devices
