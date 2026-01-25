@@ -37,6 +37,7 @@ export default function Appointments() {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isNewAppointmentOpen, setIsNewAppointmentOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [showOnlyUnpaid, setShowOnlyUnpaid] = useState(false);
 
   // Fetch appointments for the current month
   const monthStart = startOfMonth(currentMonth);
@@ -135,12 +136,19 @@ export default function Appointments() {
   const calendarDays = generateCalendarDays();
 
   const getAppointmentsForDay = (date: Date) => {
-    return appointments.filter((apt: any) => {
+    let filtered = appointments.filter((apt: any) => {
       const aptDate = typeof apt.appointmentDate === 'string' 
         ? parseISO(apt.appointmentDate) 
         : new Date(apt.appointmentDate);
       return isSameDay(aptDate, date);
     });
+    
+    // Apply unpaid filter if enabled
+    if (showOnlyUnpaid) {
+      filtered = filtered.filter((apt: any) => apt.paymentStatus === 'pending');
+    }
+    
+    return filtered;
   };
 
   const getStatusColor = (status: string) => {
@@ -243,16 +251,30 @@ export default function Appointments() {
               </div>
               <p className="text-gray-600 mt-1">Månedlig kalendervisning</p>
             </div>
-            <Button 
-              onClick={() => {
-                setSelectedDate(new Date());
-                setIsNewAppointmentOpen(true);
-              }}
-              className="bg-gradient-to-r from-purple-600 to-amber-600 hover:from-purple-700 hover:to-amber-700"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Ny avtale
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                variant={showOnlyUnpaid ? "default" : "outline"}
+                onClick={() => setShowOnlyUnpaid(!showOnlyUnpaid)}
+                className={showOnlyUnpaid ? "bg-amber-600 hover:bg-amber-700" : ""}
+              >
+                {showOnlyUnpaid ? "Vis alle" : "Vis kun ubetalte"}
+                {appointments.filter((a: any) => a.paymentStatus === 'pending').length > 0 && (
+                  <Badge className="ml-2 bg-red-500 text-white">
+                    {appointments.filter((a: any) => a.paymentStatus === 'pending').length}
+                  </Badge>
+                )}
+              </Button>
+              <Button 
+                onClick={() => {
+                  setSelectedDate(new Date());
+                  setIsNewAppointmentOpen(true);
+                }}
+                className="bg-gradient-to-r from-purple-600 to-amber-600 hover:from-purple-700 hover:to-amber-700"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Ny avtale
+              </Button>
+            </div>
           </div>
 
           {/* Month Navigation */}

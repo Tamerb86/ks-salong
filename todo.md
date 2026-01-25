@@ -742,3 +742,10 @@
 - [ ] Test notification delivery on failure (requires actual sync failure)
 - [ ] Test manual sync with various date ranges (pending backend endpoint)
 - [x] Verify sync history displays correctly
+
+## Unpaid Appointments Filter
+- [x] Add "Vis kun ubetalte" filter button in Appointments page header
+- [x] Filter appointments by paymentStatus === 'pending'
+- [x] Show count of unpaid appointments in button badge
+- [x] Add toggle state to switch between all/unpaid view
+- [x] Highlight unpaid appointments in the list (via payment status badge)
