@@ -1118,3 +1118,7 @@
 - [ ] Test appointment cancellation from Dashboard
 - [ ] Test appointment editing/rescheduling
 - [ ] Verify status updates reflect in Dashboard
+
+## Remove Duration and Første ledige from BookOnline
+- [x] Remove service duration display from service cards
+- [x] Remove "Første ledige" option from staff selection

@@ -281,10 +281,6 @@ export default function BookOnline() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <Clock className="h-4 w-4" />
-                        <span>{service.duration} minutter</span>
-                      </div>
                       <div className="flex items-center gap-2">
                         <span className="text-2xl font-bold text-gray-900">
                           {service.price} kr
@@ -313,23 +309,6 @@ export default function BookOnline() {
             </Button>
             <h2 className="text-3xl font-bold text-center mb-8">Velg frisør</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card
-                className="hover:shadow-xl transition-all cursor-pointer border-2 hover:border-purple-300"
-                onClick={() => handleStaffSelect("any")}
-              >
-                <CardHeader>
-                  <CardTitle>Første ledige</CardTitle>
-                  <CardDescription>
-                    Vi finner den første tilgjengelige frisøren for deg
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button className="w-full bg-gradient-to-r from-purple-600 to-amber-600">
-                    Fortsett
-                  </Button>
-                </CardContent>
-              </Card>
-
               {staff?.filter((s: any) => s.role === "barber" && s.isActive).map((member: any) => (
                 <Card
                   key={member.id}
