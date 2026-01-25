@@ -130,10 +130,15 @@ export default function POS() {
   };
 
   const calculateMVA = () => {
-    const subtotal = calculateSubtotal();
+    // Prices already include MVA, so we extract it
+    // If price is 450 kr (with 25% MVA), then:
+    // Price before MVA = 450 / 1.25 = 360 kr
+    // MVA = 450 - 360 = 90 kr
+    const subtotal = calculateSubtotal(); // Total with MVA
     const discountAmount = calculateDiscount();
-    const taxableAmount = subtotal - discountAmount;
-    return taxableAmount * 0.25; // 25% MVA
+    const totalWithMVA = subtotal - discountAmount;
+    const totalBeforeMVA = totalWithMVA / 1.25;
+    return totalWithMVA - totalBeforeMVA; // Extract MVA
   };
 
   const calculateTotal = () => {
@@ -528,7 +533,7 @@ export default function POS() {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Delsum:</span>
-                      <span className="font-medium">{calculateSubtotal().toFixed(2)} kr</span>
+                      <span className="font-medium">{(calculateSubtotal() / 1.25).toFixed(2)} kr</span>
                     </div>
                     {discount > 0 && (
                       <div className="flex justify-between text-red-600">

@@ -800,3 +800,7 @@
 - [ ] Include profit data in PDF export
 - [ ] Add filter by profit margin range
 - [ ] Show profit per order in transaction list
+
+## Bug Fixes
+- [x] Fix POS Delsum to show subtotal (before MVA) instead of total
+- [x] Fix POS MVA calculation (prices include MVA, extract it correctly)
