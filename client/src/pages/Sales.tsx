@@ -20,9 +20,7 @@ import { toast } from "sonner";
 export default function Sales() {
   const { user, loading: authLoading } = useAuth();
   
-  if (authLoading) return null;
-  
-  // Filter states
+  // Filter states - MUST declare all hooks before any conditional returns
   const [dateFrom, setDateFrom] = useState(format(new Date(), "yyyy-MM-dd"));
   const [dateTo, setDateTo] = useState(format(new Date(), "yyyy-MM-dd"));
   const [selectedEmployee, setSelectedEmployee] = useState<string>("all");
@@ -35,6 +33,15 @@ export default function Sales() {
   // Fetch data
   const { data: staff = [] } = trpc.staff.list.useQuery(undefined, { enabled: !authLoading });
   
+  const { data: sales = [], isLoading, refetch } = trpc.orders.list.useQuery({
+      dateFrom,
+      dateTo,
+      staffId: selectedEmployee === "all" ? undefined : parseInt(selectedEmployee),
+      paymentMethod: selectedPaymentMethod === "all" ? undefined : selectedPaymentMethod,
+    },
+    { enabled: !authLoading, refetchInterval: 30000 }
+  );
+  
   const refundMutation = trpc.orders.refund.useMutation({
     onSuccess: () => {
       toast.success("Refund behandlet");
@@ -46,15 +53,6 @@ export default function Sales() {
       toast.error(error.message);
     },
   });
-
-  const { data: sales = [], isLoading, refetch } = trpc.orders.list.useQuery({
-      dateFrom,
-      dateTo,
-      staffId: selectedEmployee === "all" ? undefined : parseInt(selectedEmployee),
-      paymentMethod: selectedPaymentMethod === "all" ? undefined : selectedPaymentMethod,
-    },
-    { enabled: !authLoading, refetchInterval: 30000 }
-  );
   
   // Calculate statistics
   const totalSales = sales.reduce((sum: number, order: any) => sum + parseFloat(order.total || "0"), 0);
@@ -79,6 +77,7 @@ export default function Sales() {
     alert("PDF export kommer snart!");
   };
   
+  // Early returns AFTER all hooks
   if (authLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
