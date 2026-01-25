@@ -851,3 +851,14 @@
 - [x] Link "Ring oss" button to phone app (tel:+4792981628)
 - [x] Add Testimonials section with customer reviews (3 reviews from real customers)
 - [x] Test all improvements (SEO title verified, phone link works, testimonials displayed, only real services shown)
+
+## WhatsApp Floating Button
+- [x] Create floating WhatsApp button component (WhatsAppButton.tsx)
+- [x] Position button in bottom-right corner (fixed position, z-50)
+- [x] Link to WhatsApp with salon phone number (wa.me/4792981628)
+- [x] Add WhatsApp icon and styling (MessageCircle icon, green background)
+- [x] Make button responsive (works on all screen sizes)
+- [x] Add hover effects and animations (scale-110, shadow transitions)
+- [x] Add hover tooltip ("Chat på WhatsApp")
+- [x] Add pre-filled message ("Hei! Jeg vil gjerne bestille time hos K.S Frisør.")
+- [x] Test WhatsApp link on mobile and desktop (opens app on mobile, web on desktop)

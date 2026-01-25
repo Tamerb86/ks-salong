@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Phone, MapPin, Clock, Star, Award, Users, Scissors } from "lucide-react";
 import { Link } from "wouter";
 import { useEffect } from "react";
+import WhatsAppButton from "@/components/WhatsAppButton";
 
 export default function Landing() {
   useEffect(() => {
@@ -464,6 +465,9 @@ export default function Landing() {
           </div>
         </div>
       </footer>
+      
+      {/* WhatsApp Floating Button */}
+      <WhatsAppButton />
     </div>
   );
 }
