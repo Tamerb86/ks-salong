@@ -949,5 +949,33 @@
 - [x] Store authentication state in sessionStorage with 24-hour expiry
 - [x] Add route /dashboard-login for PIN entry
 - [x] Update Landing page Dashboard button to redirect to /dashboard-login
-- [ ] Test PIN authentication flow with actual staff PIN
-- [ ] Add logout functionality to clear PIN session
+- [x] Test PIN authentication flow with actual staff PIN
+- [x] Add logout functionality to clear PIN session
+
+## Dashboard Logout Button
+- [x] Add logout button in Dashboard header/sidebar
+- [x] Implement logout function to clear sessionStorage dashboardAuth
+- [x] Redirect to /dashboard-login after logout
+- [x] Test logout functionality
+
+## Dashboard Access Logging
+- [x] Create dashboard_access_logs table in database schema
+- [x] Add fields: id, userId, userName, userRole, loginTime, ipAddress, userAgent
+- [x] Run database migration (0013_oval_robbie_robertson.sql)
+- [x] Implement logging in DashboardLogin after successful PIN verification
+- [x] Add logDashboardAccess function in db.ts
+- [x] Update loginWithPin endpoint to log access with IP and user agent
+- [ ] Create admin view to display access logs (optional)
+
+## Interactive Monthly Calendar for Appointments
+- [x] Install @dnd-kit/core, @dnd-kit/sortable, and @dnd-kit/utilities packages
+- [x] Create MonthlyCalendar component with grid layout
+- [x] Display appointments in calendar cells by date
+- [x] Implement drag-and-drop functionality for appointments
+- [x] Update appointment date/time in database after drop
+- [x] Add month navigation (previous/next buttons)
+- [x] Add "Today" button to quickly navigate to current month
+- [x] Integrate MonthlyCalendar into Appointments page with tabs
+- [x] Add calendar/list view toggle in Appointments page
+- [x] Test drag-and-drop rescheduling flow in browser
+- [ ] Handle conflicts when dropping appointments (optional enhancement)

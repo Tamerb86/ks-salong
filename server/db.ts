@@ -4,7 +4,7 @@ import {
   InsertUser, users, permissions, services, products, serviceStaff,
   appointments, dropInQueue, payments, orders, orderItems, timeEntries,
   customers, salonSettings, businessHours, holidays, notificationTemplates,
-  dailyReports, auditLogs, terminalReaders, fikenSyncLogs
+  dailyReports, auditLogs, terminalReaders, fikenSyncLogs, dashboardAccessLogs
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -1159,4 +1159,54 @@ export async function getFikenSyncLogsByDateRange(startDate: string, endDate: st
       )
     )
     .orderBy(desc(fikenSyncLogs.createdAt));
+}
+
+/**
+ * ============================================
+ * DASHBOARD ACCESS LOGS
+ * ============================================
+ */
+
+export async function logDashboardAccess(data: {
+  userId: number;
+  userName: string;
+  userRole?: string;
+  ipAddress?: string;
+  userAgent?: string;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const [result] = await db.insert(dashboardAccessLogs).values({
+    userId: data.userId,
+    userName: data.userName,
+    userRole: data.userRole || null,
+    ipAddress: data.ipAddress || null,
+    userAgent: data.userAgent || null,
+  });
+
+  return result;
+}
+
+export async function getDashboardAccessLogs(limit: number = 100) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(dashboardAccessLogs)
+    .orderBy(desc(dashboardAccessLogs.loginTime))
+    .limit(limit);
+}
+
+export async function getDashboardAccessLogsByUser(userId: number, limit: number = 50) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(dashboardAccessLogs)
+    .where(eq(dashboardAccessLogs.userId, userId))
+    .orderBy(desc(dashboardAccessLogs.loginTime))
+    .limit(limit);
 }

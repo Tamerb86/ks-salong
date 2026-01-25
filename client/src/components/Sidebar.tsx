@@ -220,7 +220,12 @@ export function Sidebar() {
                 "w-full text-purple-100 hover:bg-red-500/20 hover:text-white",
                 isCollapsed && "px-0"
               )}
-              onClick={() => logout()}
+              onClick={() => {
+                // Clear PIN session
+                sessionStorage.removeItem("dashboardAuth");
+                // Redirect to PIN login
+                window.location.href = "/dashboard-login";
+              }}
             >
               <LogOut className="h-5 w-5" />
               {!isCollapsed && <span className="ml-3">Logg ut</span>}

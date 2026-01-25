@@ -423,3 +423,23 @@ export const fikenSyncLogs = mysqlTable("fiken_sync_logs", {
   statusIdx: index("status_idx").on(table.status),
   createdAtIdx: index("created_at_idx").on(table.createdAt),
 }));
+
+/**
+ * ============================================
+ * DASHBOARD ACCESS LOGS
+ * ============================================
+ */
+
+export const dashboardAccessLogs = mysqlTable("dashboard_access_logs", {
+  id: int("id").primaryKey().autoincrement(),
+  userId: int("user_id").notNull(),
+  userName: varchar("user_name", { length: 255 }).notNull(),
+  userRole: varchar("user_role", { length: 50 }),
+  loginTime: datetime("login_time").notNull().default(sql`CURRENT_TIMESTAMP`),
+  ipAddress: varchar("ip_address", { length: 45 }), // IPv6 support
+  userAgent: text("user_agent"),
+  createdAt: datetime("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => ({
+  userIdIdx: index("user_id_idx").on(table.userId),
+  loginTimeIdx: index("login_time_idx").on(table.loginTime),
+}));

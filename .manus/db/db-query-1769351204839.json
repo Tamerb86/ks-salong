@@ -1,0 +1,35 @@
+{
+  "query": "SELECT name, pin, role FROM users WHERE pin IS NOT NULL LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZWkmDdVMGTAoV.aeceea61840d --database oUNZ2iw3V7HdbF8pGMTUk4 --execute SELECT name, pin, role FROM users WHERE pin IS NOT NULL LIMIT 5;",
+  "rows": [
+    {
+      "name": "Khalid Saeed",
+      "pin": "654321",
+      "role": "owner"
+    },
+    {
+      "name": "Sara Hansen",
+      "pin": "234567",
+      "role": "manager"
+    },
+    {
+      "name": "Mohammed Ali",
+      "pin": "345678",
+      "role": "barber"
+    },
+    {
+      "name": "Lars Olsen",
+      "pin": "456789",
+      "role": "barber"
+    },
+    {
+      "name": "Nina Berg",
+      "pin": "567890",
+      "role": "cashier"
+    }
+  ],
+  "messages": [],
+  "stdout": "name\tpin\trole\nKhalid Saeed\t654321\towner\nSara Hansen\t234567\tmanager\nMohammed Ali\t345678\tbarber\nLars Olsen\t456789\tbarber\nNina Berg\t567890\tcashier\n",
+  "stderr": "",
+  "execution_time_ms": 88
+}

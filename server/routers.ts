@@ -21,11 +21,21 @@ export const appRouter = router({
     
     loginWithPin: publicProcedure
       .input(z.object({ pin: z.string().length(6) }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
         const user = await db.getUserByPin(input.pin);
         if (!user) {
           throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid PIN" });
         }
+        
+        // Log dashboard access
+        await db.logDashboardAccess({
+          userId: user.id,
+          userName: user.name || "Unknown",
+          userRole: user.role,
+          ipAddress: ctx.req.ip || ctx.req.socket.remoteAddress,
+          userAgent: ctx.req.headers["user-agent"],
+        });
+        
         return { user };
       }),
   }),
@@ -264,21 +274,30 @@ export const appRouter = router({
     update: protectedProcedure
       .input(z.object({
         id: z.number(),
+        appointmentDate: z.string().optional(),
+        startTime: z.string().optional(),
+        endTime: z.string().optional(),
         status: z.enum(["pending", "confirmed", "checked_in", "no_show", "cancelled", "completed"]).optional(),
         notes: z.string().optional(),
         cancellationReason: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
-        const { id, ...data } = input;
+        const { id, appointmentDate, ...rest } = input;
         
-        if (data.status === "cancelled") {
+        // Convert string date to Date object if provided
+        const updateData: any = { ...rest };
+        if (appointmentDate) {
+          updateData.appointmentDate = new Date(appointmentDate);
+        }
+        
+        if (rest.status === "cancelled") {
           await db.updateAppointment(id, {
-            ...data,
+            ...updateData,
             cancelledAt: new Date(),
             cancelledBy: ctx.user!.id
           });
         } else {
-          await db.updateAppointment(id, data);
+          await db.updateAppointment(id, updateData);
         }
         
         return { success: true };
