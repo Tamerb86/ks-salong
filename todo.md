@@ -862,3 +862,25 @@
 - [x] Add hover tooltip ("Chat på WhatsApp")
 - [x] Add pre-filled message ("Hei! Jeg vil gjerne bestille time hos K.S Frisør.")
 - [x] Test WhatsApp link on mobile and desktop (opens app on mobile, web on desktop)
+
+## Booking Flow Testing & Admin Access
+- [ ] Test complete booking flow from landing page
+- [ ] Select service and verify service details display
+- [ ] Select date and time slot
+- [ ] Enter customer information
+- [ ] Complete payment process
+- [ ] Verify booking confirmation
+- [ ] Check booking appears in dashboard
+- [ ] Add admin dashboard access button to landing page (footer or navigation)
+- [ ] Style admin button appropriately (subtle, not prominent for public)
+- [ ] Test admin login flow from landing page
+
+## Admin Access & Landing Page Improvements (Completed)
+- [x] Add admin dashboard access button to landing page footer
+- [x] Update admin button to link to /dashboard (not /)
+- [x] Test admin button redirects correctly to dashboard
+- [x] Verify Manus OAuth authentication flow works
+- [x] Test booking flow: service selection works (10 real services, no test services)
+- [x] Test booking flow: barber selection works (Første ledige, Lars Olsen, Mohammed Ali)
+- [x] Test booking flow: date selection works
+- [ ] Fix: Time slots not displaying after date selection (needs investigation)

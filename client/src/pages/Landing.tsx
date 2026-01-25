@@ -462,6 +462,9 @@ export default function Landing() {
 
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm">
             <p>&copy; 2026 K.S Frisør. Alle rettigheter reservert.</p>
+            <Link href="/dashboard" className="inline-block mt-4 text-xs text-gray-600 hover:text-gray-400 transition">
+              Admin
+            </Link>
           </div>
         </div>
       </footer>
