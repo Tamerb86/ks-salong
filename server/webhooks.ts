@@ -6,13 +6,54 @@
 import { Request, Response } from "express";
 import * as db from "./db";
 import * as vipps from "./vipps";
+import {
+  verifyVippsSignature,
+  verifyStripeSignature,
+  validateWebhookRequest,
+  checkRateLimit,
+  logWebhookRequest,
+} from "./webhookSecurity";
 
 /**
  * Vipps Payment Callback Handler
  * Called by Vipps when payment status changes
  */
 export async function handleVippsCallback(req: Request, res: Response) {
+  const clientIp = req.ip || req.socket.remoteAddress || "unknown";
+  
   try {
+    // Rate limiting
+    const rateLimit = checkRateLimit(clientIp, 100, 60000);
+    if (!rateLimit.allowed) {
+      console.warn(`[Vipps Webhook] Rate limit exceeded for IP: ${clientIp}`);
+      await logWebhookRequest("vipps", "/api/webhooks/vipps", req, false, false, "Rate limit exceeded");
+      return res.status(429).json({ error: "Too many requests" });
+    }
+    
+    // Validate request structure
+    const validation = validateWebhookRequest(req, "vipps");
+    if (!validation.valid) {
+      console.error(`[Vipps Webhook] Validation failed: ${validation.error}`);
+      await logWebhookRequest("vipps", "/api/webhooks/vipps", req, false, false, validation.error);
+      return res.status(400).json({ error: validation.error });
+    }
+    
+    // Verify signature (if secret is configured)
+    const vippsWebhookSecret = process.env.VIPPS_WEBHOOK_SECRET;
+    if (vippsWebhookSecret) {
+      const signature = req.headers["authorization"] as string;
+      const payload = JSON.stringify(req.body);
+      
+      const isValid = verifyVippsSignature(payload, signature, vippsWebhookSecret);
+      if (!isValid) {
+        console.error("[Vipps Webhook] Invalid signature");
+        await logWebhookRequest("vipps", "/api/webhooks/vipps", req, false, false, "Invalid signature");
+        return res.status(401).json({ error: "Invalid signature" });
+      }
+    } else {
+      console.warn("[Vipps Webhook] VIPPS_WEBHOOK_SECRET not configured, skipping signature verification");
+    }
+    
     const payload = req.body;
     
     console.log("[Vipps Webhook] Received callback:", JSON.stringify(payload, null, 2));
@@ -35,11 +76,15 @@ export async function handleVippsCallback(req: Request, res: Response) {
       console.warn(`[Vipps Webhook] Unknown order ID format: ${orderId}`);
     }
     
+    // Log successful processing
+    await logWebhookRequest("vipps", "/api/webhooks/vipps", req, true, true);
+    
     // Always respond with 200 OK to Vipps
     res.status(200).json({ message: "Webhook received" });
     
   } catch (error: any) {
     console.error("[Vipps Webhook] Error processing callback:", error);
+    await logWebhookRequest("vipps", "/api/webhooks/vipps", req, false, false, error.message);
     // Still return 200 to prevent Vipps from retrying
     res.status(200).json({ message: "Error logged" });
   }
@@ -150,12 +195,49 @@ async function handleOrderPayment(
  * Stripe Webhook Handler (for future use)
  */
 export async function handleStripeWebhook(req: Request, res: Response) {
+  const clientIp = req.ip || req.socket.remoteAddress || "unknown";
+  
   try {
+    // Rate limiting
+    const rateLimit = checkRateLimit(clientIp, 100, 60000);
+    if (!rateLimit.allowed) {
+      console.warn(`[Stripe Webhook] Rate limit exceeded for IP: ${clientIp}`);
+      await logWebhookRequest("stripe", "/api/webhooks/stripe", req, false, false, "Rate limit exceeded");
+      return res.status(429).json({ error: "Too many requests" });
+    }
+    
+    // Validate request structure
+    const validation = validateWebhookRequest(req, "stripe");
+    if (!validation.valid) {
+      console.error(`[Stripe Webhook] Validation failed: ${validation.error}`);
+      await logWebhookRequest("stripe", "/api/webhooks/stripe", req, false, false, validation.error);
+      return res.status(400).json({ error: validation.error });
+    }
+    
+    // Verify signature (if secret is configured)
+    const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    if (stripeWebhookSecret) {
+      const signature = req.headers["stripe-signature"] as string;
+      const payload = JSON.stringify(req.body);
+      
+      const isValid = verifyStripeSignature(payload, signature, stripeWebhookSecret);
+      if (!isValid) {
+        console.error("[Stripe Webhook] Invalid signature");
+        await logWebhookRequest("stripe", "/api/webhooks/stripe", req, false, false, "Invalid signature");
+        return res.status(401).json({ error: "Invalid signature" });
+      }
+    } else {
+      console.warn("[Stripe Webhook] STRIPE_WEBHOOK_SECRET not configured, skipping signature verification");
+    }
+    
     // TODO: Implement Stripe webhook handling
     console.log("[Stripe Webhook] Received callback");
+    
+    await logWebhookRequest("stripe", "/api/webhooks/stripe", req, true, true);
     res.status(200).json({ received: true });
   } catch (error: any) {
     console.error("[Stripe Webhook] Error:", error);
+    await logWebhookRequest("stripe", "/api/webhooks/stripe", req, false, false, error.message);
     res.status(400).json({ error: error.message });
   }
 }

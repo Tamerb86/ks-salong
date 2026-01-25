@@ -1152,3 +1152,69 @@
 - [x] Fix last available time slot to match business closing time (18:00 instead of 17:30)
 - [x] Ensure slots are generated correctly based on service duration
 - [x] Test booking flow with different opening/closing times
+
+## Security Improvements
+### Webhooks Security
+- [x] Add signature verification for Vipps webhooks
+- [x] Add signature verification for Stripe webhooks
+- [x] Implement webhook request validation (timestamp, payload integrity)
+- [x] Add rate limiting for webhook endpoints
+- [x] Log all webhook requests for audit trail
+- [ ] Add webhook retry mechanism with exponential backoff (future enhancement)
+
+### Role-Based Permissions (RBAC)
+- [ ] Audit current role system (owner, manager, barber, cashier)
+- [ ] Create permission middleware for protected routes
+- [ ] Implement granular permissions per role:
+  - [ ] Owner: Full access to all features
+  - [ ] Manager: Access to reports, staff, appointments, settings (no financial settings)
+  - [ ] Barber: Access to own schedule, time tracking, own appointments
+  - [ ] Cashier: Access to POS, queue, customer info (read-only)
+- [ ] Add permission checks to all tRPC procedures
+- [ ] Add UI permission checks (hide/disable features based on role)
+- [ ] Create admin panel for managing role permissions
+- [ ] Add audit log for sensitive operations (delete, refund, settings changes)
+
+## UX Improvements
+### General UX
+- [ ] Add loading skeletons for all data fetching operations
+- [ ] Improve error messages (user-friendly Norwegian text)
+- [ ] Add confirmation dialogs for destructive actions
+- [ ] Improve mobile responsiveness across all pages
+- [ ] Add keyboard shortcuts for common actions
+- [ ] Improve form validation with real-time feedback
+- [ ] Add success animations for completed actions
+- [ ] Implement optimistic updates for better perceived performance
+
+### Specific Page Improvements
+- [ ] Appointments page: Add filter by staff, service, status
+- [ ] Queue page: Add drag-and-drop reordering
+- [ ] POS page: Add product search and barcode scanning
+- [ ] Reports page: Add date range presets (today, this week, this month)
+- [ ] Staff page: Add bulk actions (activate/deactivate multiple)
+- [ ] Customers page: Add advanced search and filters
+- [ ] Settings page: Add validation and preview before saving
+
+### Accessibility
+- [ ] Add ARIA labels to all interactive elements
+- [ ] Ensure keyboard navigation works on all pages
+- [ ] Improve color contrast for better readability
+- [ ] Add focus indicators for keyboard users
+- [ ] Test with screen readers
+
+## Bug Fixes
+- [ ] Fix TypeScript errors in routers.ts (staffLeaves functions not recognized)
+- [ ] Fix infinite loop issues in useEffect hooks
+- [ ] Fix date timezone issues in booking system
+- [ ] Fix empty Select.Item values causing errors
+- [ ] Fix nested anchor tags in navigation
+- [ ] Fix invisible text from theme/color mismatches
+- [ ] Fix mobile menu not closing after navigation
+- [ ] Fix calendar not updating after appointment changes
+- [ ] Fix POS total calculation rounding errors
+- [ ] Fix time tracking overtime calculation edge cases
+
+## New Issues to Fix
+- [x] Fix TypeScript errors for staffLeaves functions in routers.ts (LSP cache issue - code is correct, tsc passes)
+- [x] Add "Add Employee" button in Staff page
+- [x] Change all error messages to Norwegian in permissions system

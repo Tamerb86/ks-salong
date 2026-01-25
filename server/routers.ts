@@ -56,6 +56,24 @@ export const appRouter = router({
         return await db.getUserById(input.id);
       }),
     
+    create: adminProcedure
+      .input(z.object({
+        name: z.string(),
+        email: z.string().email(),
+        phone: z.string(),
+        role: z.enum(["owner", "manager", "barber", "cashier"]),
+        skillLevel: z.enum(["beginner", "intermediate", "expert"]).optional(),
+        durationMultiplier: z.string().optional(),
+        bookingSlotInterval: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const userId = await db.createUser({
+          ...input,
+          loginMethod: "manual",
+        });
+        return { success: true, userId };
+      }),
+    
     update: adminProcedure
       .input(z.object({
         id: z.number(),

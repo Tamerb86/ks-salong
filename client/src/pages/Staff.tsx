@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
-import { Key, Loader2, Users, Pencil, Trash2, Calendar } from "lucide-react";
+import { Key, Loader2, Users, Pencil, Trash2, Calendar, UserPlus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Layout } from "@/components/Layout";
@@ -58,6 +58,18 @@ export default function Staff() {
     endDate: "",
     reason: "",
   });
+  
+  // Add employee management
+  const [isAddEmployeeDialogOpen, setIsAddEmployeeDialogOpen] = useState(false);
+  const [addEmployeeFormData, setAddEmployeeFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    role: "barber" as "barber" | "cashier" | "manager",
+    skillLevel: "intermediate" as "beginner" | "intermediate" | "expert",
+    durationMultiplier: "1.00",
+    bookingSlotInterval: "15",
+  });
 
   const updatePinMutation = trpc.staff.update.useMutation({
     onSuccess: () => {
@@ -88,6 +100,25 @@ export default function Staff() {
     },
     onError: (error) => {
       toast.error("Feil ved sletting: " + error.message);
+    },
+  });
+  
+  const createStaffMutation = trpc.staff.create.useMutation({
+    onSuccess: () => {
+      toast.success("Ansatt lagt til!");
+      setIsAddEmployeeDialogOpen(false);
+      setAddEmployeeFormData({
+        name: "",
+        email: "",
+        phone: "",
+        role: "barber",
+        skillLevel: "intermediate",
+        durationMultiplier: "1.00",
+        bookingSlotInterval: "15",
+      });
+    },
+    onError: (error) => {
+      toast.error("Feil ved oppretting: " + error.message);
     },
   });
   
@@ -192,6 +223,18 @@ export default function Staff() {
       deleteStaffMutation.mutate({ id: staffMember.id });
     }
   };
+  
+  const handleAddEmployee = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!addEmployeeFormData.name || !addEmployeeFormData.email || !addEmployeeFormData.phone) {
+      toast.error("Navn, e-post og telefon er påkrevd");
+      return;
+    }
+    createStaffMutation.mutate({
+      ...addEmployeeFormData,
+      bookingSlotInterval: parseInt(addEmployeeFormData.bookingSlotInterval),
+    });
+  };
 
   if (isLoading) {
     return (
@@ -209,21 +252,30 @@ export default function Staff() {
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-8">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-3 bg-gradient-to-br from-purple-600 to-amber-600 rounded-xl">
-                <Users className="h-8 w-8 text-white" />
-              </div>
-              <div>
-                <div className="flex items-center gap-3">
-                  <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-amber-600 bg-clip-text text-transparent">
-                    Ansatte
-                  </h1>
-                  <LiveBadge text="Live" />
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-gradient-to-br from-purple-600 to-amber-600 rounded-xl">
+                  <Users className="h-8 w-8 text-white" />
                 </div>
-                <p className="text-gray-600 mt-1">
-                  Administrer ansatte og deres PIN-koder for tidsstempling
-                </p>
+                <div>
+                  <div className="flex items-center gap-3">
+                    <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-amber-600 bg-clip-text text-transparent">
+                      Ansatte
+                    </h1>
+                    <LiveBadge text="Live" />
+                  </div>
+                  <p className="text-gray-600 mt-1">
+                    Administrer ansatte og deres PIN-koder for tidsstempling
+                  </p>
+                </div>
               </div>
+              <Button
+                onClick={() => setIsAddEmployeeDialogOpen(true)}
+                className="bg-gradient-to-r from-purple-600 to-amber-600 hover:from-purple-700 hover:to-amber-700"
+              >
+                <UserPlus className="h-4 w-4 mr-2" />
+                Legg til ansatt
+              </Button>
             </div>
           </div>
 
@@ -696,6 +748,135 @@ export default function Staff() {
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   )}
                   Registrer ferie
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+        
+        {/* Add Employee Dialog */}
+        <Dialog open={isAddEmployeeDialogOpen} onOpenChange={setIsAddEmployeeDialogOpen}>
+          <DialogContent className="sm:max-w-[500px]">
+            <form onSubmit={handleAddEmployee}>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <UserPlus className="h-5 w-5 text-purple-600" />
+                  Legg til ny ansatt
+                </DialogTitle>
+                <DialogDescription>
+                  Fyll inn informasjon om den nye ansatte
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="add-name">Navn *</Label>
+                  <Input
+                    id="add-name"
+                    type="text"
+                    value={addEmployeeFormData.name}
+                    onChange={(e) => setAddEmployeeFormData({ ...addEmployeeFormData, name: e.target.value })}
+                    placeholder="Fullt navn"
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="add-email">E-post *</Label>
+                  <Input
+                    id="add-email"
+                    type="email"
+                    value={addEmployeeFormData.email}
+                    onChange={(e) => setAddEmployeeFormData({ ...addEmployeeFormData, email: e.target.value })}
+                    placeholder="epost@eksempel.no"
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="add-phone">Telefon *</Label>
+                  <Input
+                    id="add-phone"
+                    type="tel"
+                    value={addEmployeeFormData.phone}
+                    onChange={(e) => setAddEmployeeFormData({ ...addEmployeeFormData, phone: e.target.value })}
+                    placeholder="+47 xxx xx xxx"
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="add-role">Rolle *</Label>
+                  <select
+                    id="add-role"
+                    value={addEmployeeFormData.role}
+                    onChange={(e) => setAddEmployeeFormData({ ...addEmployeeFormData, role: e.target.value as any })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    required
+                  >
+                    <option value="barber">Frisør</option>
+                    <option value="cashier">Kasserer</option>
+                    <option value="manager">Leder</option>
+                  </select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="add-skillLevel">Ferdighetsnivå</Label>
+                  <select
+                    id="add-skillLevel"
+                    value={addEmployeeFormData.skillLevel}
+                    onChange={(e) => setAddEmployeeFormData({ ...addEmployeeFormData, skillLevel: e.target.value as any })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  >
+                    <option value="beginner">Nybegynner</option>
+                    <option value="intermediate">Middels</option>
+                    <option value="expert">Ekspert</option>
+                  </select>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="add-durationMultiplier">Varighetsmultiplikator</Label>
+                    <Input
+                      id="add-durationMultiplier"
+                      type="text"
+                      value={addEmployeeFormData.durationMultiplier}
+                      onChange={(e) => setAddEmployeeFormData({ ...addEmployeeFormData, durationMultiplier: e.target.value })}
+                      placeholder="1.00"
+                    />
+                    <p className="text-xs text-gray-500">1.0 = normal, 1.2 = 20% langsommere</p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="add-bookingSlotInterval">Tidsintervall (min)</Label>
+                    <Input
+                      id="add-bookingSlotInterval"
+                      type="number"
+                      value={addEmployeeFormData.bookingSlotInterval}
+                      onChange={(e) => setAddEmployeeFormData({ ...addEmployeeFormData, bookingSlotInterval: e.target.value })}
+                      placeholder="15"
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex gap-3 justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsAddEmployeeDialogOpen(false)}
+                >
+                  Avbryt
+                </Button>
+                <Button
+                  type="submit"
+                  className="bg-gradient-to-r from-purple-600 to-amber-600 hover:from-purple-700 hover:to-amber-700"
+                  disabled={createStaffMutation.isPending}
+                >
+                  {createStaffMutation.isPending && (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  )}
+                  Legg til ansatt
                 </Button>
               </div>
             </form>

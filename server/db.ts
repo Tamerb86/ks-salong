@@ -29,6 +29,8 @@ export async function getDb() {
  * ============================================
  */
 
+// Staff Leave Management Functions (exported below at line 1521+)
+
 export async function upsertUser(user: InsertUser): Promise<void> {
   if (!user.openId) {
     throw new Error("User openId is required for upsert");
