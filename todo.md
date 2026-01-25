@@ -653,3 +653,11 @@
 - [ ] Handle payment refunds when appointment is cancelled
 - [x] Write vitest tests for Vipps booking payment flow (6/6 tests passed)
 - [ ] Test with Vipps test environment (requires real Vipps credentials)
+
+## Booking Link Management in Settings
+- [x] Add "Booking Link" section in Settings page (Booking tab)
+- [x] Display full booking URL dynamically based on current domain
+- [x] Add copy-to-clipboard button with toast notification
+- [ ] Add QR code generator for the booking link
+- [ ] Add social media sharing buttons (Facebook, Instagram, WhatsApp)
+- [ ] Show booking link statistics (clicks, conversions)
