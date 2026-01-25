@@ -80,6 +80,11 @@ async function startServer() {
     import("../cron/cancelUnpaidAppointments").then((module) => {
       module.startCancelUnpaidAppointmentsCron();
     }).catch(console.error);
+    
+    // Start Fiken auto-sync cron job
+    import("../cron/fikenAutoSync").then((module) => {
+      module.startFikenAutoSyncCron();
+    }).catch(console.error);
   });
 }
 

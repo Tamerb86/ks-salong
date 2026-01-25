@@ -1079,3 +1079,37 @@ export async function cancelAppointment(id: number, cancellationReason: string) 
     })
     .where(eq(appointments.id, id));
 }
+
+export async function getOrdersByDateRange(startDate: string, endDate: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db
+    .select()
+    .from(orders)
+    .where(
+      and(
+        gte(orders.createdAt, new Date(startDate)),
+        lte(orders.createdAt, new Date(endDate + "T23:59:59")),
+        eq(orders.status, 'completed')
+      )
+    );
+  
+  // Get order items for each order
+  const ordersWithItems = await Promise.all(
+    result.map(async (order) => {
+      const items = await getOrderItems(order.id);
+      return {
+        ...order,
+        orderItems: items.map(item => ({
+          itemName: item.itemName,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          taxRate: item.taxRate || "25.00",
+        })),
+      };
+    })
+  );
+  
+  return ordersWithItems;
+}

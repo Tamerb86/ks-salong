@@ -697,3 +697,14 @@
 - [x] Add cancellation reason "Automatisk kansellert - betaling ikke mottatt innen 30 minutter"
 - [x] Log cancelled appointments for monitoring
 - [x] Test cron job (successfully cancelled 22 old appointments on first run)
+
+## Automatic Daily Fiken Sync Cron Job
+- [x] Create cron job to run daily at 23:00 (11 PM)
+- [x] Check if Fiken integration is enabled in settings
+- [x] Get today's date range (00:00 to 23:59)
+- [x] Fetch all completed orders for today
+- [x] Send sales data to Fiken using syncDailySalesToFiken function
+- [x] Update fikenLastSyncDate in settings after successful sync
+- [x] Log sync results (success/failure, number of sales synced)
+- [x] Handle errors gracefully and log failures
+- [x] Test cron job functionality (started successfully, will run at 23:00)

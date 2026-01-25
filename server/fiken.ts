@@ -359,3 +359,79 @@ export async function verifyTotals(
     throw new Error(`Failed to verify totals: ${error.message}`);
   }
 }
+
+/**
+ * Sync all sales for a date range to Fiken
+ * Used by auto-sync cron job
+ */
+export async function syncDailySalesToFiken(
+  apiToken: string,
+  companySlug: string,
+  startDate: Date,
+  endDate: Date
+): Promise<{ success: boolean; salesCount: number; totalAmount: number; error?: string }> {
+  try {
+    // Import db here to avoid circular dependency
+    const db = await import("./db");
+    
+    // Get all completed orders for the date range
+    const orders = await db.getOrdersByDateRange(
+      startDate.toISOString().split("T")[0],
+      endDate.toISOString().split("T")[0]
+    );
+
+    if (!orders || orders.length === 0) {
+      return {
+        success: true,
+        salesCount: 0,
+        totalAmount: 0,
+      };
+    }
+
+    let syncedCount = 0;
+    let totalAmount = 0;
+    const errors: string[] = [];
+
+    for (const order of orders) {
+      try {
+        const result = await syncOrderToFiken(apiToken, companySlug, {
+          orderNumber: order.orderNumber,
+          createdAt: order.createdAt,
+          orderItems: order.orderItems,
+          customerId: order.customerId || undefined,
+        });
+        
+        if (result.success) {
+          syncedCount++;
+          // Calculate total from order items
+          const orderTotal = order.orderItems.reduce((sum: number, item: any) => {
+            return sum + (parseFloat(item.unitPrice) * item.quantity);
+          }, 0);
+          totalAmount += orderTotal;
+        } else {
+          errors.push(`Order ${order.orderNumber}: ${result.error}`);
+        }
+      } catch (error: any) {
+        errors.push(`Order ${order.orderNumber}: ${error.message}`);
+      }
+    }
+
+    if (errors.length > 0) {
+      console.error("[Fiken-Sync] Some orders failed:", errors);
+    }
+
+    return {
+      success: syncedCount > 0,
+      salesCount: syncedCount,
+      totalAmount: totalAmount,
+      error: errors.length > 0 ? errors.join("; ") : undefined,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      salesCount: 0,
+      totalAmount: 0,
+      error: error.message,
+    };
+  }
+}
