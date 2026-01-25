@@ -210,6 +210,7 @@ export const timeEntries = mysqlTable("timeEntries", {
   totalBreakMinutes: int("totalBreakMinutes").default(0).notNull(),
   totalWorkMinutes: int("totalWorkMinutes").default(0).notNull(),
   overtimeMinutes: int("overtimeMinutes").default(0).notNull(),
+  isOvertime: boolean("isOvertime").default(false).notNull(),
   notes: text("notes"),
   editedBy: int("editedBy"),
   editReason: text("editReason"),

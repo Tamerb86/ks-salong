@@ -1248,3 +1248,19 @@
 - [x] Handle overnight shifts correctly (uses milliseconds diff)
 - [x] Test calculation with various scenarios (tested with 3 employees, works perfectly)
 - [x] Create checkpoint after testing
+
+## Automatic Clock-Out System with Overtime Tracking
+- [x] Add autoLogoutTime field to salonSettings table (default: "22:00") - already exists
+- [x] Add "Automatisk utlogging klokkeslett" in Settings page - already exists
+- [x] Add isOvertime boolean field to timeEntries table
+- [x] Push database schema changes with pnpm db:push (migration 0016 applied)
+- [x] Update clock-in logic to check if current time is after autoLogoutTime
+- [x] Mark session as overtime if clock-in is after autoLogoutTime
+- [x] Create scheduled cron job (server/jobs.ts) to run every minute
+- [x] Implement auto clock-out logic in job (clock out all active employees at configured time)
+- [x] Start jobs in server main file (server/_core/index.ts)
+- [x] Log auto clock-out events for auditing (console.log with staff ID and minutes)
+- [ ] Display overtime hours separately in Tidsstempling page
+- [ ] Test overtime tracking when clocking in after autoLogoutTime
+- [ ] Test auto clock-out at configured time
+- [ ] Create checkpoint after testing

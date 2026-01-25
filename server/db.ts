@@ -901,12 +901,28 @@ export async function clockInEmployee(staffId: number) {
     return { error: "Already clocked in", entry: existing[0] };
   }
   
+  // Get settings to check autoLogoutTime
+  const settings = await getSalonSettings();
+  const autoLogoutTime = settings?.autoLogoutTime || "22:00";
+  const [hours, minutes] = autoLogoutTime.split(":").map(Number);
+  
+  // Check if current time is after autoLogoutTime (overtime)
+  const now = new Date();
+  const osloTime = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Oslo" }));
+  const currentHours = osloTime.getHours();
+  const currentMinutes = osloTime.getMinutes();
+  const currentTotalMinutes = currentHours * 60 + currentMinutes;
+  const autoLogoutTotalMinutes = hours * 60 + minutes;
+  const isOvertime = currentTotalMinutes >= autoLogoutTotalMinutes;
+  
   const result = await db.insert(timeEntries).values({
     staffId,
     clockIn: new Date(),
+    isOvertime,
+    notes: isOvertime ? `Clocked in after ${autoLogoutTime} (overtime)` : undefined,
   });
   
-  return { success: true, id: result[0].insertId };
+  return { success: true, id: result[0].insertId, isOvertime };
 }
 
 // Clock out employee
