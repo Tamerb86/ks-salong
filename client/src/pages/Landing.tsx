@@ -462,10 +462,10 @@ export default function Landing() {
 
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm">
             <p>&copy; 2026 K.S Frisør. Alle rettigheter reservert.</p>
-            <Link href="/dashboard">
+            <Link href="/dashboard-login">
               <button className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-all shadow-md hover:shadow-lg">
                 <Lock className="h-4 w-4" />
-                كلمة سر
+                Dashboard
               </button>
             </Link>
           </div>

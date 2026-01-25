@@ -941,3 +941,13 @@
 - [x] Change button text from "Admin" to "كلمة سر"
 - [x] Improve button styling to make it more distinct and visible
 - [x] Use different color scheme (purple bg) to differentiate from regular links
+
+## PIN Authentication for Dashboard Access
+- [x] Create PIN login page component (similar to POS PIN entry)
+- [x] Implement PIN verification using auth.loginWithPin endpoint
+- [x] Add route protection to Dashboard - redirect to PIN page if not authenticated
+- [x] Store authentication state in sessionStorage with 24-hour expiry
+- [x] Add route /dashboard-login for PIN entry
+- [x] Update Landing page Dashboard button to redirect to /dashboard-login
+- [ ] Test PIN authentication flow with actual staff PIN
+- [ ] Add logout functionality to clear PIN session

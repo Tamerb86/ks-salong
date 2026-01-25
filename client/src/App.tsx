@@ -21,12 +21,14 @@ import Reports from "./pages/Reports";
 import Staff from "./pages/Staff";
 import FikenSyncHistory from "./pages/FikenSyncHistory";
 import Landing from "./pages/Landing";
+import DashboardLogin from "./pages/DashboardLogin";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path={"/"} component={Landing} />
+      <Route path={"/dashboard-login"} component={DashboardLogin} />
       <Route path={"/dashboard"} component={Home} />
       <Route path={"/book-online"} component={BookOnline} />
       <Route path={"/services"} component={Services} />

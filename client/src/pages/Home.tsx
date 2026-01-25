@@ -1,5 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { useLocation } from "wouter";
+import { useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import { getLoginUrl } from "@/const";
@@ -26,6 +28,29 @@ import { FikenSyncStatusCard } from "@/components/FikenSyncStatusCard";
 
 export default function Home() {
   const { user, loading, error, isAuthenticated, logout } = useAuth();
+  const [, setLocation] = useLocation();
+
+  // Check PIN authentication
+  useEffect(() => {
+    const dashboardAuth = sessionStorage.getItem("dashboardAuth");
+    if (!dashboardAuth) {
+      setLocation("/dashboard-login");
+      return;
+    }
+
+    try {
+      const auth = JSON.parse(dashboardAuth);
+      // Check if auth is expired (24 hours)
+      const expiryTime = 24 * 60 * 60 * 1000; // 24 hours
+      if (Date.now() - auth.timestamp > expiryTime) {
+        sessionStorage.removeItem("dashboardAuth");
+        setLocation("/dashboard-login");
+      }
+    } catch (e) {
+      sessionStorage.removeItem("dashboardAuth");
+      setLocation("/dashboard-login");
+    }
+  }, [setLocation]);
   const { data: stats, isLoading: statsLoading } = trpc.dashboard.getStats.useQuery(undefined, {
     enabled: !!user,
     refetchInterval: 30000, // Refetch every 30 seconds for real-time updates
