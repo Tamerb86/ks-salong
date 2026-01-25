@@ -21,6 +21,7 @@ interface CartItem {
   id: number;
   name: string;
   price: number;
+  cost?: number; // Cost price for profit calculation
   quantity: number;
   duration?: number;
   staffId?: number;
@@ -158,6 +159,7 @@ export default function POS() {
       itemName: item.name,
       quantity: item.quantity,
       unitPrice: item.price.toString(),
+      costPrice: item.cost?.toString() || "0.00", // Add cost price for profit calculation
       taxRate: "0.25",
       total: (item.price * item.quantity).toString(),
     }));
@@ -364,6 +366,7 @@ export default function POS() {
                                 id: product.id,
                                 name: product.name,
                                 price: parseFloat(product.price),
+                                cost: product.cost ? parseFloat(product.cost) : 0,
                                 quantity: 1,
                               })
                             }

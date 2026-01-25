@@ -520,6 +520,7 @@ export const appRouter = router({
           itemName: z.string(),
           quantity: z.number(),
           unitPrice: z.string(),
+          costPrice: z.string().optional(),
           taxRate: z.string(),
           total: z.string(),
         })),
@@ -580,6 +581,61 @@ export const appRouter = router({
         if (!order) return null;
         const items = await db.getOrderItems(input.id);
         return { ...order, items };
+      }),
+    
+    getProfitability: protectedProcedure
+      .input(z.object({
+        dateFrom: z.string().optional(),
+        dateTo: z.string().optional(),
+        staffId: z.number().optional(),
+        paymentMethod: z.string().optional(),
+      }))
+      .query(async ({ input }) => {
+        // Get all orders
+        const orders = await db.getOrdersByFilters(input);
+        
+        // Calculate profit for each order
+        let totalRevenue = 0;
+        let totalCost = 0;
+        let totalProfit = 0;
+        const orderProfits = [];
+        
+        for (const order of orders) {
+          const items = await db.getOrderItems(order.id);
+          
+          let orderRevenue = parseFloat(order.total);
+          let orderCost = 0;
+          
+          // Calculate cost from items
+          for (const item of items) {
+            const itemCost = parseFloat(item.costPrice || "0");
+            orderCost += itemCost * item.quantity;
+          }
+          
+          const orderProfit = orderRevenue - orderCost;
+          
+          totalRevenue += orderRevenue;
+          totalCost += orderCost;
+          totalProfit += orderProfit;
+          
+          orderProfits.push({
+            orderId: order.id,
+            orderNumber: order.orderNumber,
+            revenue: orderRevenue,
+            cost: orderCost,
+            profit: orderProfit,
+            profitMargin: orderRevenue > 0 ? (orderProfit / orderRevenue) * 100 : 0,
+            createdAt: order.createdAt,
+          });
+        }
+        
+        return {
+          totalRevenue,
+          totalCost,
+          totalProfit,
+          profitMargin: totalRevenue > 0 ? (totalProfit / totalRevenue) * 100 : 0,
+          orderProfits,
+        };
       }),
     
     refund: protectedProcedure
@@ -707,6 +763,81 @@ export const appRouter = router({
           synced, 
           failed, 
           total: completedOrders.length,
+          errors 
+        };
+      }),
+    
+    syncTodaySalesToFiken: protectedProcedure
+      .mutation(async () => {
+        // Get settings
+        const settings = await db.getSalonSettings();
+        
+        if (!settings || !settings.fikenEnabled || !settings.fikenApiToken || !settings.fikenCompanySlug) {
+          throw new TRPCError({ 
+            code: "PRECONDITION_FAILED", 
+            message: "Fiken integration is not configured" 
+          });
+        }
+        
+        // Get today's date in YYYY-MM-DD format
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Get all completed orders for today
+        const orders = await db.getOrdersByFilters({
+          dateFrom: today,
+          dateTo: today,
+        });
+        
+        const completedOrders = orders.filter(o => o.status === "completed");
+        
+        let synced = 0;
+        let failed = 0;
+        const errors: string[] = [];
+        let totalAmount = 0;
+        
+        for (const order of completedOrders) {
+          const items = await db.getOrderItems(order.id);
+          
+          const result = await fiken.syncOrderToFiken(
+            settings.fikenApiToken,
+            settings.fikenCompanySlug,
+            {
+              orderNumber: order.orderNumber,
+              createdAt: new Date(order.createdAt),
+              orderItems: items,
+              customerId: order.customerId || undefined,
+            }
+          );
+          
+          if (result.success) {
+            synced++;
+            totalAmount += parseFloat(order.total);
+          } else {
+            failed++;
+            errors.push(`${order.orderNumber}: ${result.error}`);
+          }
+        }
+        
+        // Log the sync operation
+        await db.createFikenSyncLog({
+          syncDate: today,
+          startTime: new Date(),
+          endTime: new Date(),
+          status: failed === 0 ? "success" : "failure",
+          salesCount: synced,
+          totalAmount: totalAmount.toString(),
+          errorMessage: errors.length > 0 ? errors.join("; ") : null,
+        });
+        
+        // Update last sync date
+        await db.updateSalonSettings({ fikenLastSyncDate: new Date() });
+        
+        return { 
+          success: true, 
+          synced, 
+          failed, 
+          total: completedOrders.length,
+          totalAmount,
           errors 
         };
       }),
@@ -879,10 +1010,14 @@ export const appRouter = router({
         return result.companies || [];
       }),
     
-    getFikenSyncLogs: protectedProcedure.query(async () => {
-      const logs = await db.getFikenSyncLogs(100); // Get last 100 logs
-      return logs;
-    }),
+    getFikenSyncLogs: protectedProcedure
+      .input(z.object({
+        limit: z.number().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        const logs = await db.getFikenSyncLogs(input?.limit || 100);
+        return logs;
+      }),
   }),
 
   terminal: router({

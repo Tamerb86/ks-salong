@@ -45,6 +45,15 @@ export default function Sales() {
     { enabled: !authLoading, refetchInterval: 30000 }
   );
   
+  const { data: profitability, isLoading: profitLoading } = trpc.orders.getProfitability.useQuery({
+      dateFrom,
+      dateTo,
+      staffId: selectedEmployee === "all" ? undefined : parseInt(selectedEmployee),
+      paymentMethod: selectedPaymentMethod === "all" ? undefined : selectedPaymentMethod,
+    },
+    { enabled: !authLoading, refetchInterval: 30000 }
+  );
+  
   const refundMutation = trpc.orders.refund.useMutation({
     onSuccess: () => {
       toast.success("Refund behandlet");
@@ -270,7 +279,7 @@ export default function Sales() {
           </div>
           
           {/* Statistics Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-gray-600">Totalt salg</CardTitle>
@@ -319,6 +328,35 @@ export default function Sales() {
                   <Skeleton className="h-8 w-32" />
                 ) : (
                   <p className="text-2xl font-bold">{totalMVA.toFixed(2)} kr</p>
+                )}
+              </CardContent>
+            </Card>
+            
+            <Card className="border-green-200 bg-green-50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-green-700 flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4" />
+                  Fortjeneste
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {profitLoading ? (
+                  <Skeleton className="h-8 w-32" />
+                ) : (
+                  <p className="text-2xl font-bold text-green-700">{profitability?.totalProfit.toFixed(2) || "0.00"} kr</p>
+                )}
+              </CardContent>
+            </Card>
+            
+            <Card className="border-purple-200 bg-purple-50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-purple-700">Fortjenestemargin</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {profitLoading ? (
+                  <Skeleton className="h-8 w-16" />
+                ) : (
+                  <p className="text-2xl font-bold text-purple-700">{profitability?.profitMargin.toFixed(1) || "0.0"}%</p>
                 )}
               </CardContent>
             </Card>

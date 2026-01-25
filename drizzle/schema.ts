@@ -179,6 +179,7 @@ export const orderItems = mysqlTable("orderItems", {
   itemName: varchar("itemName", { length: 255 }).notNull(),
   quantity: int("quantity").default(1).notNull(),
   unitPrice: decimal("unitPrice", { precision: 10, scale: 2 }).notNull(),
+  costPrice: decimal("costPrice", { precision: 10, scale: 2 }).default("0.00"), // Cost price for profit calculation
   taxRate: decimal("taxRate", { precision: 5, scale: 2 }).notNull(),
   total: decimal("total", { precision: 10, scale: 2 }).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),

@@ -771,3 +771,32 @@
 - [x] Include sales table in PDF with proper formatting
 - [ ] Test Excel export with different filters (requires user testing)
 - [ ] Test PDF export with different filters (requires user testing)
+
+## Fiken Dashboard Card + Profit Margin Reports
+### Fiken Sync Status Card in Dashboard
+- [x] Create Fiken sync status card component (FikenSyncStatusCard.tsx)
+- [x] Display last sync date and time
+- [x] Show sync status (success/failure) with color indicator
+- [x] Display number of sales synced in last sync
+- [x] Add link to Fiken sync history page
+- [x] Add quick sync button (syncTodaySalesToFiken)
+- [x] Show card only when Fiken is enabled
+- [x] Add loading states and error handling
+
+### Profit Margin Calculations
+- [x] Add cost price field to products table (already exists)
+- [x] Add cost price field to order items table (costPrice)
+- [x] Calculate profit margin for each order item (selling price - cost price)
+- [x] Create getProfitability endpoint to calculate profit on-the-fly
+- [x] Track cost price through POS order creation
+
+### Profit Reports in Sales Page
+- [x] Add profit margin statistics card (total profit, profit margin %)
+- [x] Display profit and profit margin in green/purple themed cards
+- [x] Calculate profit from order items costPrice
+- [x] Show real-time profit updates (30s refresh)
+- [ ] Add profit chart (line or bar chart showing daily/weekly profit)
+- [ ] Include profit data in Excel export
+- [ ] Include profit data in PDF export
+- [ ] Add filter by profit margin range
+- [ ] Show profit per order in transaction list

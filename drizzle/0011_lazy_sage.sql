@@ -1,0 +1,1 @@
+ALTER TABLE `orderItems` ADD `costPrice` decimal(10,2) DEFAULT '0.00';

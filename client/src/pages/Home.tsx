@@ -22,6 +22,7 @@ import {
   Scissors,
   ArrowRight,
 } from "lucide-react";
+import { FikenSyncStatusCard } from "@/components/FikenSyncStatusCard";
 
 export default function Home() {
   const { user, loading, error, isAuthenticated, logout } = useAuth();
@@ -224,6 +225,9 @@ export default function Home() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Fiken Sync Status */}
+        <FikenSyncStatusCard />
 
         {/* Quick Actions */}
         <div>
