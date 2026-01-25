@@ -1238,3 +1238,24 @@
 - [x] Add company logo to receipt header
 - [x] Improve print CSS for different paper sizes
 - [x] Test printing on different browsers and devices
+
+## Stripe Connect Integration
+- [ ] Add Stripe feature to project using webdev_add_feature
+- [ ] Create Stripe Connect onboarding flow
+- [ ] Add verification tab to check Stripe connection status
+- [ ] Add easy form to input Stripe connection details
+- [ ] Test Stripe Connect integration
+
+## POS Payment Method Improvements
+- [x] Replace payment method dropdown with button selection
+- [x] Add visual icons for each payment method (Cash, Card, Vipps, Stripe)
+- [ ] Integrate Stripe payment processing in POS (requires Stripe setup)
+- [ ] Add payment confirmation and error handling
+- [ ] Test all payment methods in POS
+
+## Sales Management
+- [x] Add delete functionality for individual sales records
+- [ ] Add bulk delete option for sales (future enhancement)
+- [x] Add confirmation dialog before deletion
+- [x] Update reports after deletion (automatic with refetch)
+- [x] Test delete functionality

@@ -857,6 +857,30 @@ export const appRouter = router({
         return { success: true };
       }),
     
+    delete: protectedProcedure
+      .input(z.object({
+        orderId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        // Get order items to restore stock
+        const items = await db.getOrderItems(input.orderId);
+        
+        // Restore product stock
+        for (const item of items) {
+          if (item.itemType === "product") {
+            await db.updateProductStock(item.itemId, item.quantity);
+          }
+        }
+        
+        // Delete order items first (foreign key constraint)
+        await db.deleteOrderItems(input.orderId);
+        
+        // Delete order
+        await db.deleteOrder(input.orderId);
+        
+        return { success: true };
+      }),
+    
     // Fiken Integration
     syncToFiken: protectedProcedure
       .input(z.object({

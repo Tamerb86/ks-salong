@@ -602,20 +602,50 @@ export default function POS() {
 
                   <div className="space-y-2">
                     <Label>Betalingsmetode</Label>
-                    <Select
-                      value={paymentMethod}
-                      onValueChange={(value: any) => setPaymentMethod(value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="cash">Kontant</SelectItem>
-                        <SelectItem value="card">Kort</SelectItem>
-                        <SelectItem value="vipps">Vipps</SelectItem>
-                        <SelectItem value="stripe">Stripe</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        type="button"
+                        variant={paymentMethod === "cash" ? "default" : "outline"}
+                        className="h-16 flex flex-col items-center justify-center gap-1"
+                        onClick={() => setPaymentMethod("cash")}
+                      >
+                        <DollarSign className="h-5 w-5" />
+                        <span className="text-xs">Kontant</span>
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={paymentMethod === "card" ? "default" : "outline"}
+                        className="h-16 flex flex-col items-center justify-center gap-1"
+                        onClick={() => setPaymentMethod("card")}
+                      >
+                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        </svg>
+                        <span className="text-xs">Kort</span>
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={paymentMethod === "vipps" ? "default" : "outline"}
+                        className="h-16 flex flex-col items-center justify-center gap-1"
+                        onClick={() => setPaymentMethod("vipps")}
+                      >
+                        <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+                        </svg>
+                        <span className="text-xs">Vipps</span>
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={paymentMethod === "stripe" ? "default" : "outline"}
+                        className="h-16 flex flex-col items-center justify-center gap-1"
+                        onClick={() => setPaymentMethod("stripe")}
+                      >
+                        <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/>
+                        </svg>
+                        <span className="text-xs">Stripe</span>
+                      </Button>
+                    </div>
                   </div>
 
                   <Button

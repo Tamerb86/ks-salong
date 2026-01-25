@@ -1567,3 +1567,11 @@ export async function getStaffLeavesForDate(staffId: number, date: Date) {
     ));
 }
 
+
+export async function deleteOrderItems(orderId: number) {
+  await database.delete(orderItems).where(eq(orderItems.orderId, orderId));
+}
+
+export async function deleteOrder(orderId: number) {
+  await database.delete(orders).where(eq(orders.id, orderId));
+}

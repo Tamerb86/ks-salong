@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { trpc } from "@/lib/trpc";
 import { format } from "date-fns";
 import { nb } from "date-fns/locale";
-import { Download, FileSpreadsheet, FileText, Search, TrendingUp, RotateCcw } from "lucide-react";
+import { Download, FileSpreadsheet, FileText, Search, TrendingUp, RotateCcw, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import * as XLSX from "xlsx";
@@ -59,6 +59,16 @@ export default function Sales() {
       toast.success("Refund behandlet");
       setRefundDialogOpen(false);
       setRefundReason("");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+  
+  const deleteMutation = trpc.orders.delete.useMutation({
+    onSuccess: () => {
+      toast.success("Ordre slettet");
       refetch();
     },
     onError: (error) => {
@@ -529,20 +539,35 @@ export default function Sales() {
                                 {parseFloat(order.total).toFixed(2)} kr
                               </p>
                               
-                              {order.status !== "refunded" && (
+                              <div className="flex flex-col gap-2">
+                                {order.status !== "refunded" && (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-red-600 hover:text-red-700"
+                                    onClick={() => {
+                                      setSelectedOrder(order);
+                                      setRefundDialogOpen(true);
+                                    }}
+                                  >
+                                    <RotateCcw className="h-4 w-4 mr-1" />
+                                    Refund
+                                  </Button>
+                                )}
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  className="text-red-600 hover:text-red-700 mt-2"
+                                  className="text-red-600 hover:text-red-700"
                                   onClick={() => {
-                                    setSelectedOrder(order);
-                                    setRefundDialogOpen(true);
+                                    if (confirm(`Er du sikker på at du vil slette ordre ${order.orderNumber}?`)) {
+                                      deleteMutation.mutate(order.id);
+                                    }
                                   }}
                                 >
-                                  <RotateCcw className="h-4 w-4 mr-1" />
-                                  Refund
+                                  <Trash2 className="h-4 w-4 mr-1" />
+                                  Slett
                                 </Button>
-                              )}
+                              </div>
                               {parseFloat(order.discountAmount) > 0 && (
                                 <p className="text-sm text-red-600">
                                   Rabatt: -{parseFloat(order.discountAmount).toFixed(2)} kr
