@@ -1408,3 +1408,6 @@
 - [x] Download high-quality images for all 19 services
 - [x] Update database with image URLs
 - [x] Ensure images display correctly in booking flow
+
+## UI Improvement - Hide Service Duration
+- [x] Remove duration display from service cards in BookOnline page

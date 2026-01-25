@@ -279,10 +279,6 @@ export default function BookOnline() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <Clock className="h-4 w-4" />
-                        <span>{service.duration} minutter</span>
-                      </div>
                       <div className="flex items-center gap-2">
                         <span className="text-2xl font-bold text-gray-900">
                           {service.price} kr
