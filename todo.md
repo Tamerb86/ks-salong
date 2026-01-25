@@ -525,3 +525,50 @@
 - [x] Add Products route to App.tsx
 - [x] Test all product management features
 - [ ] Write vitest tests for product CRUD operations
+
+## Phase 4: Kvittering + Sales System
+### Receipt Generation (Kvittering)
+- [x] Generate automatic invoice number (INV-YYYYMMDD-XXX format)
+- [x] Display MVA (25%) breakdown clearly
+- [x] Show payment method on receipt
+- [x] Include all service and product details
+- [x] Show discount and tips separately
+- [x] Display total amount with MVA included
+
+### 80mm Thermal Printer Support
+- [x] Create print-friendly receipt template (80mm width)
+- [x] Add salon information header (name, address, phone)
+- [x] Design compact layout for thermal printers
+- [ ] Add QR code/barcode for invoice reference
+- [ ] Test print layout on actual thermal printer
+- [x] Add print button with proper CSS @media print
+
+### Sales Records & Reports
+- [x] Create Sales page with comprehensive filters
+- [x] Filter by date range (today/week/month/custom)
+- [x] Filter by employee (show sales per staff member)
+- [x] Filter by payment method (Cash/Card/Vipps/Stripe)
+- [x] Display sales summary cards (total sales, transactions, average)
+- [x] Show detailed transaction list with all information
+- [ ] Add export to Excel functionality
+- [ ] Add export to PDF functionality
+- [ ] Calculate profit margins (selling price - cost price)
+
+### Refund System
+- [x] Add refund button to transaction history
+- [x] Create refund dialog with reason field (required)
+- [x] Update inventory automatically on refund (products only)
+- [x] Backend API endpoint for refund processing
+- [x] Link refund to original transaction
+- [x] Show refund status in transaction list
+- [x] Calculate refunded amounts in reports
+- [ ] Add refund history view (separate page)
+- [ ] Require manager/owner approval for refunds (optional)
+
+### Testing & Validation
+- [x] Test receipt generation with all payment methods
+- [ ] Test 80mm print layout on actual thermal printer
+- [x] Test sales filtering by all criteria
+- [x] Test refund process end-to-end
+- [x] Write vitest tests for refund logic (5 tests passed)
+- [x] Verify MVA calculations are correct

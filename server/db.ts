@@ -567,10 +567,82 @@ export async function getOrderById(id: number) {
   return result.length > 0 ? result[0] : undefined;
 }
 
+export async function getOrdersByFilters(filters: {
+  dateFrom?: string;
+  dateTo?: string;
+  staffId?: number;
+  paymentMethod?: string;
+}) {
+  const dbConn = await getDb();
+  if (!dbConn) return [];
+  
+  let query = dbConn.select({
+    id: orders.id,
+    orderNumber: orders.orderNumber,
+    customerId: orders.customerId,
+    staffId: orders.staffId,
+    staffName: users.name,
+    subtotal: orders.subtotal,
+    taxAmount: orders.taxAmount,
+    discountAmount: orders.discountAmount,
+    tipAmount: orders.tipAmount,
+    total: orders.total,
+    status: orders.status,
+    paymentMethod: sql<string>`${payments.method}`.as('paymentMethod'),
+    notes: orders.notes,
+    createdAt: orders.createdAt,
+  })
+  .from(orders)
+  .leftJoin(users, eq(orders.staffId, users.id))
+  .leftJoin(payments, eq(orders.id, payments.orderId));
+  
+  const conditions = [];
+  
+  if (filters.dateFrom) {
+    conditions.push(gte(orders.createdAt, new Date(filters.dateFrom)));
+  }
+  
+  if (filters.dateTo) {
+    const endDate = new Date(filters.dateTo);
+    endDate.setHours(23, 59, 59, 999);
+    conditions.push(lte(orders.createdAt, endDate));
+  }
+  
+  if (filters.staffId) {
+    conditions.push(eq(orders.staffId, filters.staffId));
+  }
+  
+  if (filters.paymentMethod) {
+    conditions.push(sql`${payments.method} = ${filters.paymentMethod}`);
+  }
+  
+  if (conditions.length > 0) {
+    query = query.where(and(...conditions)) as any;
+  }
+  
+  const result = await query.orderBy(desc(orders.createdAt));
+  return result;
+}
+
 export async function getOrderItems(orderId: number) {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(orderItems).where(eq(orderItems.orderId, orderId));
+  const result = await db.select().from(orderItems).where(eq(orderItems.orderId, orderId));
+  return result;
+}
+
+export async function updateOrderStatus(orderId: number, status: string, refundReason?: string) {
+  const db = await getDb();
+  if (!db) return;
+  
+  const updateData: any = { status };
+  if (refundReason) {
+    updateData.notes = sql`CONCAT(COALESCE(${orders.notes}, ''), ' [Refund: ', ${refundReason}, ']')`;
+  }
+  
+  await db.update(orders)
+    .set(updateData)
+    .where(eq(orders.id, orderId));
 }
 
 export async function createPayment(data: typeof payments.$inferInsert) {

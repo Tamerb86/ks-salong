@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import { DollarSign, Minus, Plus, Printer, Search, ShoppingCart, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import "@/styles/print-receipt.css";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -587,15 +588,20 @@ export default function POS() {
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>Kvittering</DialogTitle>
-            <DialogDescription>Ordre #{lastReceipt?.id}</DialogDescription>
+            <DialogDescription>Faktura #{lastReceipt?.orderNumber}</DialogDescription>
           </DialogHeader>
           {lastReceipt && (
-            <div className="space-y-4 py-4">
-              <div className="text-center border-b pb-4">
-                <h2 className="text-xl font-bold">K.S Salong</h2>
+            <div className="receipt-print space-y-4 py-4 print:p-4">
+              <div className="text-center border-b pb-4 print:border-dashed">
+                <h2 className="text-xl font-bold print:text-2xl">K.S Salong</h2>
                 <p className="text-sm text-gray-600">Professional Hair Salon</p>
-                <p className="text-xs text-gray-500 mt-2">
-                  {format(new Date(), "dd.MM.yyyy HH:mm")}
+                <p className="text-xs text-gray-500 mt-1">Adresse: [Din adresse]</p>
+                <p className="text-xs text-gray-500">Telefon: [Ditt telefonnummer]</p>
+                <p className="text-xs text-gray-500 mt-2 font-mono">
+                  Faktura: {lastReceipt.orderNumber}
+                </p>
+                <p className="text-xs text-gray-500">
+                  Dato: {format(new Date(), "dd.MM.yyyy HH:mm")}
                 </p>
               </div>
 
@@ -614,10 +620,10 @@ export default function POS() {
                 ))}
               </div>
 
-              <div className="space-y-1 text-sm border-t pt-2">
+              <div className="space-y-1 text-sm border-t pt-2 print:border-dashed">
                 <div className="flex justify-between">
-                  <span>Delsum:</span>
-                  <span>{calculateSubtotal().toFixed(2)} kr</span>
+                  <span>Delsum (eks. MVA):</span>
+                  <span>{(calculateSubtotal() / 1.25).toFixed(2)} kr</span>
                 </div>
                 {discount > 0 && (
                   <div className="flex justify-between text-red-600">
@@ -625,9 +631,13 @@ export default function POS() {
                     <span>-{calculateDiscount().toFixed(2)} kr</span>
                   </div>
                 )}
-                <div className="flex justify-between text-gray-600">
+                <div className="flex justify-between font-medium">
                   <span>MVA (25%):</span>
                   <span>{calculateMVA().toFixed(2)} kr</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Delsum (inkl. MVA):</span>
+                  <span>{calculateSubtotal().toFixed(2)} kr</span>
                 </div>
                 {tip > 0 && (
                   <div className="flex justify-between text-green-600">
@@ -635,15 +645,19 @@ export default function POS() {
                     <span>+{tip.toFixed(2)} kr</span>
                   </div>
                 )}
-                <div className="flex justify-between font-bold text-lg border-t pt-2">
-                  <span>Totalt:</span>
+                <div className="flex justify-between font-bold text-lg border-t pt-2 print:border-double print:border-t-2">
+                  <span>Totalt å betale:</span>
                   <span>{calculateTotal().toFixed(2)} kr</span>
                 </div>
               </div>
 
-              <div className="text-center text-xs text-gray-500 border-t pt-4">
-                <p>Betalingsmetode: {paymentMethod.toUpperCase()}</p>
-                <p className="mt-2">Takk for besøket!</p>
+              <div className="text-center text-xs text-gray-500 border-t pt-4 print:border-dashed">
+                <p className="font-medium">Betalingsmetode: {paymentMethod.toUpperCase()}</p>
+                {activeEmployee && (
+                  <p className="mt-1">Betjent av: {activeEmployee.name}</p>
+                )}
+                <p className="mt-3 font-medium">Takk for besøket!</p>
+                <p className="mt-1">Velkommen tilbake!</p>
               </div>
             </div>
           )}

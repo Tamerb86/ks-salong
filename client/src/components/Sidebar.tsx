@@ -80,6 +80,11 @@ const navItems: NavItem[] = [
     icon: Package,
   },
   {
+    title: "Salg",
+    href: "/sales",
+    icon: BarChart3,
+  },
+  {
     title: "Innstillinger",
     href: "/settings",
     icon: Settings,

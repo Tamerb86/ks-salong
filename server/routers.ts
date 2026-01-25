@@ -422,7 +422,11 @@ export const appRouter = router({
         employeeName: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
-        const orderNumber = `ORD-${Date.now()}`;
+        // Generate invoice number: INV-YYYYMMDD-XXX
+        const now = new Date();
+        const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
+        const randomSuffix = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+        const orderNumber = `INV-${dateStr}-${randomSuffix}`;
         
         const orderId = await db.createOrder({
           orderNumber,
@@ -447,6 +451,17 @@ export const appRouter = router({
         return { orderId, orderNumber };
       }),
     
+    list: protectedProcedure
+      .input(z.object({
+        dateFrom: z.string().optional(),
+        dateTo: z.string().optional(),
+        staffId: z.number().optional(),
+        paymentMethod: z.string().optional(),
+      }))
+      .query(async ({ input }) => {
+        return await db.getOrdersByFilters(input);
+      }),
+    
     getById: protectedProcedure
       .input(z.object({ id: z.number() }))
       .query(async ({ input }) => {
@@ -454,6 +469,28 @@ export const appRouter = router({
         if (!order) return null;
         const items = await db.getOrderItems(input.id);
         return { ...order, items };
+      }),
+    
+    refund: protectedProcedure
+      .input(z.object({
+        orderId: z.number(),
+        reason: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        // Get order items to restore stock
+        const items = await db.getOrderItems(input.orderId);
+        
+        // Restore product stock
+        for (const item of items) {
+          if (item.itemType === "product") {
+            await db.updateProductStock(item.itemId, item.quantity);
+          }
+        }
+        
+        // Update order status
+        await db.updateOrderStatus(input.orderId, "refunded", input.reason);
+        
+        return { success: true };
       }),
   }),
 

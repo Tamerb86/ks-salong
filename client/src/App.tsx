@@ -7,6 +7,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import Services from "@/pages/Services";
 import Products from "@/pages/Products";
+import Sales from "@/pages/Sales";
 import BookOnline from "./pages/BookOnline";
 import Appointments from "./pages/Appointments";
 import Queue from "./pages/Queue";
@@ -25,7 +26,8 @@ function Router() {
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/services"} component={Services} />
-      <Route path={"/products"} component={Products} />
+        <Route path="/products" component={Products} />
+        <Route path="/sales" component={Sales} />
       <Route path={"/book"} component={BookOnline} />
       <Route path={"/appointments"} component={Appointments} />
       <Route path={"/queue"} component={Queue} />
