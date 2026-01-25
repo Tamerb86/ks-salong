@@ -35,6 +35,12 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
+  
+  // Webhook endpoints
+  const webhooks = await import("../webhooks");
+  app.post("/api/webhooks/vipps", webhooks.handleVippsCallback);
+  app.post("/api/webhooks/stripe", webhooks.handleStripeWebhook);
+  
   // tRPC API
   app.use(
     "/api/trpc",

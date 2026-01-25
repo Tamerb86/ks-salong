@@ -4,7 +4,7 @@ import {
   InsertUser, users, permissions, services, products, serviceStaff,
   appointments, dropInQueue, payments, orders, orderItems, timeEntries,
   customers, salonSettings, businessHours, holidays, notificationTemplates,
-  dailyReports, auditLogs
+  dailyReports, auditLogs, terminalReaders
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -984,4 +984,68 @@ export async function getEmployeeWorkSummary(staffId: number, startDate: Date, e
     totalOvertimeHours: (totalOvertimeMinutes / 60).toFixed(2),
     entries,
   };
+}
+
+/**
+ * ============================================
+ * STRIPE TERMINAL READERS
+ * ============================================
+ */
+
+// Save Terminal Reader
+export async function saveTerminalReader(reader: {
+  id: string;
+  label: string;
+  locationId: string;
+  serialNumber?: string;
+  deviceType?: string;
+  status?: string;
+  ipAddress?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+  
+  await db.insert(terminalReaders).values({
+    id: reader.id,
+    label: reader.label,
+    locationId: reader.locationId,
+    serialNumber: reader.serialNumber || null,
+    deviceType: reader.deviceType || null,
+    status: reader.status || "offline",
+    ipAddress: reader.ipAddress || null,
+    lastSeenAt: new Date(),
+  }).onDuplicateKeyUpdate({
+    set: {
+      label: reader.label,
+      status: reader.status || "offline",
+      ipAddress: reader.ipAddress || null,
+      lastSeenAt: new Date(),
+      updatedAt: new Date(),
+    },
+  });
+}
+
+// Get all Terminal Readers
+export async function getTerminalReaders() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(terminalReaders).orderBy(desc(terminalReaders.registeredAt));
+}
+
+// Get Terminal Reader by ID
+export async function getTerminalReaderById(id: string) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const [reader] = await db.select().from(terminalReaders).where(eq(terminalReaders.id, id)).limit(1);
+  return reader || null;
+}
+
+// Delete Terminal Reader
+export async function deleteTerminalReader(id: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+  
+  await db.delete(terminalReaders).where(eq(terminalReaders.id, id));
 }

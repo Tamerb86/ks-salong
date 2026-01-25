@@ -105,6 +105,11 @@ export const appointments = mysqlTable("appointments", {
   cancelledBy: int("cancelledBy"),
   reminderSent24h: boolean("reminderSent24h").default(false).notNull(),
   reminderSent2h: boolean("reminderSent2h").default(false).notNull(),
+  // Vipps Payment Integration
+  vippsOrderId: varchar("vippsOrderId", { length: 255 }), // Vipps order ID
+  paymentStatus: mysqlEnum("paymentStatus", ["pending", "paid", "failed", "refunded", "expired"]).default("pending"),
+  paymentAmount: decimal("paymentAmount", { precision: 10, scale: 2 }),
+  paidAt: timestamp("paidAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -290,6 +295,9 @@ export const salonSettings = mysqlTable("salonSettings", {
   fikenCompanySlug: varchar("fikenCompanySlug", { length: 255 }),
   fikenLastSyncDate: timestamp("fikenLastSyncDate"),
   fikenAutoSync: boolean("fikenAutoSync").default(false).notNull(),
+  // Stripe Terminal Integration
+  stripeTerminalEnabled: boolean("stripeTerminalEnabled").default(false).notNull(),
+  stripeTerminalLocationId: varchar("stripeTerminalLocationId", { length: 255 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -373,3 +381,19 @@ export type Customer = typeof customers.$inferSelect;
 export type SalonSettings = typeof salonSettings.$inferSelect;
 export type BusinessHours = typeof businessHours.$inferSelect;
 export type DailyReport = typeof dailyReports.$inferSelect;
+
+export const terminalReaders = mysqlTable("terminalReaders", {
+  id: varchar("id", { length: 255 }).primaryKey(), // Stripe reader ID (e.g., tmr_xxxxx)
+  label: varchar("label", { length: 255 }).notNull(),
+  locationId: varchar("locationId", { length: 255 }).notNull(),
+  serialNumber: varchar("serialNumber", { length: 255 }),
+  deviceType: varchar("deviceType", { length: 100 }), // e.g., "bbpos_wisepos_e"
+  status: varchar("status", { length: 50 }), // "online", "offline"
+  ipAddress: varchar("ipAddress", { length: 50 }),
+  lastSeenAt: timestamp("lastSeenAt"),
+  registeredAt: timestamp("registeredAt").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type TerminalReader = typeof terminalReaders.$inferSelect;

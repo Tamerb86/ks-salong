@@ -603,3 +603,53 @@
 - [x] Write vitest tests for Fiken integration (9/9 tests passed)
 - [ ] Test with real Fiken test account (requires user's Fiken credentials)
 - [x] Document setup process for users (in UI)
+
+## Stripe Connect + WisePOS E Terminal Integration
+- [ ] Research Stripe Connect platform setup and requirements
+- [ ] Research Stripe Terminal API for WisePOS E reader
+- [ ] Understand reader discovery and connection flow
+- [ ] Add Stripe Connect credentials to database schema (stripeConnectEnabled, stripeSecretKey, stripePublishableKey, stripeTerminalLocationId)
+- [ ] Create Stripe Terminal service module (server/stripeTerminal.ts)
+- [ ] Implement reader discovery endpoint
+- [ ] Implement reader connection endpoint
+- [ ] Implement payment intent creation with Terminal
+- [ ] Implement payment collection from reader
+- [ ] Add Terminal reader management UI in Settings page
+- [ ] Add "Pay with Card Reader" button in POS page
+- [ ] Show reader connection status in POS
+- [ ] Handle payment success/failure from reader
+- [ ] Link Terminal payments to orders table
+- [ ] Write vitest tests for Terminal integration
+- [ ] Test with actual WisePOS E reader (requires physical device)
+- [ ] Document setup process for users
+
+## Online Booking Payment Integration
+- [ ] Add requirePaymentForBooking setting (already exists in schema)
+- [ ] Create Stripe Checkout session endpoint for booking payments
+- [ ] Add paymentIntentId and paymentStatus fields to appointments table
+- [ ] Link payment confirmation with appointment auto-confirmation
+- [ ] Add payment UI to online booking page (before final confirmation)
+- [ ] Create webhook endpoint to handle Stripe payment events
+- [ ] Auto-confirm appointment when payment succeeds
+- [ ] Cancel/expire appointment if payment fails or times out
+- [ ] Show payment status in appointment details
+- [ ] Add "Pay Now" button for pending payment appointments
+- [ ] Send confirmation email after successful payment
+- [ ] Write vitest tests for payment flow
+- [ ] Test with Stripe test mode cards
+
+## Vipps Online Booking Payment Integration
+- [x] Add vippsOrderId and paymentStatus fields to appointments table
+- [x] Create Vipps payment initiation endpoint for bookings
+- [x] Generate Vipps payment link with booking details
+- [x] Add payment UI to BookOnline page (Step 5: Payment)
+- [x] Redirect customer to Vipps app/web for payment
+- [x] Implement Vipps webhook handler for payment callbacks
+- [x] Auto-confirm appointment when Vipps payment succeeds
+- [ ] Cancel/expire appointment if payment fails or times out (30 min)
+- [ ] Show payment status in Appointments page
+- [ ] Add "Pay with Vipps" button for pending payment appointments
+- [ ] Send confirmation SMS/email after successful payment
+- [ ] Handle payment refunds when appointment is cancelled
+- [x] Write vitest tests for Vipps booking payment flow (6/6 tests passed)
+- [ ] Test with Vipps test environment (requires real Vipps credentials)

@@ -43,6 +43,20 @@
       "when": 1769301499640,
       "tag": "0005_curly_yellowjacket",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1769320826528,
+      "tag": "0006_yielding_lockheed",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1769333183207,
+      "tag": "0007_melted_firebrand",
+      "breakpoints": true
     }
   ]
 }

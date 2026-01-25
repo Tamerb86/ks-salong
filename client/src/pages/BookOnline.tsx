@@ -43,10 +43,17 @@ export default function BookOnline() {
     { enabled: !!selectedDate }
   );
 
-  const createBookingMutation = trpc.appointments.create.useMutation({
-    onSuccess: () => {
-      toast.success("Booking bekreftet! Vi gleder oss til å se deg!");
-      setStep(6); // Success step
+  const createBookingMutation = trpc.appointments.createWithPayment.useMutation({
+    onSuccess: (data) => {
+      if (data.requiresPayment && data.vippsUrl) {
+        // Redirect to Vipps payment
+        toast.info("Omdirigerer til Vipps...");
+        window.location.href = data.vippsUrl;
+      } else {
+        // Booking confirmed without payment
+        toast.success("Booking bekreftet! Vi gleder oss til å se deg!");
+        setStep(6); // Success step
+      }
     },
     onError: (error) => {
       toast.error("Feil ved booking: " + error.message);
@@ -88,7 +95,7 @@ export default function BookOnline() {
     }
   };
 
-  const handleSubmitBooking = (e: React.FormEvent) => {
+  const handleSubmitBooking = (e: React.FormEvent, requirePayment: boolean = false) => {
     e.preventDefault();
 
     if (!customerInfo.name || !customerInfo.phone) {
@@ -109,6 +116,7 @@ export default function BookOnline() {
       startTime: selectedTime,
       endTime: `${endTime.getHours().toString().padStart(2, '0')}:${endTime.getMinutes().toString().padStart(2, '0')}`,
       notes: `${customerInfo.name} - ${customerInfo.phone}${customerInfo.email ? ` - ${customerInfo.email}` : ''}${customerInfo.notes ? ` - ${customerInfo.notes}` : ''}`,
+      requirePayment: requirePayment,
     });
   };
 
@@ -571,11 +579,8 @@ export default function BookOnline() {
                   </Button>
                   <Button
                     onClick={(e) => {
-                      if (paymentMethod === "vipps") {
-                        toast.info("Vipps-betaling vil bli implementert snart");
-                        // TODO: Integrate Vipps payment API
-                      }
-                      handleSubmitBooking(e);
+                      const requirePayment = paymentMethod === "vipps";
+                      handleSubmitBooking(e, requirePayment);
                     }}
                     className="flex-1 bg-gradient-to-r from-purple-600 to-amber-600 hover:from-purple-700 hover:to-amber-700"
                     disabled={createBookingMutation.isPending}

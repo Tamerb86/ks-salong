@@ -281,6 +281,116 @@ export const appRouter = router({
         
         return { success: true };
       }),
+    
+    // Create booking with Vipps payment
+    createWithPayment: publicProcedure
+      .input(z.object({
+        customerId: z.number(),
+        staffId: z.number(),
+        serviceId: z.number(),
+        appointmentDate: z.date(),
+        startTime: z.string(),
+        endTime: z.string(),
+        notes: z.string().optional(),
+        requirePayment: z.boolean(),
+      }))
+      .mutation(async ({ input }) => {
+        // Check for conflicts
+        const existingAppointments = await db.getAppointmentsByStaffAndDate(
+          input.staffId,
+          input.appointmentDate
+        );
+        
+        const hasConflict = existingAppointments.some(apt => {
+          return (
+            (input.startTime >= apt.startTime && input.startTime < apt.endTime) ||
+            (input.endTime > apt.startTime && input.endTime <= apt.endTime) ||
+            (input.startTime <= apt.startTime && input.endTime >= apt.endTime)
+          );
+        });
+        
+        if (hasConflict) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "This time slot is already booked"
+          });
+        }
+        
+        // Get service price
+        const service = await db.getServiceById(input.serviceId);
+        if (!service) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Service not found" });
+        }
+        
+        // Create appointment
+        const appointmentId = await db.createAppointment({
+          customerId: input.customerId,
+          staffId: input.staffId,
+          serviceId: input.serviceId,
+          appointmentDate: input.appointmentDate,
+          startTime: input.startTime,
+          endTime: input.endTime,
+          notes: input.notes,
+          status: input.requirePayment ? "pending" : "confirmed",
+          paymentStatus: input.requirePayment ? "pending" : undefined,
+          paymentAmount: input.requirePayment ? service.price : undefined,
+        });
+        
+        // If payment required, initiate Vipps payment
+        if (input.requirePayment) {
+          const settings = await db.getSalonSettings();
+          if (!settings?.vippsEnabled || !settings?.vippsClientId) {
+            throw new TRPCError({ code: "BAD_REQUEST", message: "Vipps not configured" });
+          }
+          
+          const vipps = await import("./vipps");
+          const customer = await db.getCustomerById(input.customerId);
+          
+          const paymentResult = await vipps.initiateVippsPayment(
+            `APT-${appointmentId}`,
+            Number(service.price),
+            `Booking: ${service.name}`,
+            customer?.phone
+          );
+          
+          if (paymentResult.orderId && appointmentId) {
+            await db.updateAppointment(appointmentId, {
+              vippsOrderId: paymentResult.orderId,
+            });
+            
+            return {
+              appointmentId,
+              requiresPayment: true,
+              vippsUrl: paymentResult.url,
+              orderId: paymentResult.orderId,
+            };
+          } else {
+            throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to initiate payment" });
+          }
+        }
+        
+        return {
+          appointmentId,
+          requiresPayment: false,
+        };
+      }),
+    
+    // Check payment status
+    checkPaymentStatus: publicProcedure
+      .input(z.object({
+        appointmentId: z.number(),
+      }))
+      .query(async ({ input }) => {
+        const appointment = await db.getAppointmentById(input.appointmentId);
+        if (!appointment) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Appointment not found" });
+        }
+        
+        return {
+          paymentStatus: (appointment as any).paymentStatus || "pending",
+          status: appointment.status,
+        };
+      }),
   }),
 
   queue: router({
@@ -726,6 +836,8 @@ export const appRouter = router({
         fikenApiToken: z.string().optional(),
         fikenCompanySlug: z.string().optional(),
         fikenAutoSync: z.boolean().optional(),
+        stripeTerminalEnabled: z.boolean().optional(),
+        stripeTerminalLocationId: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
         await db.updateSalonSettings(input);
@@ -765,6 +877,186 @@ export const appRouter = router({
       .query(async ({ input }) => {
         const result = await fiken.testFikenConnection(input.apiToken);
         return result.companies || [];
+      }),
+  }),
+
+  terminal: router({
+    // Test Stripe connection
+    testConnection: adminProcedure
+      .input(z.object({
+        secretKey: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        const terminal = await import("./stripeTerminal");
+        return await terminal.testStripeConnection(input.secretKey);
+      }),
+    
+    // Create Terminal Location
+    createLocation: adminProcedure
+      .input(z.object({
+        displayName: z.string(),
+        address: z.object({
+          line1: z.string(),
+          city: z.string(),
+          country: z.string(),
+          postalCode: z.string(),
+        }),
+      }))
+      .mutation(async ({ input }) => {
+        const settings = await db.getSalonSettings();
+        if (!settings?.stripeSecretKey) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Stripe Secret Key not configured" });
+        }
+        const terminal = await import("./stripeTerminal");
+        return await terminal.createTerminalLocation(settings.stripeSecretKey, input);
+      }),
+    
+    // List Terminal Locations
+    listLocations: adminProcedure.query(async () => {
+      const settings = await db.getSalonSettings();
+      if (!settings?.stripeSecretKey) {
+        return [];
+      }
+      const terminal = await import("./stripeTerminal");
+      return await terminal.listTerminalLocations(settings.stripeSecretKey);
+    }),
+    
+    // Register Terminal Reader
+    registerReader: adminProcedure
+      .input(z.object({
+        registrationCode: z.string(),
+        label: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        const settings = await db.getSalonSettings();
+        if (!settings?.stripeSecretKey || !settings?.stripeTerminalLocationId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Stripe Terminal not configured" });
+        }
+        const terminal = await import("./stripeTerminal");
+        const result = await terminal.registerTerminalReader(settings.stripeSecretKey, {
+          ...input,
+          locationId: settings.stripeTerminalLocationId,
+        });
+        
+        if (result.success && result.reader) {
+          // Save reader to database
+          await db.saveTerminalReader({
+            id: result.reader.id,
+            label: result.reader.label,
+            locationId: result.reader.location,
+            serialNumber: result.reader.serial_number,
+            deviceType: result.reader.device_type,
+            status: result.reader.status,
+            ipAddress: result.reader.ip_address,
+          });
+        }
+        
+        return result;
+      }),
+    
+    // List Terminal Readers
+    listReaders: protectedProcedure.query(async () => {
+      return await db.getTerminalReaders();
+    }),
+    
+    // Get Reader Status
+    getReaderStatus: protectedProcedure
+      .input(z.object({
+        readerId: z.string(),
+      }))
+      .query(async ({ input }) => {
+        const settings = await db.getSalonSettings();
+        if (!settings?.stripeSecretKey) {
+          return null;
+        }
+        const terminal = await import("./stripeTerminal");
+        return await terminal.getTerminalReader(settings.stripeSecretKey, input.readerId);
+      }),
+    
+    // Delete Terminal Reader
+    deleteReader: adminProcedure
+      .input(z.object({
+        readerId: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        const settings = await db.getSalonSettings();
+        if (!settings?.stripeSecretKey) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Stripe not configured" });
+        }
+        const terminal = await import("./stripeTerminal");
+        const result = await terminal.deleteTerminalReader(settings.stripeSecretKey, input.readerId);
+        
+        if (result.success) {
+          await db.deleteTerminalReader(input.readerId);
+        }
+        
+        return result;
+      }),
+    
+    // Create Payment Intent for Terminal
+    createPaymentIntent: protectedProcedure
+      .input(z.object({
+        amount: z.number(),
+        orderId: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const settings = await db.getSalonSettings();
+        if (!settings?.stripeSecretKey) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Stripe not configured" });
+        }
+        const terminal = await import("./stripeTerminal");
+        return await terminal.createTerminalPaymentIntent(settings.stripeSecretKey, {
+          amount: Math.round(input.amount * 100), // Convert to øre
+          currency: "NOK",
+          metadata: input.orderId ? { orderId: String(input.orderId) } : {},
+        });
+      }),
+    
+    // Process Payment on Reader
+    processPayment: protectedProcedure
+      .input(z.object({
+        readerId: z.string(),
+        paymentIntentId: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        const settings = await db.getSalonSettings();
+        if (!settings?.stripeSecretKey) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Stripe not configured" });
+        }
+        const terminal = await import("./stripeTerminal");
+        return await terminal.processPaymentOnReader(
+          settings.stripeSecretKey,
+          input.readerId,
+          input.paymentIntentId
+        );
+      }),
+    
+    // Cancel Reader Action
+    cancelPayment: protectedProcedure
+      .input(z.object({
+        readerId: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        const settings = await db.getSalonSettings();
+        if (!settings?.stripeSecretKey) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Stripe not configured" });
+        }
+        const terminal = await import("./stripeTerminal");
+        return await terminal.cancelReaderAction(settings.stripeSecretKey, input.readerId);
+      }),
+    
+    // Get Payment Intent Status
+    getPaymentStatus: protectedProcedure
+      .input(z.object({
+        paymentIntentId: z.string(),
+      }))
+      .query(async ({ input }) => {
+        const settings = await db.getSalonSettings();
+        if (!settings?.stripeSecretKey) {
+          return null;
+        }
+        const terminal = await import("./stripeTerminal");
+        return await terminal.getPaymentIntent(settings.stripeSecretKey, input.paymentIntentId);
       }),
   }),
 
