@@ -76,6 +76,8 @@ export default function Settings() {
     defaultMvaTax: "25.00",
     bookingSlotInterval: 15,
     bufferTimeBetweenAppointments: 5,
+    onlineBookingBufferTime: 15,
+    dropInBufferTime: 15,
     cancellationPolicyHours: 24,
     reminder24hEnabled: true,
     reminder2hEnabled: true,
@@ -131,6 +133,8 @@ export default function Settings() {
         defaultMvaTax: settings.defaultMvaTax || "25.00",
         bookingSlotInterval: settings.bookingSlotInterval || 15,
         bufferTimeBetweenAppointments: settings.bufferTimeBetweenAppointments || 5,
+        onlineBookingBufferTime: settings.onlineBookingBufferTime || 15,
+        dropInBufferTime: settings.dropInBufferTime || 15,
         cancellationPolicyHours: settings.cancellationPolicyHours || 24,
         reminder24hEnabled: settings.reminder24hEnabled ?? true,
         reminder2hEnabled: settings.reminder2hEnabled ?? true,
@@ -519,6 +523,52 @@ export default function Settings() {
                         })
                       }
                     />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="onlineBookingBufferTime">
+                      Buffertid for nettbookinger (minutter)
+                    </Label>
+                    <select
+                      id="onlineBookingBufferTime"
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      value={formData.onlineBookingBufferTime}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          onlineBookingBufferTime: parseInt(e.target.value),
+                        })
+                      }
+                    >
+                      <option value={15}>15 minutter</option>
+                      <option value={30}>30 minutter</option>
+                      <option value={45}>45 minutter</option>
+                      <option value={60}>60 minutter</option>
+                    </select>
+                    <p className="text-sm text-gray-500">Tid mellom nettbookinger</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="dropInBufferTime">
+                      Buffertid for drop-in (minutter)
+                    </Label>
+                    <select
+                      id="dropInBufferTime"
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      value={formData.dropInBufferTime}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          dropInBufferTime: parseInt(e.target.value),
+                        })
+                      }
+                    >
+                      <option value={15}>15 minutter</option>
+                      <option value={30}>30 minutter</option>
+                      <option value={45}>45 minutter</option>
+                      <option value={60}>60 minutter</option>
+                    </select>
+                    <p className="text-sm text-gray-500">Tid mellom drop-in kunder</p>
                   </div>
 
                   <div className="space-y-2">

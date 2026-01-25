@@ -1411,3 +1411,10 @@
 
 ## UI Improvement - Hide Service Duration
 - [x] Remove duration display from service cards in BookOnline page
+
+## Buffer Time Settings
+- [x] Add buffer time fields to salonSettings table (onlineBookingBuffer, dropInBuffer)
+- [x] Create UI in Settings page to configure buffer time (15, 30, 45, 60 minutes)
+- [x] Apply buffer time when calculating available time slots for online bookings
+- [x] Apply buffer time when adding drop-in customers to queue
+- [x] Test buffer time with different scenarios

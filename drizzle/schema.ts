@@ -281,6 +281,8 @@ export const salonSettings = mysqlTable("salonSettings", {
   timezone: varchar("timezone", { length: 50 }).default("Europe/Oslo").notNull(),
   bookingSlotInterval: int("bookingSlotInterval").default(15).notNull(), // minutes
   bufferTimeBetweenAppointments: int("bufferTimeBetweenAppointments").default(5).notNull(), // minutes
+  onlineBookingBufferTime: int("onlineBookingBufferTime").default(15).notNull(), // Buffer time between online bookings (minutes)
+  dropInBufferTime: int("dropInBufferTime").default(15).notNull(), // Buffer time for drop-in customers (minutes)
   cancellationPolicyHours: int("cancellationPolicyHours").default(24).notNull(),
   lateCancellationFeePercent: decimal("lateCancellationFeePercent", { precision: 5, scale: 2 }).default("50.00"),
   noShowFeePercent: decimal("noShowFeePercent", { precision: 5, scale: 2 }).default("100.00"),
