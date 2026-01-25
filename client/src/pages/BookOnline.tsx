@@ -16,8 +16,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { Calendar, Clock, Loader2, MapPin, Phone, Scissors, User } from "lucide-react";
-import { useState } from "react";
+import { CalendarIcon, Clock, Loader2, MapPin, Phone, Scissors, User } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { nb } from "date-fns/locale";
 import { toast } from "sonner";
 import { Layout } from "@/components/Layout";
 import { useLocation } from "wouter";
@@ -28,7 +32,7 @@ export default function BookOnline() {
   const [step, setStep] = useState(1);
   const [selectedService, setSelectedService] = useState<any>(null);
   const [selectedStaff, setSelectedStaff] = useState<string>("any");
-  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState("");
   const [customerInfo, setCustomerInfo] = useState({
     name: "",
@@ -38,11 +42,16 @@ export default function BookOnline() {
   });
   const [paymentMethod, setPaymentMethod] = useState<"vipps" | "pay_later">("vipps");
 
+  // Debug: Log selectedDate changes
+  useEffect(() => {
+    console.log("[BookOnline] selectedDate changed:", selectedDate);
+  }, [selectedDate]);
+
   const { data: services, isLoading: servicesLoading } = trpc.services.list.useQuery();
   const { data: staff, isLoading: staffLoading } = trpc.staff.list.useQuery();
   const { data: settings } = trpc.settings.get.useQuery();
   const { data: appointments } = trpc.appointments.listByDate.useQuery(
-    { date: selectedDate ? new Date(selectedDate) : new Date() },
+    { date: selectedDate || new Date() },
     { enabled: !!selectedDate }
   );
 
@@ -106,7 +115,7 @@ export default function BookOnline() {
       return;
     }
 
-    const appointmentDate = new Date(selectedDate);
+    const appointmentDate = selectedDate!;
     const [hours, minutes] = selectedTime.split(':');
     const endTime = new Date(appointmentDate);
     endTime.setHours(parseInt(hours), parseInt(minutes) + selectedService.duration);
@@ -134,10 +143,11 @@ export default function BookOnline() {
     return slots;
   };
 
-  const isTimeSlotAvailable = (date: string, time: string) => {
+  const isTimeSlotAvailable = (date: Date, time: string) => {
     if (!appointments || !selectedService) return true;
 
-    const slotDateTime = new Date(`${date}T${time}`);
+    const dateStr = format(date, "yyyy-MM-dd");
+    const slotDateTime = new Date(`${dateStr}T${time}`);
     const slotEnd = new Date(slotDateTime.getTime() + selectedService.duration * 60000);
 
     return !appointments.some((apt: any) => {
@@ -336,14 +346,34 @@ export default function BookOnline() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="date">Dato</Label>
-                  <Input
-                    id="date"
-                    type="date"
-                    value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                    min={new Date().toISOString().split("T")[0]}
-                  />
+                  <Label>Dato</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start text-left font-normal"
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {selectedDate ? (
+                          format(selectedDate, "PPP", { locale: nb })
+                        ) : (
+                          <span>Velg dato</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={selectedDate}
+                        onSelect={(date) => {
+                          console.log("[BookOnline] Calendar onSelect:", date);
+                          setSelectedDate(date);
+                        }}
+                        disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
 
                 {selectedDate && (
@@ -458,7 +488,7 @@ export default function BookOnline() {
                   <div className="p-4 bg-purple-50 rounded-lg space-y-2">
                     <h3 className="font-semibold">Oppsummering:</h3>
                     <p><strong>Tjeneste:</strong> {selectedService.name}</p>
-                    <p><strong>Dato:</strong> {selectedDate}</p>
+                    <p><strong>Dato:</strong> {selectedDate ? format(selectedDate, "PPP", { locale: nb }) : ""}</p>
                     <p><strong>Tid:</strong> {selectedTime}</p>
                     <p><strong>Pris:</strong> {selectedService.price} kr</p>
                   </div>
@@ -495,7 +525,7 @@ export default function BookOnline() {
                   <div className="space-y-1 text-sm">
                     <p><strong>Tjeneste:</strong> {selectedService.name}</p>
                     <p><strong>Varighet:</strong> {selectedService.duration} minutter</p>
-                    <p><strong>Dato:</strong> {selectedDate}</p>
+                    <p><strong>Dato:</strong> {selectedDate ? format(selectedDate, "PPP", { locale: nb }) : ""}</p>
                     <p><strong>Tid:</strong> {selectedTime}</p>
                     <p><strong>Kunde:</strong> {customerInfo.name}</p>
                     <p><strong>Telefon:</strong> {customerInfo.phone}</p>
@@ -624,7 +654,7 @@ export default function BookOnline() {
               <div className="p-6 bg-purple-50 rounded-lg mb-6">
                 <p className="font-semibold mb-2">Din avtale:</p>
                 <p>{selectedService.name}</p>
-                <p>{selectedDate} kl. {selectedTime}</p>
+                <p>{selectedDate ? format(selectedDate, "dd.MM.yyyy", { locale: nb }) : ""} kl. {selectedTime}</p>
                 <p className="text-sm text-gray-600 mt-2">
                   Storgata 122C, 3915 Porsgrunn
                 </p>
@@ -634,7 +664,7 @@ export default function BookOnline() {
                   setStep(1);
                   setSelectedService(null);
                   setSelectedStaff("any");
-                  setSelectedDate("");
+                  setSelectedDate(undefined);
                   setSelectedTime("");
                   setCustomerInfo({ name: "", email: "", phone: "", notes: "" });
                 }}

@@ -864,16 +864,16 @@
 - [x] Test WhatsApp link on mobile and desktop (opens app on mobile, web on desktop)
 
 ## Booking Flow Testing & Admin Access
-- [ ] Test complete booking flow from landing page
-- [ ] Select service and verify service details display
-- [ ] Select date and time slot
-- [ ] Enter customer information
-- [ ] Complete payment process
-- [ ] Verify booking confirmation
-- [ ] Check booking appears in dashboard
-- [ ] Add admin dashboard access button to landing page (footer or navigation)
-- [ ] Style admin button appropriately (subtle, not prominent for public)
-- [ ] Test admin login flow from landing page
+- [x] Test complete booking flow from landing page (ALL STEPS WORKING!)
+- [x] Select service and verify service details display (10 real services)
+- [x] Select date and time slot (interactive calendar + 20 time slots)
+- [x] Enter customer information (form validation working)
+- [x] Complete payment process (Kontant payment, skips to confirmation)
+- [x] Verify booking confirmation (displays appointment details)
+- [ ] Check booking appears in dashboard (requires admin login)
+- [x] Add admin dashboard access button to landing page (footer)
+- [x] Style admin button appropriately (subtle, gray text)
+- [x] Test admin login flow from landing page (OAuth working)
 
 ## Admin Access & Landing Page Improvements (Completed)
 - [x] Add admin dashboard access button to landing page footer
@@ -883,4 +883,20 @@
 - [x] Test booking flow: service selection works (10 real services, no test services)
 - [x] Test booking flow: barber selection works (Første ledige, Lars Olsen, Mohammed Ali)
 - [x] Test booking flow: date selection works
-- [ ] Fix: Time slots not displaying after date selection (needs investigation)
+- [x] Fix: Time slots not displaying after date selection (FIXED with Calendar component)
+
+## Fix Time Slot Display & Interactive Calendar
+- [x] Investigate why time slots don't display after date selection (native input onChange issue)
+- [x] Fix time slot generation logic (replaced native input with Calendar component)
+- [x] Create interactive calendar component for booking (shadcn Calendar)
+- [x] Add date-fns library for Norwegian date formatting
+- [x] Update selectedDate state from string to Date | undefined
+- [x] Fix all date handling logic throughout BookOnline component
+- [x] Test booking flow end-to-end (ALL WORKING!)
+- [ ] Add staff skill level field to users table (beginner/intermediate/expert)
+- [ ] Add duration multiplier field to users table (e.g., 1.0, 1.2, 1.5)
+- [ ] Update time slot generation to use staff-specific durations
+- [ ] Add admin interface in Staff page to set skill levels
+- [ ] Add admin interface to configure duration multipliers
+- [ ] Test booking flow with different staff skill levels
+- [ ] Verify calendar displays correct time slots for each staff member
