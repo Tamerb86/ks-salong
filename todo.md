@@ -1396,3 +1396,9 @@
 - [x] Delete all payments
 - [x] Delete all time entries
 - [x] Keep services and staff (will be updated with real data)
+
+## Add Common Salon Services
+- [x] Create popular salon services with realistic prices
+- [x] Include services for men and women
+- [x] Add service durations
+- [x] Make services editable from admin panel
