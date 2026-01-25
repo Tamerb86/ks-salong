@@ -1051,3 +1051,60 @@
 - [x] Verified address field update successfully saved to database
 - [x] Confirmed dialog closes after save
 - [x] All form fields working correctly
+
+## Reports System
+
+### Database Schema
+- [x] daily_reports table already exists with comprehensive fields
+- [x] time_entries table already exists with clock in/out, breaks, overtime tracking
+- [x] Database schema ready for reports system
+
+### Sales Report
+- [ ] Create backend endpoint to get sales data with filters (date range, staff, service)
+- [ ] Calculate total sales, number of transactions, average transaction value
+- [ ] Group sales by service, staff, payment method
+- [ ] Include appointment details in sales report
+
+### Time Tracking Report
+- [ ] Create backend endpoint to get time entries with filters (date range, staff)
+- [ ] Calculate total hours worked per staff member
+- [ ] Identify weekend overtime (Saturday/Sunday)
+- [ ] Calculate weekly/monthly totals
+
+### Excel Export
+- [x] Install exceljs library
+- [ ] Create Excel export function for sales report
+- [x] Create Excel export function for time tracking report
+- [x] Include filters and totals in exported Excel
+- [x] Format duration as decimal hours (HH.HH)
+- [x] Return Excel as base64 for client download
+
+### PDF Export
+- [x] Install pdfkit library
+- [ ] Create PDF export function for sales report
+- [x] Create PDF export function for time tracking report
+- [x] Include filters and totals in exported PDF
+- [x] Format duration as decimal hours (HH.HH)
+- [x] Return PDF as base64 for client downl### Reports Page UI
+- [x] Reports page already exists with tabs
+- [x] Date range picker for filtering (today/week/month)
+- [x] Employee filter dropdown
+- [x] Display summary cards (total hours, regular, overtime)
+- [x] Display detailed table with all time entries
+- [x] Excel export button connected to backend
+- [x] PDF export button connected to backend
+- [x] Show loading states during export with toast notifications## Automated Daily Report
+- [ ] Create scheduled job to run at end of day (e.g., 11:59 PM)
+- [ ] Generate daily report with sales and time tracking summary
+- [ ] Save report to daily_reports table
+- [ ] Export report as Excel and PDF to server storage
+- [ ] Add endpoint to list all generated daily reports
+- [ ] Add UI to view and download past daily reports
+
+### Testing
+- [ ] Write vitest tests for sales report calculations
+- [ ] Write vitest tests for time tracking calculations
+- [ ] Test Excel export with sample data
+- [ ] Test PDF export with sample data
+- [ ] Test automated daily report generation
+- [ ] Verify weekend overtime calculation

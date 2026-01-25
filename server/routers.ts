@@ -1418,6 +1418,167 @@ export const appRouter = router({
         const endDate = new Date(input.to + "T23:59:59");
         return await db.getTimeEntries(startDate, endDate, input.employeeId);
       }),
+
+    // Export time report to Excel
+    exportTimeReportExcel: protectedProcedure
+      .input(z.object({
+        from: z.string(),
+        to: z.string(),
+        employeeId: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const startDate = new Date(input.from + "T00:00:00");
+        const endDate = new Date(input.to + "T23:59:59");
+        const entries = await db.getTimeEntries(startDate, endDate, input.employeeId);
+        
+        // Generate Excel file
+        const ExcelJS = await import("exceljs");
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet("Tidsrapport");
+        
+        // Add title and filters
+        worksheet.mergeCells("A1:F1");
+        worksheet.getCell("A1").value = "Tidsrapport";
+        worksheet.getCell("A1").font = { size: 16, bold: true };
+        worksheet.getCell("A1").alignment = { horizontal: "center" };
+        
+        worksheet.getCell("A2").value = "Periode:";
+        worksheet.getCell("B2").value = `${input.from} til ${input.to}`;
+        
+        // Add headers
+        worksheet.getRow(4).values = ["Ansatt", "Dato", "Inn", "Ut", "Timer", "Overtid"];
+        worksheet.getRow(4).font = { bold: true };
+        
+        // Add data
+        let rowIndex = 5;
+        let totalMinutes = 0;
+        let overtimeMinutes = 0;
+        
+        entries.forEach((entry: any) => {
+          const minutes = entry.totalMinutes || 0;
+          totalMinutes += minutes;
+          if (entry.isWeekend) overtimeMinutes += minutes;
+          
+          worksheet.getRow(rowIndex).values = [
+            entry.employeeName,
+            new Date(entry.clockIn).toLocaleDateString("nb-NO"),
+            new Date(entry.clockIn).toLocaleTimeString("nb-NO", { hour: "2-digit", minute: "2-digit" }),
+            entry.clockOut ? new Date(entry.clockOut).toLocaleTimeString("nb-NO", { hour: "2-digit", minute: "2-digit" }) : "Aktiv",
+            (minutes / 60).toFixed(2),
+            entry.isWeekend ? "Ja" : "Nei",
+          ];
+          rowIndex++;
+        });
+        
+        // Add totals
+        rowIndex++;
+        worksheet.getCell(`A${rowIndex}`).value = "Totalt:";
+        worksheet.getCell(`A${rowIndex}`).font = { bold: true };
+        worksheet.getCell(`E${rowIndex}`).value = (totalMinutes / 60).toFixed(2);
+        worksheet.getCell(`E${rowIndex}`).font = { bold: true };
+        
+        rowIndex++;
+        worksheet.getCell(`A${rowIndex}`).value = "Overtidstimer:";
+        worksheet.getCell(`E${rowIndex}`).value = (overtimeMinutes / 60).toFixed(2);
+        
+        // Auto-fit columns
+        worksheet.columns.forEach(column => {
+          column.width = 15;
+        });
+        
+        // Generate buffer
+        const buffer = await workbook.xlsx.writeBuffer();
+        const base64 = Buffer.from(buffer).toString("base64");
+        
+        return {
+          data: base64,
+          filename: `tidsrapport_${input.from}_${input.to}.xlsx`,
+          mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        };
+      }),
+
+    // Export time report to PDF
+    exportTimeReportPDF: protectedProcedure
+      .input(z.object({
+        from: z.string(),
+        to: z.string(),
+        employeeId: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const startDate = new Date(input.from + "T00:00:00");
+        const endDate = new Date(input.to + "T23:59:59");
+        const entries = await db.getTimeEntries(startDate, endDate, input.employeeId);
+        
+        // Generate PDF file
+        const PDFDocument = (await import("pdfkit")).default;
+        const doc = new PDFDocument({ margin: 50 });
+        
+        const chunks: Buffer[] = [];
+        doc.on("data", (chunk) => chunks.push(chunk));
+        
+        // Add title
+        doc.fontSize(20).text("Tidsrapport", { align: "center" });
+        doc.moveDown();
+        
+        // Add filters
+        doc.fontSize(12).text(`Periode: ${input.from} til ${input.to}`);
+        doc.moveDown();
+        
+        // Add table header
+        const tableTop = doc.y;
+        doc.fontSize(10).font("Helvetica-Bold");
+        doc.text("Ansatt", 50, tableTop, { width: 100 });
+        doc.text("Dato", 150, tableTop, { width: 80 });
+        doc.text("Inn", 230, tableTop, { width: 50 });
+        doc.text("Ut", 280, tableTop, { width: 50 });
+        doc.text("Timer", 330, tableTop, { width: 50 });
+        doc.text("Overtid", 380, tableTop, { width: 50 });
+        
+        doc.moveTo(50, tableTop + 15).lineTo(550, tableTop + 15).stroke();
+        doc.moveDown();
+        
+        // Add data
+        doc.font("Helvetica");
+        let totalMinutes = 0;
+        let overtimeMinutes = 0;
+        
+        entries.forEach((entry: any) => {
+          const minutes = entry.totalMinutes || 0;
+          totalMinutes += minutes;
+          if (entry.isWeekend) overtimeMinutes += minutes;
+          
+          const y = doc.y;
+          doc.text(entry.employeeName, 50, y, { width: 100 });
+          doc.text(new Date(entry.clockIn).toLocaleDateString("nb-NO"), 150, y, { width: 80 });
+          doc.text(new Date(entry.clockIn).toLocaleTimeString("nb-NO", { hour: "2-digit", minute: "2-digit" }), 230, y, { width: 50 });
+          doc.text(entry.clockOut ? new Date(entry.clockOut).toLocaleTimeString("nb-NO", { hour: "2-digit", minute: "2-digit" }) : "Aktiv", 280, y, { width: 50 });
+          doc.text((minutes / 60).toFixed(2), 330, y, { width: 50 });
+          doc.text(entry.isWeekend ? "Ja" : "Nei", 380, y, { width: 50 });
+          doc.moveDown(0.5);
+        });
+        
+        // Add totals
+        doc.moveDown();
+        doc.font("Helvetica-Bold");
+        doc.text(`Totale timer: ${(totalMinutes / 60).toFixed(2)}`);
+        doc.text(`Overtidstimer: ${(overtimeMinutes / 60).toFixed(2)}`);
+        
+        doc.end();
+        
+        // Wait for PDF generation to complete
+        await new Promise<void>((resolve) => {
+          doc.on("end", () => resolve());
+        });
+        
+        const buffer = Buffer.concat(chunks);
+        const base64 = buffer.toString("base64");
+        
+        return {
+          data: base64,
+          filename: `tidsrapport_${input.from}_${input.to}.pdf`,
+          mimeType: "application/pdf",
+        };
+      }),
   }),
 });
 

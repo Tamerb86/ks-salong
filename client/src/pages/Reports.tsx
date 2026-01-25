@@ -66,54 +66,80 @@ export default function Reports() {
   
   const totals = calculateTotals();
   
-  // Export to Excel (CSV format)
-  const handleExportExcel = () => {
+  // Export to Excel (XLSX format)
+  const exportExcelMutation = trpc.timeTracking.exportTimeReportExcel.useMutation();
+  
+  const handleExportExcel = async () => {
     if (!timeEntries || timeEntries.length === 0) {
       toast.error("Ingen data å eksportere");
       return;
     }
     
-    const headers = ["Ansatt", "Dato", "Inn", "Ut", "Timer", "Overtid"];
-    const rows = timeEntries.map((entry: any) => [
-      entry.employeeName,
-      format(new Date(entry.clockIn), "dd.MM.yyyy", { locale: nb }),
-      format(new Date(entry.clockIn), "HH:mm"),
-      entry.clockOut ? format(new Date(entry.clockOut), "HH:mm") : "Ikke stemplet ut",
-      entry.totalMinutes ? (entry.totalMinutes / 60).toFixed(2) : "0",
-      entry.isWeekend ? "Ja" : "Nei",
-    ]);
-    
-    // Add filter info
-    const filterInfo = [
-      ["Tidsrapport"],
-      ["Periode:", `${format(new Date(from), "dd.MM.yyyy")} - ${format(new Date(to), "dd.MM.yyyy")}`],
-      ["Ansatt:", selectedEmployee === "all" ? "Alle" : staff?.find((s: any) => s.id.toString() === selectedEmployee)?.name],
-      [],
-      ["Sammendrag:"],
-      ["Totale timer:", totals.totalHours],
-      ["Ordinære timer:", totals.regularHours],
-      ["Overtidstimer:", totals.overtimeHours],
-      [],
-    ];
-    
-    const csvContent = [
-      ...filterInfo,
-      headers,
-      ...rows,
-    ].map(row => row.join(";")).join("\\n");
-    
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `tidsrapport_${from}_${to}.csv`;
-    link.click();
-    
-    toast.success("Rapport eksportert til Excel!");
+    try {
+      toast.info("Genererer Excel-fil...");
+      const result = await exportExcelMutation.mutateAsync({
+        from,
+        to,
+        employeeId: selectedEmployee === "all" ? undefined : parseInt(selectedEmployee),
+      });
+      
+      // Convert base64 to blob and download
+      const byteCharacters = atob(result.data);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: result.mimeType });
+      
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = result.filename;
+      link.click();
+      
+      toast.success("Excel-rapport lastet ned!");
+    } catch (error) {
+      console.error("Excel export error:", error);
+      toast.error("Feil ved eksportering til Excel");
+    }
   };
   
-  // Export to PDF (simple text format for now)
-  const handleExportPDF = () => {
-    toast.info("PDF-eksport kommer snart!");
+  // Export to PDF
+  const exportPDFMutation = trpc.timeTracking.exportTimeReportPDF.useMutation();
+  
+  const handleExportPDF = async () => {
+    if (!timeEntries || timeEntries.length === 0) {
+      toast.error("Ingen data å eksportere");
+      return;
+    }
+    
+    try {
+      toast.info("Genererer PDF-fil...");
+      const result = await exportPDFMutation.mutateAsync({
+        from,
+        to,
+        employeeId: selectedEmployee === "all" ? undefined : parseInt(selectedEmployee),
+      });
+      
+      // Convert base64 to blob and download
+      const byteCharacters = atob(result.data);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: result.mimeType });
+      
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = result.filename;
+      link.click();
+      
+      toast.success("PDF-rapport lastet ned!");
+    } catch (error) {
+      console.error("PDF export error:", error);
+      toast.error("Feil ved eksportering til PDF");
+    }
   };
   
   return (

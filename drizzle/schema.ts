@@ -492,3 +492,4 @@ export const customerTags = mysqlTable("customer_tags", {
 
 export type CustomerTag = typeof customerTags.$inferSelect;
 export type NewCustomerTag = typeof customerTags.$inferInsert;
+
