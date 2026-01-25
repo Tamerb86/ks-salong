@@ -838,3 +838,9 @@
 - [x] Test image loading and responsiveness
 - [x] Test booking flow from landing page (works correctly)
 - [x] Verify all "Bestill time" buttons navigate to /book-online
+
+## Update Gallery with Haircut Design Photos
+- [x] Add professional haircut design photos (4 images showing artistic work)
+- [x] Update gallery grid to display 4 images (md:grid-cols-2 lg:grid-cols-4)
+- [x] Ensure responsive layout for new images
+- [x] Test gallery display on mobile and desktop

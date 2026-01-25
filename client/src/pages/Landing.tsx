@@ -218,15 +218,18 @@ export default function Landing() {
             <p className="text-xl text-gray-600">Se vårt arbeid og moderne salong</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="relative h-64 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition">
-              <img src="/images/salon-work.png" alt="Salon" className="w-full h-full object-cover" />
+              <img src="/images/salon-work.png" alt="Salon interior" className="w-full h-full object-cover" />
             </div>
             <div className="relative h-64 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition">
-              <img src="/images/salon-gallery-1.jpeg" alt="Customer at salon" className="w-full h-full object-cover" />
+              <img src="/images/salon-gallery-1.jpeg" alt="Customer service" className="w-full h-full object-cover" />
             </div>
             <div className="relative h-64 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition">
-              <img src="/images/champion-2022.png" alt="Interior" className="w-full h-full object-cover" />
+              <img src="/images/haircut-designs.png" alt="Professional haircut designs" className="w-full h-full object-cover" />
+            </div>
+            <div className="relative h-64 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition">
+              <img src="/images/champion-2022.png" alt="Norgesmester 2022" className="w-full h-full object-cover" />
             </div>
           </div>
         </div>
