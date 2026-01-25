@@ -900,3 +900,35 @@
 - [ ] Add admin interface to configure duration multipliers
 - [ ] Test booking flow with different staff skill levels
 - [ ] Verify calendar displays correct time slots for each staff member
+
+## Staff Skill Level & Duration Multipliers
+- [x] Add skillLevel field to users table (enum: 'beginner', 'intermediate', 'expert')
+- [x] Add durationMultiplier field to users table (decimal: 1.0, 1.2, 1.5)
+- [x] Run database migration to add new fields (drizzle/0012_massive_ricochet.sql)
+- [x] Update Staff page UI to show and edit skill level
+- [x] Add skill level selector in staff edit dialog (dropdown with 3 options)
+- [x] Add duration multiplier input in staff edit dialog (or auto-set based on skill)
+- [x] Update backend API to accept skillLevel and durationMultiplier fields
+- [x] Update BookOnline time slot generation to use staff-specific durations
+- [x] Calculate actual service duration: baseDuration * staffMultiplier
+- [x] Update isTimeSlotAvailable to use actual duration for conflict detection
+- [x] Test staff edit dialog and auto-update of duration multiplier
+- [x] Verify changes persist in database after save
+- [ ] Test complete booking flow with different staff skill levels
+- [ ] Verify time slots adjust correctly for each staff member
+
+## Interactive Monthly Calendar for Appointments
+- [ ] Install @dnd-kit/core and @dnd-kit/sortable for drag-and-drop
+- [ ] Create MonthlyCalendar component with grid layout
+- [ ] Fetch all appointments for selected month
+- [ ] Display appointments in calendar cells by date
+- [ ] Color-code appointments by status (Pending/Confirmed/Completed/Cancelled)
+- [ ] Make appointment cards draggable
+- [ ] Implement drop zones for each date cell
+- [ ] Handle drag-and-drop to reschedule appointments
+- [ ] Update appointment date/time in database after drop
+- [ ] Add confirmation dialog before rescheduling
+- [ ] Show appointment details on hover or click
+- [ ] Add month navigation (previous/next buttons)
+- [ ] Test drag-and-drop functionality
+- [ ] Verify database updates correctly after reschedule

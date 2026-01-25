@@ -41,6 +41,8 @@ export default function Staff() {
     phone: "",
     role: "barber" as "owner" | "manager" | "barber" | "cashier",
     isActive: true,
+    skillLevel: "intermediate" as "beginner" | "intermediate" | "expert",
+    durationMultiplier: "1.00",
   });
 
   const updatePinMutation = trpc.staff.update.useMutation({
@@ -99,8 +101,10 @@ export default function Staff() {
       name: staffMember.name || "",
       email: staffMember.email || "",
       phone: staffMember.phone || "",
-      role: staffMember.role || "user",
+      role: staffMember.role || "barber",
       isActive: staffMember.isActive ?? true,
+      skillLevel: staffMember.skillLevel || "intermediate",
+      durationMultiplier: staffMember.durationMultiplier || "1.00",
     });
     setIsEditDialogOpen(true);
   };
@@ -210,6 +214,25 @@ export default function Staff() {
                         {member.pin ? "****" + member.pin.slice(-2) : "Ikke satt"}
                       </span>
                     </div>
+                    {member.role === "barber" && (
+                      <>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Ferdighetsnivå:</span>
+                          <span className="font-medium">
+                            {member.skillLevel === "beginner" && "Nybegynner"}
+                            {member.skillLevel === "intermediate" && "Middels"}
+                            {member.skillLevel === "expert" && "Ekspert"}
+                            {!member.skillLevel && "Middels"}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Varighet:</span>
+                          <span className="font-medium">
+                            {member.durationMultiplier ? `${(parseFloat(member.durationMultiplier) * 100).toFixed(0)}%` : "100%"}
+                          </span>
+                        </div>
+                      </>
+                    )}
                     <div className="pt-2 border-t">
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -365,6 +388,46 @@ export default function Staff() {
                     <option value="cashier">Kasserer</option>
                     <option value="owner">Eier</option>
                   </select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="edit-skill">Ferdighetsnivå</Label>
+                  <select
+                    id="edit-skill"
+                    value={editFormData.skillLevel}
+                    onChange={(e) => {
+                      const skill = e.target.value as "beginner" | "intermediate" | "expert";
+                      // Auto-set duration multiplier based on skill level
+                      const multipliers = { beginner: "1.50", intermediate: "1.00", expert: "0.80" };
+                      setEditFormData({ 
+                        ...editFormData, 
+                        skillLevel: skill,
+                        durationMultiplier: multipliers[skill]
+                      });
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  >
+                    <option value="beginner">Nybegynner (50% lengre tid)</option>
+                    <option value="intermediate">Middels (normal tid)</option>
+                    <option value="expert">Ekspert (20% raskere)</option>
+                  </select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="edit-multiplier">Varighet multiplikator</Label>
+                  <Input
+                    id="edit-multiplier"
+                    type="number"
+                    step="0.1"
+                    min="0.5"
+                    max="2.0"
+                    value={editFormData.durationMultiplier}
+                    onChange={(e) => setEditFormData({ ...editFormData, durationMultiplier: e.target.value })}
+                    placeholder="1.00"
+                  />
+                  <p className="text-xs text-gray-500">
+                    1.0 = normal tid, 1.5 = 50% lengre, 0.8 = 20% raskere
+                  </p>
                 </div>
                 
                 <div className="flex items-center gap-2">

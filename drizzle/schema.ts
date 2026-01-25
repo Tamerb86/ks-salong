@@ -16,6 +16,8 @@ export const users = mysqlTable("users", {
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["owner", "manager", "barber", "cashier", "customer"]).default("customer").notNull(),
   pin: varchar("pin", { length: 6 }), // For employee POS login
+  skillLevel: mysqlEnum("skillLevel", ["beginner", "intermediate", "expert"]).default("intermediate"),
+  durationMultiplier: decimal("durationMultiplier", { precision: 3, scale: 2 }).default("1.00"), // 1.0 = normal, 1.2 = 20% slower, 1.5 = 50% slower
   twoFactorEnabled: boolean("twoFactorEnabled").default(false).notNull(),
   twoFactorSecret: text("twoFactorSecret"),
   isActive: boolean("isActive").default(true).notNull(),

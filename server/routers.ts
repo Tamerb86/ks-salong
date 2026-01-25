@@ -55,6 +55,8 @@ export const appRouter = router({
         role: z.enum(["owner", "manager", "barber", "cashier"]).optional(),
         pin: z.string().length(6).optional(),
         isActive: z.boolean().optional(),
+        skillLevel: z.enum(["beginner", "intermediate", "expert"]).optional(),
+        durationMultiplier: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
         const { id, ...data } = input;

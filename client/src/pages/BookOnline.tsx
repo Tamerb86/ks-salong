@@ -133,9 +133,26 @@ export default function BookOnline() {
   };
 
   const generateTimeSlots = () => {
+    if (!selectedService || !staff) return [];
+
+    // Get selected staff's duration multiplier
+    let durationMultiplier = 1.0;
+    if (selectedStaff !== "any") {
+      const staffMember = staff.find((s: any) => s.id === parseInt(selectedStaff));
+      if (staffMember && staffMember.durationMultiplier) {
+        durationMultiplier = parseFloat(staffMember.durationMultiplier);
+      }
+    }
+
+    // Calculate actual service duration based on staff skill
+    const baseDuration = selectedService.duration; // in minutes
+    const actualDuration = Math.ceil(baseDuration * durationMultiplier);
+
+    // Generate time slots with appropriate intervals
     const slots = [];
+    const slotInterval = 30; // Fixed 30-minute intervals for simplicity
     for (let hour = 9; hour <= 18; hour++) {
-      for (let min = 0; min < 60; min += 30) {
+      for (let min = 0; min < 60; min += slotInterval) {
         const timeStr = `${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`;
         slots.push(timeStr);
       }
@@ -144,11 +161,23 @@ export default function BookOnline() {
   };
 
   const isTimeSlotAvailable = (date: Date, time: string) => {
-    if (!appointments || !selectedService) return true;
+    if (!appointments || !selectedService || !staff) return true;
+
+    // Get selected staff's duration multiplier
+    let durationMultiplier = 1.0;
+    if (selectedStaff !== "any") {
+      const staffMember = staff.find((s: any) => s.id === parseInt(selectedStaff));
+      if (staffMember && staffMember.durationMultiplier) {
+        durationMultiplier = parseFloat(staffMember.durationMultiplier);
+      }
+    }
+
+    // Calculate actual service duration
+    const actualDuration = Math.ceil(selectedService.duration * durationMultiplier);
 
     const dateStr = format(date, "yyyy-MM-dd");
     const slotDateTime = new Date(`${dateStr}T${time}`);
-    const slotEnd = new Date(slotDateTime.getTime() + selectedService.duration * 60000);
+    const slotEnd = new Date(slotDateTime.getTime() + actualDuration * 60000);
 
     return !appointments.some((apt: any) => {
       if (apt.status === "cancelled") return false;
