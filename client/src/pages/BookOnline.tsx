@@ -20,8 +20,11 @@ import { Calendar, Clock, Loader2, MapPin, Phone, Scissors, User } from "lucide-
 import { useState } from "react";
 import { toast } from "sonner";
 import { Layout } from "@/components/Layout";
+import { useLocation } from "wouter";
 
 export default function BookOnline() {
+  const [location] = useLocation();
+  const isPublicBooking = location === "/book-online";
   const [step, setStep] = useState(1);
   const [selectedService, setSelectedService] = useState<any>(null);
   const [selectedStaff, setSelectedStaff] = useState<string>("any");
@@ -152,18 +155,17 @@ export default function BookOnline() {
     });
   };
 
+  const loadingContent = (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-white to-amber-50">
+      <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+    </div>
+  );
+
   if (servicesLoading || staffLoading) {
-    return (
-      <Layout>
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-white to-amber-50">
-        <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
-      </div>
-      </Layout>
-    );
+    return isPublicBooking ? loadingContent : <Layout>{loadingContent}</Layout>;
   }
 
-  return (
-    <Layout>
+  const bookingContent = (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="bg-gradient-to-r from-purple-600 to-amber-600 text-white py-12">
         <div className="container mx-auto px-6">
@@ -645,6 +647,7 @@ export default function BookOnline() {
         )}
       </div>
     </div>
-    </Layout>
   );
+
+  return isPublicBooking ? bookingContent : <Layout>{bookingContent}</Layout>;
 }

@@ -20,12 +20,15 @@ import Tidsstempling from "./pages/Tidsstempling";
 import Reports from "./pages/Reports";
 import Staff from "./pages/Staff";
 import FikenSyncHistory from "./pages/FikenSyncHistory";
+import Landing from "./pages/Landing";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
+      <Route path={"/"} component={Landing} />
+      <Route path={"/dashboard"} component={Home} />
+      <Route path={"/book-online"} component={BookOnline} />
       <Route path={"/services"} component={Services} />
         <Route path="/products" component={Products} />
         <Route path="/sales" component={Sales} />

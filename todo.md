@@ -804,3 +804,23 @@
 ## Bug Fixes
 - [x] Fix POS Delsum to show subtotal (before MVA) instead of total
 - [x] Fix POS MVA calculation (prices include MVA, extract it correctly)
+
+## Public Landing Website
+- [x] Gather salon information from Facebook/Instagram/norgebeauty.com
+- [x] Download professional salon photos
+- [x] Design landing page with purple gradient branding
+- [x] Add hero section with booking CTA and Norwegian Champion 2022 badge
+- [x] Add services showcase section (6 services with icons)
+- [x] Add gallery section with 3 professional salon photos
+- [x] Add about section with complete salon story
+- [x] Add contact section with address, phone, hours, Google Maps
+- [x] Integrate booking system (all buttons link to /book-online)
+- [x] Remove sidebar from booking page when accessed publicly
+- [x] Make landing page fully responsive for mobile
+- [x] Add Norwegian language content throughout
+- [x] Add footer with social media links (Facebook, Instagram)
+- [x] Add smooth scroll navigation (#om-oss, #tjenester, #kontakt)
+- [x] Add 5-star rating display with review count
+- [ ] Replace placeholder images with real salon photos from owner
+- [ ] Add SEO meta tags (title, description, keywords)
+- [ ] Test booking flow from landing page to completion
