@@ -72,7 +72,7 @@ export default function QueueTV() {
               <Scissors className="h-8 w-8 text-purple-600" />
             </div>
             <div>
-              <h1 className="text-7xl font-bold mb-2">K.S Salong</h1>
+              <h1 className="text-7xl font-bold mb-2">Khalid Salong</h1>
               <p className="text-3xl text-purple-100">Luksus OG Rimelige PRISER!</p>
             </div>
           </div>

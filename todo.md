@@ -1380,3 +1380,9 @@
 - [x] Remove authentication requirement from /book-online page
 - [x] Allow public access to booking page without login
 - [x] Test booking flow works for customers without account
+
+## Branding Update - Change Name to Khalid Salong
+- [x] Update VITE_APP_TITLE environment variable
+- [x] Update all page titles and headers
+- [x] Update meta tags and SEO
+- [x] Update logo text references

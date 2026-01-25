@@ -8,7 +8,7 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 export default function Landing() {
   useEffect(() => {
     // Set SEO meta tags
-    document.title = "K.S Frisør - Norgesmester 2022 | Frisørsalong i Porsgrunn";
+    document.title = "Khalid Salong - Norgesmester 2022 | Frisørsalong i Porsgrunn";
     
     // Update or create meta description
     let metaDescription = document.querySelector('meta[name="description"]');
@@ -17,7 +17,7 @@ export default function Landing() {
       metaDescription.setAttribute('name', 'description');
       document.head.appendChild(metaDescription);
     }
-    metaDescription.setAttribute('content', 'K.S Frisør - Prisbelønt frisørsalong i Porsgrunn. Norgesmester 2022. Profesjonelle tjenester for herre og dame. Book time online. 5 stjerner fra 55+ fornøyde kunder.');
+    metaDescription.setAttribute('content', 'Khalid Salong - Prisbelønt frisørsalong i Porsgrunn. Norgesmester 2022. Profesjonelle tjenester for herre og dame. Book time online. 5 stjerner fra 55+ fornøyde kunder.');
     
     // Update or create meta keywords
     let metaKeywords = document.querySelector('meta[name="keywords"]');
@@ -26,7 +26,7 @@ export default function Landing() {
       metaKeywords.setAttribute('name', 'keywords');
       document.head.appendChild(metaKeywords);
     }
-    metaKeywords.setAttribute('content', 'frisør porsgrunn, herreklipp, dameklipp, skjegg trim, hårfarge, K.S Frisør, norgesmester frisør, beste frisør porsgrunn');
+    metaKeywords.setAttribute('content', 'frisør porsgrunn, herreklipp, dameklipp, skjegg trim, hårfarge, Khalid Salong, norgesmester frisør, beste frisør porsgrunn');
   }, []);
 
   return (
@@ -36,7 +36,7 @@ export default function Landing() {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <Scissors className="h-8 w-8 text-purple-600" />
-            <span className="text-2xl font-bold text-gray-900">K.S Frisør</span>
+            <span className="text-2xl font-bold text-gray-900">Khalid Salong</span>
           </div>
           <div className="hidden md:flex gap-6">
             <a href="#om-oss" className="text-gray-700 hover:text-purple-600 transition">Om oss</a>
@@ -66,7 +66,7 @@ export default function Landing() {
             Norgesmester 2022
           </div>
           <h1 className="text-5xl md:text-6xl font-bold mb-6">
-            Velkommen til K.S Frisør
+            Velkommen til Khalid Salong
           </h1>
           <p className="text-xl md:text-2xl mb-8 text-gray-200">
             Luksus og rimelige priser i hjertet av Porsgrunn
@@ -143,15 +143,15 @@ export default function Landing() {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-4xl font-bold mb-6 text-gray-900">Om K.S Frisør</h2>
+              <h2 className="text-4xl font-bold mb-6 text-gray-900">Om Khalid Salong</h2>
               <p className="text-lg text-gray-700 mb-4 leading-relaxed">
-                Velkommen til K.S Frisør, en ledende frisørsalong i hjertet av Porsgrunn. 
+                Velkommen til Khalid Salong, en ledende frisørsalong i hjertet av Porsgrunn. 
                 Beliggende i Storgata 122, tilbyr denne salongen topp kvalitet hårpleietjenester 
                 som har fått strålende anmeldelser fra kundene.
               </p>
               <p className="text-lg text-gray-700 mb-4 leading-relaxed">
                 Med en imponerende gjennomsnittsvurdering på 5 av 5 fra hele 55 anmeldelser, 
-                skiller K.S Frisør seg ut som et enestående valg for de som søker det beste innen hårpleie.
+                skiller Khalid Salong seg ut som et enestående valg for de som søker det beste innen hårpleie.
               </p>
               <p className="text-lg text-gray-700 mb-6 leading-relaxed">
                 I denne moderne og stilfulle salongen serveres kundene av høyt kvalifiserte frisører 
@@ -167,7 +167,7 @@ export default function Landing() {
             <div className="relative">
               <img 
                 src="/images/champion-2022.png" 
-                alt="K.S Frisør Interior" 
+                alt="Khalid Salong Interior" 
                 className="rounded-lg shadow-2xl"
               />
               <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-lg shadow-xl">
@@ -430,7 +430,7 @@ export default function Landing() {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Scissors className="h-6 w-6 text-purple-400" />
-                <span className="text-xl font-bold text-white">K.S Frisør</span>
+                <span className="text-xl font-bold text-white">Khalid Salong</span>
               </div>
               <p className="text-sm">
                 Norgesmester 2022 i frisørfaget. Luksus og rimelige priser i Porsgrunn.
@@ -461,7 +461,7 @@ export default function Landing() {
           </div>
 
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm">
-            <p>&copy; 2026 K.S Frisør. Alle rettigheter reservert.</p>
+            <p>&copy; 2026 Khalid Salong. Alle rettigheter reservert.</p>
             <Link href="/dashboard-login">
               <button className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-all shadow-md hover:shadow-lg">
                 <Lock className="h-4 w-4" />

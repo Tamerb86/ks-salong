@@ -601,7 +601,7 @@ export default function POS() {
           {lastReceipt && (
             <div className="receipt-print space-y-4 py-4 print:p-4">
               <div className="text-center border-b pb-4 print:border-dashed">
-                <h2 className="text-xl font-bold print:text-2xl">K.S Salong</h2>
+                <h2 className="text-xl font-bold print:text-2xl">Khalid Salong</h2>
                 <p className="text-sm text-gray-600">Professional Hair Salon</p>
                 <p className="text-xs text-gray-500 mt-1">Adresse: [Din adresse]</p>
                 <p className="text-xs text-gray-500">Telefon: [Ditt telefonnummer]</p>
