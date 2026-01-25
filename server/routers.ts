@@ -396,6 +396,31 @@ export const appRouter = router({
         };
       }),
     
+    // List all appointments
+    list: protectedProcedure
+      .query(async () => {
+        const today = new Date();
+        const endDate = new Date(today);
+        endDate.setMonth(endDate.getMonth() + 3); // Next 3 months
+        
+        return await db.getAppointmentsByDateRange(
+          today.toISOString().split('T')[0],
+          endDate.toISOString().split('T')[0]
+        );
+      }),
+    
+    // Cancel appointment
+    cancel: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        await db.updateAppointment(input.id, {
+          status: "cancelled",
+          cancelledAt: new Date(),
+          cancelledBy: ctx.user!.id
+        });
+        return { success: true };
+      }),
+    
     // Check payment status
     checkPaymentStatus: publicProcedure
       .input(z.object({

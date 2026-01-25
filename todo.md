@@ -1108,3 +1108,27 @@
 - [ ] Test PDF export with sample data
 - [ ] Test automated daily report generation
 - [ ] Verify weekend overtime calculation
+
+## Fix MonthlyCalendar Date Parsing Error
+- [x] Fix dateString.split error in MonthlyCalendar.tsx
+- [x] Ensure appointmentDate is converted to string before parseISO
+- [ ] Test Appointments page loads without errors
+
+## Test Appointment Management
+- [ ] Test appointment cancellation from Dashboard
+- [ ] Test appointment editing/rescheduling
+- [ ] Verify status updates reflect in Dashboard
+
+## Appointment Editing and Cancellation
+- [x] Add appointments.list endpoint to get all appointments
+- [x] Add appointments.cancel endpoint to cancel appointments
+- [x] Create list view in Appointments page with table
+- [x] Add Edit button for each appointment
+- [x] Add Cancel button for each appointment
+- [x] Create Edit dialog with date and time inputs
+- [x] Create Cancel confirmation dialog
+- [x] Connect to backend mutations
+- [x] Test editing appointment in browser
+- [x] Test cancelling appointment in browser
+- [x] Verify status updates in Dashboard
+- [x] All tests passed successfully

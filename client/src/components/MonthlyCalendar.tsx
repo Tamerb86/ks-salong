@@ -118,7 +118,11 @@ export function MonthlyCalendar() {
   const appointmentsByDate = useMemo(() => {
     const grouped: Record<string, Appointment[]> = {};
     appointments.forEach((apt: any) => {
-      const dateKey = format(parseISO(apt.appointmentDate), "yyyy-MM-dd");
+      // Handle both Date objects and ISO strings
+      const date = apt.appointmentDate instanceof Date 
+        ? apt.appointmentDate 
+        : parseISO(String(apt.appointmentDate));
+      const dateKey = format(date, "yyyy-MM-dd");
       if (!grouped[dateKey]) {
         grouped[dateKey] = [];
       }
