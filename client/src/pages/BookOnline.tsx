@@ -173,7 +173,23 @@ export default function BookOnline() {
       const hour = Math.floor(timeInMinutes / 60);
       const min = timeInMinutes % 60;
       const timeStr = `${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`;
-      if (hour >= 9 && hour < 20) { // Safety check: only 9:00-19:xx
+      
+      // Check if this time slot falls within staff break time
+      let isDuringBreak = false;
+      if (staffMember?.breakStartTime && staffMember?.breakEndTime) {
+        const [breakStartHour, breakStartMin] = staffMember.breakStartTime.split(":").map(Number);
+        const [breakEndHour, breakEndMin] = staffMember.breakEndTime.split(":").map(Number);
+        const breakStart = breakStartHour * 60 + breakStartMin;
+        const breakEnd = breakEndHour * 60 + breakEndMin;
+        const slotEnd = timeInMinutes + actualDuration;
+        
+        // Check if slot overlaps with break time
+        isDuringBreak = (timeInMinutes >= breakStart && timeInMinutes < breakEnd) || 
+                        (slotEnd > breakStart && slotEnd <= breakEnd) ||
+                        (timeInMinutes <= breakStart && slotEnd >= breakEnd);
+      }
+      
+      if (hour >= 9 && hour < 20 && !isDuringBreak) { // Safety check: only 9:00-19:xx and not during break
         slots.push(timeStr);
       }
     }

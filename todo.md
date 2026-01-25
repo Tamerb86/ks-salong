@@ -1132,3 +1132,10 @@
 - [x] Add Åpningstider tab in Settings page
 - [ ] Create business hours form for each day of the week
 - [x] Update BookOnline to use dynamic closing time from settings
+
+## Add Staff Break Time Feature
+- [x] Add breakStartTime and breakEndTime fields to users table schema
+- [ ] Add break time fields in Staff management page UI
+- [ ] Update backend API to handle break time updates
+- [ ] Update BookOnline to filter out break times from available slots
+- [ ] Test break time functionality with different scenarios

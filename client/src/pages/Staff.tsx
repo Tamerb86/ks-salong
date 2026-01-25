@@ -43,6 +43,9 @@ export default function Staff() {
     isActive: true,
     skillLevel: "intermediate" as "beginner" | "intermediate" | "expert",
     durationMultiplier: "1.00",
+    bookingSlotInterval: 15,
+    breakStartTime: "",
+    breakEndTime: "",
   });
 
   const updatePinMutation = trpc.staff.update.useMutation({
@@ -106,6 +109,8 @@ export default function Staff() {
       skillLevel: staffMember.skillLevel || "intermediate",
       durationMultiplier: staffMember.durationMultiplier || "1.00",
       bookingSlotInterval: staffMember.bookingSlotInterval || 15,
+      breakStartTime: staffMember.breakStartTime || "",
+      breakEndTime: staffMember.breakEndTime || "",
     });
     setIsEditDialogOpen(true);
   };
@@ -444,6 +449,34 @@ export default function Staff() {
                   </select>
                   <p className="text-xs text-gray-500">
                     Bestemmer hvor ofte tidspunkter vises i online booking
+                  </p>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="edit-break-start">Pausetid start (valgfritt)</Label>
+                  <Input
+                    id="edit-break-start"
+                    type="time"
+                    value={editFormData.breakStartTime || ""}
+                    onChange={(e) => setEditFormData({ ...editFormData, breakStartTime: e.target.value })}
+                    placeholder="12:00"
+                  />
+                  <p className="text-xs text-gray-500">
+                    Start på pausetid (f.eks. 12:00)
+                  </p>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="edit-break-end">Pausetid slutt (valgfritt)</Label>
+                  <Input
+                    id="edit-break-end"
+                    type="time"
+                    value={editFormData.breakEndTime || ""}
+                    onChange={(e) => setEditFormData({ ...editFormData, breakEndTime: e.target.value })}
+                    placeholder="13:00"
+                  />
+                  <p className="text-xs text-gray-500">
+                    Slutt på pausetid (f.eks. 13:00)
                   </p>
                 </div>
                 

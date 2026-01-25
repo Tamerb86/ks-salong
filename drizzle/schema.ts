@@ -19,6 +19,8 @@ export const users = mysqlTable("users", {
   skillLevel: mysqlEnum("skillLevel", ["beginner", "intermediate", "expert"]).default("intermediate"),
   durationMultiplier: decimal("durationMultiplier", { precision: 3, scale: 2 }).default("1.00"), // 1.0 = normal, 1.2 = 20% slower, 1.5 = 50% slower
   bookingSlotInterval: int("bookingSlotInterval").default(15).notNull(), // minutes: 15 or 30
+  breakStartTime: varchar("breakStartTime", { length: 5 }), // Format: HH:MM (e.g., "12:00")
+  breakEndTime: varchar("breakEndTime", { length: 5 }), // Format: HH:MM (e.g., "13:00")
   twoFactorEnabled: boolean("twoFactorEnabled").default(false).notNull(),
   twoFactorSecret: text("twoFactorSecret"),
   isActive: boolean("isActive").default(true).notNull(),
