@@ -1391,7 +1391,11 @@ export const appRouter = router({
           throw new TRPCError({ code: "BAD_REQUEST", message: result.error });
         }
         
-        return { success: true, employee: { id: employee.id, name: employee.name, role: employee.role }, timeEntry: result?.entry || { clockIn: new Date() } };
+        if (!result || !('entry' in result)) {
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to clock in" });
+        }
+        
+        return { success: true, employee: { id: employee.id, name: employee.name, role: employee.role }, timeEntry: result.entry };
       }),
     
     // Clock out
@@ -1418,7 +1422,7 @@ export const appRouter = router({
           throw new TRPCError({ code: "BAD_REQUEST", message: result.error });
         }
         
-        return { success: true, employee: { id: employee.id, name: employee.name, role: employee.role }, timeEntry: result?.entry || { clockOut: new Date() } };
+        return { success: true, employee: { id: employee.id, name: employee.name, role: employee.role }, totalMinutes: result.totalMinutes, overtimeMinutes: result.overtimeMinutes };
       }),
     
     // Get currently clocked in employees
