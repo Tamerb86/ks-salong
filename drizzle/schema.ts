@@ -284,6 +284,12 @@ export const salonSettings = mysqlTable("salonSettings", {
   stripeConnectEnabled: boolean("stripeConnectEnabled").default(false).notNull(),
   stripeConnectAccountId: text("stripeConnectAccountId"),
   platformFeePercent: decimal("platformFeePercent", { precision: 5, scale: 2 }).default("0.00"),
+  // Fiken Accounting Integration
+  fikenEnabled: boolean("fikenEnabled").default(false).notNull(),
+  fikenApiToken: text("fikenApiToken"),
+  fikenCompanySlug: varchar("fikenCompanySlug", { length: 255 }),
+  fikenLastSyncDate: timestamp("fikenLastSyncDate"),
+  fikenAutoSync: boolean("fikenAutoSync").default(false).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

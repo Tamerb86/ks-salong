@@ -4,6 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, adminProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
+import * as fiken from "./fiken";
 import { TRPCError } from "@trpc/server";
 
 export const appRouter = router({
@@ -492,6 +493,153 @@ export const appRouter = router({
         
         return { success: true };
       }),
+    
+    // Fiken Integration
+    syncToFiken: protectedProcedure
+      .input(z.object({
+        orderId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        // Get settings
+        const settings = await db.getSalonSettings();
+        
+        if (!settings || !settings.fikenEnabled || !settings.fikenApiToken || !settings.fikenCompanySlug) {
+          throw new TRPCError({ 
+            code: "PRECONDITION_FAILED", 
+            message: "Fiken integration is not configured" 
+          });
+        }
+        
+        // Get order details
+        const order = await db.getOrderById(input.orderId);
+        if (!order) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Order not found" });
+        }
+        
+        const items = await db.getOrderItems(input.orderId);
+        
+        // Sync to Fiken
+        const result = await fiken.syncOrderToFiken(
+          settings.fikenApiToken,
+          settings.fikenCompanySlug,
+          {
+            orderNumber: order.orderNumber,
+            createdAt: new Date(order.createdAt),
+            orderItems: items,
+            customerId: order.customerId || undefined,
+          }
+        );
+        
+        if (!result.success) {
+          throw new TRPCError({ 
+            code: "INTERNAL_SERVER_ERROR", 
+            message: result.error || "Failed to sync to Fiken" 
+          });
+        }
+        
+        return { success: true, saleId: result.saleId };
+      }),
+    
+    syncDailyToFiken: protectedProcedure
+      .input(z.object({
+        date: z.string(), // YYYY-MM-DD
+      }))
+      .mutation(async ({ input }) => {
+        // Get settings
+        const settings = await db.getSalonSettings();
+        
+        if (!settings || !settings.fikenEnabled || !settings.fikenApiToken || !settings.fikenCompanySlug) {
+          throw new TRPCError({ 
+            code: "PRECONDITION_FAILED", 
+            message: "Fiken integration is not configured" 
+          });
+        }
+        
+        // Get all completed orders for the date
+        const orders = await db.getOrdersByFilters({
+          dateFrom: input.date,
+          dateTo: input.date,
+        });
+        
+        const completedOrders = orders.filter(o => o.status === "completed");
+        
+        let synced = 0;
+        let failed = 0;
+        const errors: string[] = [];
+        
+        for (const order of completedOrders) {
+          const items = await db.getOrderItems(order.id);
+          
+          const result = await fiken.syncOrderToFiken(
+            settings.fikenApiToken,
+            settings.fikenCompanySlug,
+            {
+              orderNumber: order.orderNumber,
+              createdAt: new Date(order.createdAt),
+              orderItems: items,
+              customerId: order.customerId || undefined,
+            }
+          );
+          
+          if (result.success) {
+            synced++;
+          } else {
+            failed++;
+            errors.push(`${order.orderNumber}: ${result.error}`);
+          }
+        }
+        
+        // Update last sync date
+        await db.updateSalonSettings({ fikenLastSyncDate: new Date() });
+        
+        return { 
+          success: true, 
+          synced, 
+          failed, 
+          total: completedOrders.length,
+          errors 
+        };
+      }),
+    
+    verifyFikenTotals: protectedProcedure
+      .input(z.object({
+        dateFrom: z.string(), // YYYY-MM-DD
+        dateTo: z.string(), // YYYY-MM-DD
+      }))
+      .query(async ({ input }) => {
+        // Get settings
+        const settings = await db.getSalonSettings();
+        
+        if (!settings || !settings.fikenEnabled || !settings.fikenApiToken || !settings.fikenCompanySlug) {
+          throw new TRPCError({ 
+            code: "PRECONDITION_FAILED", 
+            message: "Fiken integration is not configured" 
+          });
+        }
+        
+        // Get K.S Salong total
+        const orders = await db.getOrdersByFilters({
+          dateFrom: input.dateFrom,
+          dateTo: input.dateTo,
+        });
+        
+        const completedOrders = orders.filter(o => o.status === "completed");
+        const ksSalongTotal = completedOrders.reduce(
+          (sum, order) => sum + parseFloat(order.total),
+          0
+        );
+        
+        // Verify with Fiken
+        const verification = await fiken.verifyTotals(
+          settings.fikenApiToken,
+          settings.fikenCompanySlug,
+          input.dateFrom,
+          input.dateTo,
+          ksSalongTotal
+        );
+        
+        return verification;
+      }),
   }),
 
   payments: router({
@@ -574,6 +722,10 @@ export const appRouter = router({
         requirePaymentForBooking: z.boolean().optional(),
         autoLogoutTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/).optional(), // HH:MM format
         universalPin: z.string().length(4).or(z.string().length(6)).optional(),
+        fikenEnabled: z.boolean().optional(),
+        fikenApiToken: z.string().optional(),
+        fikenCompanySlug: z.string().optional(),
+        fikenAutoSync: z.boolean().optional(),
       }))
       .mutation(async ({ input }) => {
         await db.updateSalonSettings(input);
@@ -595,6 +747,24 @@ export const appRouter = router({
         const { dayOfWeek, ...data } = input;
         await db.updateBusinessHours(dayOfWeek, data);
         return { success: true };
+      }),
+    
+    // Fiken Integration
+    testFikenConnection: adminProcedure
+      .input(z.object({
+        apiToken: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        return await fiken.testFikenConnection(input.apiToken);
+      }),
+    
+    getFikenCompanies: adminProcedure
+      .input(z.object({
+        apiToken: z.string(),
+      }))
+      .query(async ({ input }) => {
+        const result = await fiken.testFikenConnection(input.apiToken);
+        return result.companies || [];
       }),
   }),
 

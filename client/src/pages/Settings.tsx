@@ -23,12 +23,16 @@ import {
   Briefcase,
   FileText,
   DollarSign,
+  Calculator,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Layout } from "@/components/Layout";
+import { FikenTab } from "@/components/FikenTab";
 
-type TabId = "overview" | "google-calendar" | "notifications" | "booking" | "payment" | "staff" | "goals" | "workplan" | "conflicts" | "reports" | "history";
+type TabId = "overview" | "google-calendar" | "notifications" | "booking" | "payment" | "staff" | "fiken" | "goals" | "workplan" | "conflicts" | "reports" | "history";
 
 interface Tab {
   id: TabId;
@@ -43,6 +47,7 @@ const tabs: Tab[] = [
   { id: "booking", label: "Booking", icon: <Clock className="h-4 w-4" /> },
   { id: "payment", label: "Betaling", icon: <DollarSign className="h-4 w-4" /> },
   { id: "staff", label: "Ansatte", icon: <Users className="h-4 w-4" /> },
+  { id: "fiken", label: "Fiken Regnskap", icon: <Calculator className="h-4 w-4" /> },
   { id: "reports", label: "Rapporter", icon: <BarChart3 className="h-4 w-4" /> },
 ];
 
@@ -645,6 +650,10 @@ export default function Settings() {
                   </div>
                 </CardContent>
               </Card>
+            )}
+
+            {activeTab === "fiken" && (
+              <FikenTab />
             )}
 
             {activeTab === "reports" && (

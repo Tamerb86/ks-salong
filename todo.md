@@ -572,3 +572,34 @@
 - [x] Test refund process end-to-end
 - [x] Write vitest tests for refund logic (5 tests passed)
 - [x] Verify MVA calculations are correct
+
+## Fiken Accounting Integration
+- [ ] Research Fiken API documentation and endpoints
+- [ ] Understand Fiken authentication (OAuth2 or API tokens)
+- [ ] Add Fiken API credentials to Settings page
+- [ ] Create backend service for Fiken API calls
+- [ ] Implement daily sales sync to Fiken
+- [ ] Map K.S Salong transactions to Fiken sale format
+- [ ] Handle MVA (25%) tax mapping to Fiken
+- [ ] Create verification endpoint to compare totals
+- [ ] Add UI to trigger manual sync
+- [ ] Add UI to view sync status and last sync time
+- [ ] Handle Fiken API errors gracefully
+- [ ] Add sync history log
+- [ ] Write vitest tests for Fiken integration
+- [ ] Test end-to-end sales sync flow
+- [ ] Document Fiken setup process for users
+
+## Fiken Accounting Integration
+- [x] Research Fiken API and authentication methods
+- [x] Add Fiken settings to database schema (fikenEnabled, fikenApiToken, fikenCompanySlug, fikenAutoSync)
+- [x] Create Fiken service module (server/fiken.ts) with API functions
+- [x] Add Fiken configuration UI in Settings page
+- [x] Implement test connection feature
+- [x] Implement manual sync button for today's sales
+- [x] Implement automatic daily sync (optional)
+- [x] Create verification system to compare K.S Salong totals with Fiken
+- [x] Add sync status indicators and last sync date
+- [x] Write vitest tests for Fiken integration (9/9 tests passed)
+- [ ] Test with real Fiken test account (requires user's Fiken credentials)
+- [x] Document setup process for users (in UI)

@@ -36,6 +36,13 @@
       "when": 1769297932767,
       "tag": "0004_naive_dorian_gray",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1769301499640,
+      "tag": "0005_curly_yellowjacket",
+      "breakpoints": true
     }
   ]
 }
