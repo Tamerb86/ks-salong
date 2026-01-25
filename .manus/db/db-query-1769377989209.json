@@ -1,0 +1,25 @@
+{
+  "query": "SELECT id, name, duration FROM services WHERE name LIKE '%Herreklipp%' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZWkmDdVMGTAoV.aeceea61840d --database oUNZ2iw3V7HdbF8pGMTUk4 --execute SELECT id, name, duration FROM services WHERE name LIKE '%Herreklipp%' LIMIT 5;",
+  "rows": [
+    {
+      "id": "11",
+      "name": "Herreklipp",
+      "duration": "30"
+    },
+    {
+      "id": "180034",
+      "name": "Herreklipp",
+      "duration": "30"
+    },
+    {
+      "id": "180035",
+      "name": "Herreklipp + Skjegg",
+      "duration": "45"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tduration\n11\tHerreklipp\t30\n180034\tHerreklipp\t30\n180035\tHerreklipp + Skjegg\t45\n",
+  "stderr": "",
+  "execution_time_ms": 93
+}

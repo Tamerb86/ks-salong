@@ -1122,3 +1122,8 @@
 ## Remove Duration and Første ledige from BookOnline
 - [x] Remove service duration display from service cards
 - [x] Remove "Første ledige" option from staff selection
+
+## Set Last Booking End Time to 19:45
+- [ ] Check if closingTime exists in salonSettings table
+- [ ] Update BookOnline to calculate last available slot based on service duration
+- [ ] Ensure appointments end by 19:45 (e.g., 15min service → last slot 19:30, 30min → 19:15)

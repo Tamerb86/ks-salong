@@ -153,9 +153,20 @@ export default function BookOnline() {
     // Use staff-specific booking slot interval, fallback to 15 minutes
     const staffMember = staff?.find((s: any) => s.id === parseInt(selectedStaff));
     const slotInterval = staffMember?.bookingSlotInterval || 15;
-    for (let hour = 9; hour <= 18; hour++) {
-      for (let min = 0; min < 60; min += slotInterval) {
-        const timeStr = `${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`;
+    
+    // Last appointment must end by 19:45
+    const closingTime = 19 * 60 + 45; // 19:45 in minutes
+    const rawLastStartTime = closingTime - actualDuration; // Calculate last possible start time
+    // Round down to nearest slot interval to ensure we don't skip the last valid slot
+    const lastStartTime = Math.floor(rawLastStartTime / slotInterval) * slotInterval;
+    
+    // Generate slots from 9:00 until lastStartTime
+    const startTime = 9 * 60; // 9:00 in minutes
+    for (let timeInMinutes = startTime; timeInMinutes <= lastStartTime; timeInMinutes += slotInterval) {
+      const hour = Math.floor(timeInMinutes / 60);
+      const min = timeInMinutes % 60;
+      const timeStr = `${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`;
+      if (hour >= 9 && hour < 20) { // Safety check: only 9:00-19:xx
         slots.push(timeStr);
       }
     }
