@@ -17,6 +17,7 @@ import {
   ChevronLeft,
   Menu,
   Package,
+  CreditCard,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
@@ -48,6 +49,11 @@ const navItems: NavItem[] = [
     title: "POS",
     href: "/pos",
     icon: DollarSign,
+  },
+  {
+    title: "Betalingshistorikk",
+    href: "/payment-history",
+    icon: CreditCard,
   },
   {
     title: "Kunder",

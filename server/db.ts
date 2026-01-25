@@ -338,6 +338,7 @@ export async function getAppointmentById(id: number) {
     startTime: appointments.startTime,
     endTime: appointments.endTime,
     status: appointments.status,
+    paymentStatus: appointments.paymentStatus,
     notes: appointments.notes,
     customer: {
       id: customers.id,
@@ -696,6 +697,64 @@ export async function getPaymentsByAppointmentId(appointmentId: number) {
     .from(payments)
     .where(eq(payments.appointmentId, appointmentId))
     .orderBy(desc(payments.createdAt));
+}
+
+/**
+ * Get all payments with optional filters
+ */
+export async function getPayments(filters?: {
+  startDate?: string;
+  endDate?: string;
+  status?: string;
+  method?: string;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+
+  let query = db
+    .select({
+      id: payments.id,
+      appointmentId: payments.appointmentId,
+      customerId: payments.customerId,
+      amount: payments.amount,
+      currency: payments.currency,
+      method: payments.method,
+      status: payments.status,
+      provider: payments.provider,
+      providerTransactionId: payments.providerTransactionId,
+      providerPaymentIntentId: payments.providerPaymentIntentId,
+      paidAt: payments.paidAt,
+      createdAt: payments.createdAt,
+      customerName: sql<string>`CONCAT(${customers.firstName}, ' ', ${customers.lastName})`.as('customerName'),
+    })
+    .from(payments)
+    .leftJoin(customers, eq(payments.customerId, customers.id));
+
+  const conditions = [];
+
+  if (filters?.startDate) {
+    conditions.push(gte(payments.createdAt, new Date(filters.startDate)));
+  }
+
+  if (filters?.endDate) {
+    const endDate = new Date(filters.endDate);
+    endDate.setHours(23, 59, 59, 999);
+    conditions.push(lte(payments.createdAt, endDate));
+  }
+
+  if (filters?.status) {
+    conditions.push(eq(payments.status, filters.status as any));
+  }
+
+  if (filters?.method) {
+    conditions.push(eq(payments.method, filters.method as any));
+  }
+
+  if (conditions.length > 0) {
+    query = query.where(and(...conditions)) as any;
+  }
+
+  return await query.orderBy(desc(payments.createdAt));
 }
 
 /**

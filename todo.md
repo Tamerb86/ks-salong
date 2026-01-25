@@ -1306,3 +1306,27 @@
 - [ ] Create setup guide for WisePOS E configuration
 - [ ] Add troubleshooting section for common errors
 - [ ] Create checkpoint after implementation
+
+## Stripe Terminal Integration with Appointments
+- [x] Add "Betal med Terminal" button in Appointments page for completed appointments
+- [x] Create Terminal payment dialog component with reader selection
+- [x] Pass appointment ID and total amount to Terminal payment flow
+- [x] Update appointment paymentStatus after successful Terminal payment
+- [x] Link Terminal payment record to appointment in database
+- [x] Show payment confirmation in appointment details
+
+## WisePOS E Setup Guide
+- [x] Create comprehensive setup documentation (WISEPOS_SETUP.md)
+- [x] Document steps to create Terminal Location in Stripe Dashboard
+- [x] Add instructions for pairing WisePOS E reader
+- [x] Include troubleshooting section for common issues
+- [ ] Add setup guide link in Settings page under Stripe Terminal section
+
+## Payment History Page
+- [x] Create Betalingshistorikk page to display all Terminal payments
+- [x] Add filters for date range, payment status, and amount
+- [x] Display payment details (amount, date, reader, status, appointment link)
+- [x] Add receipt printing functionality for each payment
+- [x] Show payment statistics (total, average, count)
+- [ ] Add export to Excel/PDF functionality
+- [x] Link payments to appointments when applicable

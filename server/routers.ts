@@ -278,6 +278,7 @@ export const appRouter = router({
         startTime: z.string().optional(),
         endTime: z.string().optional(),
         status: z.enum(["pending", "confirmed", "checked_in", "no_show", "cancelled", "completed"]).optional(),
+        paymentStatus: z.enum(["pending", "paid", "refunded"]).optional(),
         notes: z.string().optional(),
         cancellationReason: z.string().optional(),
       }))
@@ -1034,6 +1035,17 @@ export const appRouter = router({
   }),
 
   payments: router({
+    list: protectedProcedure
+      .input(z.object({
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+        status: z.enum(["pending", "initiated", "authorized", "captured", "refunded", "failed", "cancelled", "expired"]).optional(),
+        method: z.string().optional(),
+      }))
+      .query(async ({ input }) => {
+        return await db.getPayments(input);
+      }),
+    
     create: protectedProcedure
       .input(z.object({
         orderId: z.number().optional(),
