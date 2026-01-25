@@ -31,9 +31,10 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Layout } from "@/components/Layout";
 import { FikenTab } from "@/components/FikenTab";
+import { BusinessHoursTab } from "@/components/BusinessHoursTab";
 import { QRCodeSVG } from "qrcode.react";
 
-type TabId = "overview" | "google-calendar" | "notifications" | "booking" | "payment" | "staff" | "fiken" | "goals" | "workplan" | "conflicts" | "reports" | "history";
+type TabId = "overview" | "google-calendar" | "notifications" | "booking" | "payment" | "staff" | "fiken" | "goals" | "workplan" | "conflicts" | "reports" | "history" | "business-hours";
 
 interface Tab {
   id: TabId;
@@ -43,6 +44,7 @@ interface Tab {
 
 const tabs: Tab[] = [
   { id: "overview", label: "Oversikt", icon: <SettingsIcon className="h-4 w-4" /> },
+  { id: "business-hours", label: "Åpningstider", icon: <Clock className="h-4 w-4" /> },
   { id: "google-calendar", label: "Google Calendar", icon: <Calendar className="h-4 w-4" /> },
   { id: "notifications", label: "Varsler", icon: <Bell className="h-4 w-4" /> },
   { id: "booking", label: "Booking", icon: <Clock className="h-4 w-4" /> },
@@ -271,6 +273,10 @@ export default function Settings() {
                   </div>
                 </CardContent>
               </Card>
+            )}
+
+            {activeTab === "business-hours" && (
+              <BusinessHoursTab />
             )}
 
             {activeTab === "google-calendar" && (

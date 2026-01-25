@@ -1127,3 +1127,8 @@
 - [ ] Check if closingTime exists in salonSettings table
 - [ ] Update BookOnline to calculate last available slot based on service duration
 - [ ] Ensure appointments end by 19:45 (e.g., 15min service → last slot 19:30, 30min → 19:15)
+
+## Add Business Hours Tab in Settings
+- [x] Add Åpningstider tab in Settings page
+- [ ] Create business hours form for each day of the week
+- [x] Update BookOnline to use dynamic closing time from settings

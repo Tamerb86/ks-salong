@@ -48,6 +48,7 @@ export default function BookOnline() {
   }, [selectedDate]);
 
   const { data: services, isLoading: servicesLoading } = trpc.services.list.useQuery();
+  const { data: businessHours } = trpc.settings.getBusinessHours.useQuery();
   const { data: staff, isLoading: staffLoading } = trpc.staff.list.useQuery();
   const { data: settings } = trpc.settings.get.useQuery();
   const { data: appointments } = trpc.appointments.listByDate.useQuery(
@@ -154,8 +155,14 @@ export default function BookOnline() {
     const staffMember = staff?.find((s: any) => s.id === parseInt(selectedStaff));
     const slotInterval = staffMember?.bookingSlotInterval || 15;
     
-    // Last appointment must end by 19:45
-    const closingTime = 19 * 60 + 45; // 19:45 in minutes
+    // Get closing time for the selected day from business hours
+    const dayOfWeek = selectedDate?.getDay() || 0;
+    const dayHours = businessHours?.find((bh: any) => bh.dayOfWeek === dayOfWeek);
+    const closeTimeStr = dayHours?.closeTime || "19:45";
+    const [closeHour, closeMinute] = closeTimeStr.split(":").map(Number);
+    const closingTime = closeHour * 60 + closeMinute;
+    
+    // Last appointment must end by closing time
     const rawLastStartTime = closingTime - actualDuration; // Calculate last possible start time
     // Round down to nearest slot interval to ensure we don't skip the last valid slot
     const lastStartTime = Math.floor(rawLastStartTime / slotInterval) * slotInterval;
