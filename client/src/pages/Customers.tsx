@@ -23,10 +23,12 @@ import {
   Loader2,
   Mail,
   Phone,
+  Plus,
   Search,
   TrendingUp,
   User,
   Users,
+  UserPlus,
 } from "lucide-react";
 import { useState } from "react";
 import { useLocation } from "wouter";
@@ -38,6 +40,13 @@ export default function Customers() {
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [newCustomer, setNewCustomer] = useState({
+    firstName: "",
+    lastName: "",
+    phone: "",
+    email: "",
+  });
 
   const { data: customers, isLoading } = trpc.customers.list.useQuery(undefined, {
     refetchInterval: 30000, // Refetch every 30 seconds for real-time updates
@@ -54,6 +63,15 @@ export default function Customers() {
     { customerId: selectedCustomerId! },
     { enabled: !!selectedCustomerId }
   );
+
+  const utils = trpc.useUtils();
+  const createCustomerMutation = trpc.customers.create.useMutation({
+    onSuccess: () => {
+      utils.customers.list.invalidate();
+      setCreateDialogOpen(false);
+      setNewCustomer({ firstName: "", lastName: "", phone: "", email: "" });
+    },
+  });
 
   const filteredCustomers = customers?.customers?.filter((customer: any) => {
     const query = searchQuery.toLowerCase();
@@ -103,19 +121,28 @@ export default function Customers() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-3 bg-gradient-to-br from-purple-600 to-amber-600 rounded-xl">
-              <Users className="h-8 w-8 text-white" />
-            </div>
-            <div>
-              <div className="flex items-center gap-3">
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-amber-600 bg-clip-text text-transparent">
-                  Kunder
-                </h1>
-                <LiveBadge text="Live" />
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-gradient-to-br from-purple-600 to-amber-600 rounded-xl">
+                <Users className="h-8 w-8 text-white" />
               </div>
-              <p className="text-gray-600">Administrer kundedatabase og CRM</p>
+              <div>
+                <div className="flex items-center gap-3">
+                  <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-amber-600 bg-clip-text text-transparent">
+                    Kunder
+                  </h1>
+                  <LiveBadge text="Live" />
+                </div>
+                <p className="text-gray-600">Administrer kundedatabase og CRM</p>
+              </div>
             </div>
+            <Button
+              onClick={() => setCreateDialogOpen(true)}
+              className="bg-gradient-to-r from-purple-600 to-amber-600 hover:from-purple-700 hover:to-amber-700"
+            >
+              <UserPlus className="h-4 w-4 mr-2" />
+              Ny Kunde
+            </Button>
           </div>
         </div>
 
@@ -432,6 +459,105 @@ export default function Customers() {
               )}
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Customer Dialog */}
+      <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <UserPlus className="h-5 w-5" />
+              Opprett ny kunde
+            </DialogTitle>
+            <DialogDescription>
+              Fyll inn kundens informasjon. Telefonnummer er påkrevd.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium mb-1 block">Fornavn *</label>
+                <Input
+                  placeholder="Fornavn"
+                  value={newCustomer.firstName}
+                  onChange={(e) =>
+                    setNewCustomer({ ...newCustomer, firstName: e.target.value })
+                  }
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block">Etternavn *</label>
+                <Input
+                  placeholder="Etternavn"
+                  value={newCustomer.lastName}
+                  onChange={(e) =>
+                    setNewCustomer({ ...newCustomer, lastName: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-1 block">Telefon *</label>
+              <Input
+                placeholder="Telefonnummer"
+                value={newCustomer.phone}
+                onChange={(e) =>
+                  setNewCustomer({ ...newCustomer, phone: e.target.value })
+                }
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-1 block">E-post (valgfritt)</label>
+              <Input
+                type="email"
+                placeholder="E-postadresse"
+                value={newCustomer.email}
+                onChange={(e) =>
+                  setNewCustomer({ ...newCustomer, email: e.target.value })
+                }
+              />
+            </div>
+            <div className="flex gap-2 pt-4">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => {
+                  setCreateDialogOpen(false);
+                  setNewCustomer({ firstName: "", lastName: "", phone: "", email: "" });
+                }}
+              >
+                Avbryt
+              </Button>
+              <Button
+                className="flex-1 bg-gradient-to-r from-purple-600 to-amber-600 hover:from-purple-700 hover:to-amber-700"
+                onClick={() => {
+                  if (!newCustomer.firstName || !newCustomer.lastName || !newCustomer.phone) {
+                    return;
+                  }
+                  createCustomerMutation.mutate(newCustomer);
+                }}
+                disabled={
+                  !newCustomer.firstName ||
+                  !newCustomer.lastName ||
+                  !newCustomer.phone ||
+                  createCustomerMutation.isPending
+                }
+              >
+                {createCustomerMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Oppretter...
+                  </>
+                ) : (
+                  <>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Opprett kunde
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

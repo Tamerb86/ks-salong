@@ -1418,3 +1418,14 @@
 - [x] Apply buffer time when calculating available time slots for online bookings
 - [x] Apply buffer time when adding drop-in customers to queue
 - [x] Test buffer time with different scenarios
+
+## Auto-login After PIN Entry
+- [ ] Remove employee selection step after PIN verification
+- [ ] Automatically log in the employee after correct PIN is entered
+- [ ] Update Tidsstempling page to handle auto-login flow
+
+## Add Customer Creation in Kunder Page
+- [x] Add 'Ny Kunde' button in Customers page header
+- [x] Create customer creation dialog with form fields
+- [x] Implement customer creation mutation
+- [ ] Test customer creation flow

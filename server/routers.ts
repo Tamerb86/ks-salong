@@ -1370,20 +1370,13 @@ export const appRouter = router({
     // Verify PIN and clock in
     clockIn: publicProcedure
       .input(z.object({ 
-        pin: z.string().length(4).or(z.string().length(6)),
-        employeeId: z.number()
+        pin: z.string().length(4).or(z.string().length(6))
       }))
       .mutation(async ({ input }) => {
-        // Verify universal PIN
-        const settings = await db.getSalonSettings();
-        if (!settings || input.pin !== settings.universalPin) {
-          throw new TRPCError({ code: "UNAUTHORIZED", message: "Ugyldig PIN" });
-        }
-        
-        // Get employee
-        const employee = await db.getUserById(input.employeeId);
+        // Find employee by PIN
+        const employee = await db.getUserByPin(input.pin);
         if (!employee || !employee.isActive) {
-          throw new TRPCError({ code: "NOT_FOUND", message: "Ansatt ikke funnet" });
+          throw new TRPCError({ code: "UNAUTHORIZED", message: "Ugyldig PIN" });
         }
         
         const result = await db.clockInEmployee(employee.id);
@@ -1401,20 +1394,13 @@ export const appRouter = router({
     // Clock out
     clockOut: publicProcedure
       .input(z.object({ 
-        pin: z.string().length(4).or(z.string().length(6)),
-        employeeId: z.number()
+        pin: z.string().length(4).or(z.string().length(6))
       }))
       .mutation(async ({ input }) => {
-        // Verify universal PIN
-        const settings = await db.getSalonSettings();
-        if (!settings || input.pin !== settings.universalPin) {
-          throw new TRPCError({ code: "UNAUTHORIZED", message: "Ugyldig PIN" });
-        }
-        
-        // Get employee
-        const employee = await db.getUserById(input.employeeId);
+        // Find employee by PIN
+        const employee = await db.getUserByPin(input.pin);
         if (!employee || !employee.isActive) {
-          throw new TRPCError({ code: "NOT_FOUND", message: "Ansatt ikke funnet" });
+          throw new TRPCError({ code: "UNAUTHORIZED", message: "Ugyldig PIN" });
         }
         
         const result = await db.clockOutEmployee(employee.id);
