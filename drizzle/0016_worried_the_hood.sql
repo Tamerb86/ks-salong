@@ -1,1 +1,0 @@
-ALTER TABLE `timeEntries` ADD `isOvertime` boolean DEFAULT false NOT NULL;

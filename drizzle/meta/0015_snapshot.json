@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "4d548c61-30fd-4cbb-a539-ebacee777cc9",
+  "id": "d922ec32-e527-45c4-8f09-93fec5003f8d",
   "prevId": "dde443e8-3449-47a3-8988-6ff9186fabb3",
   "tables": {
     "appointments": {
@@ -1546,14 +1546,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "currency": {
-          "name": "currency",
-          "type": "varchar(3)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'NOK'"
-        },
         "method": {
           "name": "method",
           "type": "enum('vipps','stripe','cash','gift_card')",
@@ -1563,11 +1555,11 @@
         },
         "status": {
           "name": "status",
-          "type": "enum('pending','initiated','authorized','captured','refunded','failed','cancelled','expired')",
+          "type": "enum('initiated','authorized','captured','refunded','failed')",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'pending'"
+          "default": "'initiated'"
         },
         "provider": {
           "name": "provider",
@@ -1593,13 +1585,6 @@
         "metadata": {
           "name": "metadata",
           "type": "json",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "paidAt": {
-          "name": "paidAt",
-          "type": "timestamp",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -1644,36 +1629,7 @@
           "default": "(now())"
         }
       },
-      "indexes": {
-        "payment_appointment_id_idx": {
-          "name": "payment_appointment_id_idx",
-          "columns": [
-            "appointmentId"
-          ],
-          "isUnique": false
-        },
-        "payment_provider_transaction_id_idx": {
-          "name": "payment_provider_transaction_id_idx",
-          "columns": [
-            "providerTransactionId"
-          ],
-          "isUnique": false
-        },
-        "payment_status_idx": {
-          "name": "payment_status_idx",
-          "columns": [
-            "status"
-          ],
-          "isUnique": false
-        },
-        "payment_created_at_idx": {
-          "name": "payment_created_at_idx",
-          "columns": [
-            "createdAt"
-          ],
-          "isUnique": false
-        }
-      },
+      "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {
         "payments_id": {
@@ -2687,6 +2643,14 @@
           "notNull": false,
           "autoincrement": false,
           "default": "'1.00'"
+        },
+        "bookingSlotInterval": {
+          "name": "bookingSlotInterval",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 15
         },
         "twoFactorEnabled": {
           "name": "twoFactorEnabled",

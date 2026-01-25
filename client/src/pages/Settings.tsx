@@ -26,15 +26,12 @@ import {
   Calculator,
   CheckCircle,
   XCircle,
-  CreditCard,
-  ArrowRight,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Layout } from "@/components/Layout";
 import { FikenTab } from "@/components/FikenTab";
 import { QRCodeSVG } from "qrcode.react";
-import { useLocation } from "wouter";
 
 type TabId = "overview" | "google-calendar" | "notifications" | "booking" | "payment" | "staff" | "fiken" | "goals" | "workplan" | "conflicts" | "reports" | "history";
 
@@ -57,7 +54,6 @@ const tabs: Tab[] = [
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState<TabId>("overview");
-  const [, setLocation] = useLocation();
   const { data: settings, isLoading } = trpc.settings.get.useQuery();
   const updateMutation = trpc.settings.update.useMutation({
     onSuccess: () => {
@@ -76,22 +72,14 @@ export default function Settings() {
     defaultMvaTax: "25.00",
     bookingSlotInterval: 15,
     bufferTimeBetweenAppointments: 5,
-    onlineBookingBufferTime: 15,
-    dropInBufferTime: 15,
     cancellationPolicyHours: 24,
     reminder24hEnabled: true,
     reminder2hEnabled: true,
     vippsEnabled: false,
-    vippsClientId: "",
-    vippsClientSecret: "",
-    vippsMerchantSerialNumber: "",
-    vippsSubscriptionKey: "",
     requirePaymentForBooking: false,
     autoLogoutTime: "22:00",
     universalPin: "1234",
     customBookingUrl: "",
-    stripeTerminalEnabled: false,
-    stripeTerminalLocationId: "",
   });
 
   const [urlError, setUrlError] = useState("");
@@ -133,22 +121,14 @@ export default function Settings() {
         defaultMvaTax: settings.defaultMvaTax || "25.00",
         bookingSlotInterval: settings.bookingSlotInterval || 15,
         bufferTimeBetweenAppointments: settings.bufferTimeBetweenAppointments || 5,
-        onlineBookingBufferTime: settings.onlineBookingBufferTime || 15,
-        dropInBufferTime: settings.dropInBufferTime || 15,
         cancellationPolicyHours: settings.cancellationPolicyHours || 24,
         reminder24hEnabled: settings.reminder24hEnabled ?? true,
         reminder2hEnabled: settings.reminder2hEnabled ?? true,
         vippsEnabled: settings.vippsEnabled ?? false,
-        vippsClientId: settings.vippsClientId || "",
-        vippsClientSecret: settings.vippsClientSecret || "",
-        vippsMerchantSerialNumber: settings.vippsMerchantSerialNumber || "",
-        vippsSubscriptionKey: settings.vippsSubscriptionKey || "",
         requirePaymentForBooking: settings.requirePaymentForBooking ?? false,
         autoLogoutTime: settings.autoLogoutTime || "22:00",
         universalPin: settings.universalPin || "1234",
         customBookingUrl: settings.customBookingUrl || "",
-        stripeTerminalEnabled: settings.stripeTerminalEnabled ?? false,
-        stripeTerminalLocationId: settings.stripeTerminalLocationId || "",
       });
     }
   }, [settings]);
@@ -526,52 +506,6 @@ export default function Settings() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="onlineBookingBufferTime">
-                      Buffertid for nettbookinger (minutter)
-                    </Label>
-                    <select
-                      id="onlineBookingBufferTime"
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                      value={formData.onlineBookingBufferTime}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          onlineBookingBufferTime: parseInt(e.target.value),
-                        })
-                      }
-                    >
-                      <option value={15}>15 minutter</option>
-                      <option value={30}>30 minutter</option>
-                      <option value={45}>45 minutter</option>
-                      <option value={60}>60 minutter</option>
-                    </select>
-                    <p className="text-sm text-gray-500">Tid mellom nettbookinger</p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="dropInBufferTime">
-                      Buffertid for drop-in (minutter)
-                    </Label>
-                    <select
-                      id="dropInBufferTime"
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                      value={formData.dropInBufferTime}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          dropInBufferTime: parseInt(e.target.value),
-                        })
-                      }
-                    >
-                      <option value={15}>15 minutter</option>
-                      <option value={30}>30 minutter</option>
-                      <option value={45}>45 minutter</option>
-                      <option value={60}>60 minutter</option>
-                    </select>
-                    <p className="text-sm text-gray-500">Tid mellom drop-in kunder</p>
-                  </div>
-
-                  <div className="space-y-2">
                     <Label htmlFor="cancellationPolicyHours">
                       Avbestillingsvarsel (timer)
                     </Label>
@@ -765,146 +699,6 @@ export default function Settings() {
                       <p className="text-sm text-yellow-800">
                         ⚠️ Du må aktivere Vipps for å kreve betaling ved booking
                       </p>
-                    </div>
-                  )}
-
-                  {formData.vippsEnabled && (
-                    <div className="space-y-4 p-4 border rounded-lg bg-purple-50">
-                      <h3 className="font-semibold text-purple-900">Vipps API-innstillinger</h3>
-                      <p className="text-sm text-purple-700">
-                        Få disse verdiene fra <a href="https://portal.vipps.no/" target="_blank" rel="noopener noreferrer" className="underline">Vipps Developer Portal</a>
-                      </p>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="vippsClientId">Client ID</Label>
-                        <Input
-                          id="vippsClientId"
-                          type="text"
-                          placeholder="Vipps Client ID"
-                          value={formData.vippsClientId || ''}
-                          onChange={(e) =>
-                            setFormData({ ...formData, vippsClientId: e.target.value })
-                          }
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="vippsClientSecret">Client Secret</Label>
-                        <Input
-                          id="vippsClientSecret"
-                          type="password"
-                          placeholder="Vipps Client Secret"
-                          value={formData.vippsClientSecret || ''}
-                          onChange={(e) =>
-                            setFormData({ ...formData, vippsClientSecret: e.target.value })
-                          }
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="vippsMerchantSerialNumber">Merchant Serial Number (MSN)</Label>
-                        <Input
-                          id="vippsMerchantSerialNumber"
-                          type="text"
-                          placeholder="Vipps MSN"
-                          value={formData.vippsMerchantSerialNumber || ''}
-                          onChange={(e) =>
-                            setFormData({ ...formData, vippsMerchantSerialNumber: e.target.value })
-                          }
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="vippsSubscriptionKey">Subscription Key (Ocp-Apim-Subscription-Key)</Label>
-                        <Input
-                          id="vippsSubscriptionKey"
-                          type="password"
-                          placeholder="Vipps Subscription Key"
-                          value={formData.vippsSubscriptionKey || ''}
-                          onChange={(e) =>
-                            setFormData({ ...formData, vippsSubscriptionKey: e.target.value })
-                          }
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Stripe Terminal Section */}
-                  <div className="flex items-center justify-between p-4 border rounded-lg mt-6">
-                    <div className="space-y-0.5">
-                      <Label htmlFor="stripeTerminalEnabled" className="text-base">
-                        Aktiver Stripe Terminal
-                      </Label>
-                      <p className="text-sm text-gray-500">
-                        Tillat betaling med Stripe Terminal (WisePOS E)
-                      </p>
-                    </div>
-                    <Switch
-                      id="stripeTerminalEnabled"
-                      checked={formData.stripeTerminalEnabled}
-                      onCheckedChange={(checked) =>
-                        setFormData({ ...formData, stripeTerminalEnabled: checked })
-                      }
-                    />
-                  </div>
-
-                  {formData.stripeTerminalEnabled && (
-                    <div className="space-y-4">
-                      {/* Quick Access Card */}
-                      <Card className="bg-gradient-to-br from-purple-50 to-blue-50 border-purple-200">
-                        <CardContent className="pt-6">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                              <div className="p-3 bg-purple-600 rounded-lg">
-                                <CreditCard className="h-6 w-6 text-white" />
-                              </div>
-                              <div>
-                                <h3 className="font-semibold text-lg">Terminal Betaling</h3>
-                                <p className="text-sm text-gray-600">Åpne Terminal for å ta imot betalinger med WisePOS E</p>
-                              </div>
-                            </div>
-                            <Button
-                              onClick={() => setLocation("/terminal-payment")}
-                              className="bg-purple-600 hover:bg-purple-700"
-                            >
-                              Åpne Terminal
-                              <ArrowRight className="h-4 w-4 ml-2" />
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-
-                      {/* Configuration Card */}
-                      <div className="p-6 bg-blue-50 border border-blue-200 rounded-lg space-y-4">
-                        <h3 className="font-semibold text-lg mb-2">Stripe Terminal Innstillinger</h3>
-                        <p className="text-sm text-gray-600 mb-4">
-                          Konfigurer Stripe Terminal for å akseptere betalinger i butikken med WisePOS E reader.
-                          <a
-                            href="https://dashboard.stripe.com/terminal/locations"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:underline ml-1"
-                          >
-                            Åpne Stripe Dashboard →
-                          </a>
-                        </p>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="stripeTerminalLocationId">Terminal Location ID</Label>
-                          <Input
-                            id="stripeTerminalLocationId"
-                            type="text"
-                            placeholder="tml_xxxxxxxxxxxxx"
-                            value={formData.stripeTerminalLocationId || ''}
-                            onChange={(e) =>
-                              setFormData({ ...formData, stripeTerminalLocationId: e.target.value })
-                            }
-                          />
-                          <p className="text-xs text-gray-500">
-                            Finn Location ID i Stripe Dashboard under Terminal → Locations
-                          </p>
-                        </div>
-                      </div>
                     </div>
                   )}
 

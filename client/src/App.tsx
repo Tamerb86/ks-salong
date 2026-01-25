@@ -9,7 +9,6 @@ import Services from "@/pages/Services";
 import Products from "@/pages/Products";
 import Sales from "@/pages/Sales";
 import BookOnline from "./pages/BookOnline";
-import PaymentCallback from "./pages/PaymentCallback";
 import Appointments from "./pages/Appointments";
 import Queue from "./pages/Queue";
 import POS from "./pages/POS";
@@ -19,8 +18,6 @@ import Customers from "./pages/Customers";
 import CustomerProfile from "./pages/CustomerProfile";
 import QueueTV from "./pages/QueueTV";
 import Tidsstempling from "./pages/Tidsstempling";
-import TerminalPayment from "./pages/TerminalPayment";
-import PaymentHistory from "./pages/PaymentHistory";
 import Reports from "./pages/Reports";
 import Staff from "./pages/Staff";
 import FikenSyncHistory from "./pages/FikenSyncHistory";
@@ -35,7 +32,6 @@ function Router() {
       <Route path={"/dashboard-login"} component={DashboardLogin} />
       <Route path={"/dashboard"} component={Home} />
       <Route path={"/book-online"} component={BookOnline} />
-      <Route path={"/payment-callback"} component={PaymentCallback} />
       <Route path={"/services"} component={Services} />
         <Route path="/products" component={Products} />
         <Route path="/sales" component={Sales} />
@@ -46,8 +42,6 @@ function Router() {
       <Route path={"/pos"} component={POS} />
       <Route path={"/time-clock"} component={TimeClock} />
       <Route path={"/tidsstempling"} component={Tidsstempling} />
-      <Route path={"/terminal-payment"} component={TerminalPayment} />
-      <Route path={"/payment-history"} component={PaymentHistory} />
       <Route path={"/customers"} component={Customers} />
       <Route path={"/customers/:id"} component={CustomerProfile} />
       <Route path={"/reports"} component={Reports} />

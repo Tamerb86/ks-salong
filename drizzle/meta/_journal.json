@@ -110,29 +110,8 @@
     {
       "idx": 15,
       "version": "5",
-      "when": 1769356686618,
-      "tag": "0015_daffy_luke_cage",
-      "breakpoints": true
-    },
-    {
-      "idx": 16,
-      "version": "5",
-      "when": 1769360037158,
-      "tag": "0016_worried_the_hood",
-      "breakpoints": true
-    },
-    {
-      "idx": 17,
-      "version": "5",
-      "when": 1769371620264,
-      "tag": "0017_adorable_diamondback",
-      "breakpoints": true
-    },
-    {
-      "idx": 18,
-      "version": "5",
-      "when": 1769371955691,
-      "tag": "0018_futuristic_jane_foster",
+      "when": 1769376965990,
+      "tag": "0015_dusty_sway",
       "breakpoints": true
     }
   ]

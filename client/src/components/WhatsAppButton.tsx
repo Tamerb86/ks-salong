@@ -2,7 +2,7 @@ import { MessageCircle } from "lucide-react";
 
 export default function WhatsAppButton() {
   const phoneNumber = "4792981628"; // Without + or spaces
-  const message = "Hei! Jeg vil gjerne bestille time hos K.S Salong.";
+  const message = "Hei! Jeg vil gjerne bestille time hos K.S Frisør.";
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
   return (

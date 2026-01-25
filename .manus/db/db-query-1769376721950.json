@@ -1,0 +1,15 @@
+{
+  "query": "UPDATE users SET bookingSlotInterval = 30 WHERE name LIKE '%Mohammed%'; SELECT id, name, bookingSlotInterval FROM users WHERE name LIKE '%Mohammed%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZWkmDdVMGTAoV.aeceea61840d --database oUNZ2iw3V7HdbF8pGMTUk4 --execute UPDATE users SET bookingSlotInterval = 30 WHERE name LIKE '%Mohammed%'; SELECT id, name, bookingSlotInterval FROM users WHERE name LIKE '%Mohammed%';",
+  "rows": [
+    {
+      "id": "10",
+      "name": "Mohammed Ali",
+      "bookingSlotInterval": "30"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tbookingSlotInterval\n10\tMohammed Ali\t30\n",
+  "stderr": "",
+  "execution_time_ms": 75
+}

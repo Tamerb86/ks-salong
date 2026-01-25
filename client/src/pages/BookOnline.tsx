@@ -31,7 +31,7 @@ export default function BookOnline() {
   const isPublicBooking = location === "/book-online";
   const [step, setStep] = useState(1);
   const [selectedService, setSelectedService] = useState<any>(null);
-  const [selectedStaff, setSelectedStaff] = useState<string>("");
+  const [selectedStaff, setSelectedStaff] = useState<string>("any");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState("");
   const [customerInfo, setCustomerInfo] = useState({
@@ -122,7 +122,7 @@ export default function BookOnline() {
 
     createBookingMutation.mutate({
       customerId: 1, // Will be created/linked in backend
-      staffId: parseInt(selectedStaff),
+      staffId: selectedStaff === "any" ? 1 : parseInt(selectedStaff),
       serviceId: selectedService.id,
       appointmentDate: appointmentDate,
       startTime: selectedTime,
@@ -137,9 +137,11 @@ export default function BookOnline() {
 
     // Get selected staff's duration multiplier
     let durationMultiplier = 1.0;
-    const staffMember = staff?.find((s: any) => s.id === parseInt(selectedStaff));
-    if (staffMember && staffMember.durationMultiplier) {
-      durationMultiplier = parseFloat(staffMember.durationMultiplier);
+    if (selectedStaff !== "any") {
+      const staffMember = staff.find((s: any) => s.id === parseInt(selectedStaff));
+      if (staffMember && staffMember.durationMultiplier) {
+        durationMultiplier = parseFloat(staffMember.durationMultiplier);
+      }
     }
 
     // Calculate actual service duration based on staff skill
@@ -148,7 +150,9 @@ export default function BookOnline() {
 
     // Generate time slots with appropriate intervals
     const slots = [];
-    const slotInterval = 30; // Fixed 30-minute intervals for simplicity
+    // Use staff-specific booking slot interval, fallback to 15 minutes
+    const staffMember = staff?.find((s: any) => s.id === parseInt(selectedStaff));
+    const slotInterval = staffMember?.bookingSlotInterval || 15;
     for (let hour = 9; hour <= 18; hour++) {
       for (let min = 0; min < 60; min += slotInterval) {
         const timeStr = `${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`;
@@ -163,7 +167,7 @@ export default function BookOnline() {
 
     // Get selected staff's duration multiplier
     let durationMultiplier = 1.0;
-    if (selectedStaff) {
+    if (selectedStaff !== "any") {
       const staffMember = staff.find((s: any) => s.id === parseInt(selectedStaff));
       if (staffMember && staffMember.durationMultiplier) {
         durationMultiplier = parseFloat(staffMember.durationMultiplier);
@@ -179,7 +183,7 @@ export default function BookOnline() {
 
     return !appointments.some((apt: any) => {
       if (apt.status === "cancelled") return false;
-      if (selectedStaff && apt.staffId !== parseInt(selectedStaff)) return false;
+      if (selectedStaff !== "any" && apt.staffId !== parseInt(selectedStaff)) return false;
 
       const aptStart = new Date(apt.appointmentTime);
       const aptEnd = new Date(aptStart.getTime() + apt.duration * 60000);
@@ -277,6 +281,10 @@ export default function BookOnline() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Clock className="h-4 w-4" />
+                        <span>{service.duration} minutter</span>
+                      </div>
                       <div className="flex items-center gap-2">
                         <span className="text-2xl font-bold text-gray-900">
                           {service.price} kr
@@ -305,6 +313,23 @@ export default function BookOnline() {
             </Button>
             <h2 className="text-3xl font-bold text-center mb-8">Velg frisør</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card
+                className="hover:shadow-xl transition-all cursor-pointer border-2 hover:border-purple-300"
+                onClick={() => handleStaffSelect("any")}
+              >
+                <CardHeader>
+                  <CardTitle>Første ledige</CardTitle>
+                  <CardDescription>
+                    Vi finner den første tilgjengelige frisøren for deg
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button className="w-full bg-gradient-to-r from-purple-600 to-amber-600">
+                    Fortsett
+                  </Button>
+                </CardContent>
+              </Card>
+
               {staff?.filter((s: any) => s.role === "barber" && s.isActive).map((member: any) => (
                 <Card
                   key={member.id}
@@ -314,7 +339,7 @@ export default function BookOnline() {
                   <CardHeader>
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-amber-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                        {member.name?.charAt(0) || "?"}
+                        {member.name.charAt(0)}
                       </div>
                       <div>
                         <CardTitle>{member.name}</CardTitle>

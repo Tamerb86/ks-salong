@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { Clock, LogIn, LogOut, Users, TrendingUp } from "lucide-react";
+import { Clock, LogIn, LogOut, Users, TrendingUp, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
 import { nb } from "date-fns/locale";
 import { toast } from "sonner";
@@ -12,7 +12,8 @@ import { Layout } from "@/components/Layout";
 export default function Tidsstempling() {
   const [pin, setPin] = useState("");
   const [mode, setMode] = useState<"clockIn" | "clockOut">("clockIn");
-
+  const [showEmployeeSelect, setShowEmployeeSelect] = useState(false);
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState<number | null>(null);
   
   const { data: clockedIn, refetch } = trpc.timeTracking.getClockedIn.useQuery(undefined, {
     refetchInterval: 5000, // Refresh every 5 seconds
@@ -49,6 +50,8 @@ export default function Tidsstempling() {
   
   const resetForm = () => {
     setPin("");
+    setShowEmployeeSelect(false);
+    setSelectedEmployeeId(null);
   };
   
   const handlePinSubmit = (e: React.FormEvent) => {
@@ -59,15 +62,19 @@ export default function Tidsstempling() {
       return;
     }
     
-    // Auto-login with PIN (backend will verify PIN and find employee)
-    if (mode === "clockIn") {
-      clockInMutation.mutate({ pin });
-    } else {
-      clockOutMutation.mutate({ pin });
-    }
+    // Show employee selection screen
+    setShowEmployeeSelect(true);
   };
   
-
+  const handleEmployeeSelect = (employeeId: number) => {
+    setSelectedEmployeeId(employeeId);
+    
+    if (mode === "clockIn") {
+      clockInMutation.mutate({ pin, employeeId });
+    } else {
+      clockOutMutation.mutate({ pin, employeeId });
+    }
+  };
   
   const handlePinPad = (digit: string) => {
     if (pin.length < 6) {
@@ -79,7 +86,10 @@ export default function Tidsstempling() {
     setPin("");
   };
   
-
+  const handleBack = () => {
+    setShowEmployeeSelect(false);
+    setPin("");
+  };
   
   const calculateDuration = (clockIn: Date) => {
     const now = new Date();
@@ -107,11 +117,16 @@ export default function Tidsstempling() {
                 {mode === "clockIn" ? "Stemple Inn" : "Stemple Ut"}
               </CardTitle>
               <CardDescription>
-                Skriv inn PIN-kode for å {mode === "clockIn" ? "starte" : "avslutte"} arbeidsdagen
+                {showEmployeeSelect 
+                  ? "Velg din profil" 
+                  : `Skriv inn PIN-kode for å ${mode === "clockIn" ? "starte" : "avslutte"} arbeidsdagen`
+                }
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {/* Mode Toggle */}
+              {!showEmployeeSelect ? (
+                <>
+                  {/* Mode Toggle */}
                   <div className="flex gap-2 mb-6">
                     <Button
                       variant={mode === "clockIn" ? "default" : "outline"}
@@ -183,6 +198,45 @@ export default function Tidsstempling() {
                       </Button>
                     </div>
                   </form>
+                </>
+              ) : (
+                <>
+                  {/* Employee Selection */}
+                  <div className="space-y-4">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleBack}
+                      className="mb-4"
+                    >
+                      <ArrowLeft className="h-4 w-4 mr-2" />
+                      Tilbake
+                    </Button>
+                    
+                    <div className="grid grid-cols-1 gap-3 max-h-96 overflow-y-auto">
+                      {activeEmployees?.map((employee: any) => (
+                        <Button
+                          key={employee.id}
+                          variant="outline"
+                          className="h-20 text-left justify-start hover:bg-purple-50 hover:border-purple-300"
+                          onClick={() => handleEmployeeSelect(employee.id)}
+                          disabled={clockInMutation.isPending || clockOutMutation.isPending}
+                        >
+                          <div className="flex items-center gap-3 w-full">
+                            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-purple-400 to-amber-400 flex items-center justify-center text-white font-bold text-lg">
+                              {employee.name.charAt(0)}
+                            </div>
+                            <div className="flex-1">
+                              <p className="font-semibold text-base">{employee.name}</p>
+                              <p className="text-sm text-gray-500 capitalize">{employee.role}</p>
+                            </div>
+                          </div>
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
           
@@ -249,15 +303,10 @@ export default function Tidsstempling() {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-amber-600">
-                {(() => {
-                  const totalMinutes = clockedIn?.reduce((total, entry) => {
-                    const diff = new Date().getTime() - new Date(entry.clockIn).getTime();
-                    return total + Math.floor(diff / (1000 * 60));
-                  }, 0) || 0;
-                  const hours = Math.floor(totalMinutes / 60);
-                  const minutes = totalMinutes % 60;
-                  return `${hours}t ${minutes}m`;
-                })()}
+                {clockedIn?.reduce((total, entry) => {
+                  const diff = new Date().getTime() - new Date(entry.clockIn).getTime();
+                  return total + Math.floor(diff / (1000 * 60 * 60));
+                }, 0) || 0}t
               </div>
             </CardContent>
           </Card>

@@ -338,7 +338,6 @@ export async function getAppointmentById(id: number) {
     startTime: appointments.startTime,
     endTime: appointments.endTime,
     status: appointments.status,
-    paymentStatus: appointments.paymentStatus,
     notes: appointments.notes,
     customer: {
       id: customers.id,
@@ -650,114 +649,6 @@ export async function updatePayment(id: number, data: Partial<typeof payments.$i
 }
 
 /**
- * Update payment status by reference (providerPaymentIntentId)
- */
-export async function updatePaymentStatus(
-  reference: string,
-  status: "pending" | "initiated" | "authorized" | "captured" | "refunded" | "failed" | "cancelled" | "expired",
-  paidAt?: Date
-) {
-  const db = await getDb();
-  if (!db) return;
-  const updateData: any = { status, updatedAt: new Date() };
-  
-  if (paidAt) {
-    updateData.paidAt = paidAt;
-  }
-  
-  await db
-    .update(payments)
-    .set(updateData)
-    .where(eq(payments.providerPaymentIntentId, reference));
-}
-
-/**
- * Get payment by reference
- */
-export async function getPaymentByReference(reference: string) {
-  const db = await getDb();
-  if (!db) return null;
-  const result = await db
-    .select()
-    .from(payments)
-    .where(eq(payments.providerPaymentIntentId, reference))
-    .limit(1);
-  
-  return result[0] || null;
-}
-
-/**
- * Get payments by appointment ID
- */
-export async function getPaymentsByAppointmentId(appointmentId: number) {
-  const db = await getDb();
-  if (!db) return [];
-  return await db
-    .select()
-    .from(payments)
-    .where(eq(payments.appointmentId, appointmentId))
-    .orderBy(desc(payments.createdAt));
-}
-
-/**
- * Get all payments with optional filters
- */
-export async function getPayments(filters?: {
-  startDate?: string;
-  endDate?: string;
-  status?: string;
-  method?: string;
-}) {
-  const db = await getDb();
-  if (!db) return [];
-
-  let query = db
-    .select({
-      id: payments.id,
-      appointmentId: payments.appointmentId,
-      customerId: payments.customerId,
-      amount: payments.amount,
-      currency: payments.currency,
-      method: payments.method,
-      status: payments.status,
-      provider: payments.provider,
-      providerTransactionId: payments.providerTransactionId,
-      providerPaymentIntentId: payments.providerPaymentIntentId,
-      paidAt: payments.paidAt,
-      createdAt: payments.createdAt,
-      customerName: sql<string>`CONCAT(${customers.firstName}, ' ', ${customers.lastName})`.as('customerName'),
-    })
-    .from(payments)
-    .leftJoin(customers, eq(payments.customerId, customers.id));
-
-  const conditions = [];
-
-  if (filters?.startDate) {
-    conditions.push(gte(payments.createdAt, new Date(filters.startDate)));
-  }
-
-  if (filters?.endDate) {
-    const endDate = new Date(filters.endDate);
-    endDate.setHours(23, 59, 59, 999);
-    conditions.push(lte(payments.createdAt, endDate));
-  }
-
-  if (filters?.status) {
-    conditions.push(eq(payments.status, filters.status as any));
-  }
-
-  if (filters?.method) {
-    conditions.push(eq(payments.method, filters.method as any));
-  }
-
-  if (conditions.length > 0) {
-    query = query.where(and(...conditions)) as any;
-  }
-
-  return await query.orderBy(desc(payments.createdAt));
-}
-
-/**
  * ============================================
  * TIME TRACKING
  * ============================================
@@ -960,28 +851,12 @@ export async function clockInEmployee(staffId: number) {
     return { error: "Already clocked in", entry: existing[0] };
   }
   
-  // Get settings to check autoLogoutTime
-  const settings = await getSalonSettings();
-  const autoLogoutTime = settings?.autoLogoutTime || "22:00";
-  const [hours, minutes] = autoLogoutTime.split(":").map(Number);
-  
-  // Check if current time is after autoLogoutTime (overtime)
-  const now = new Date();
-  const osloTime = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Oslo" }));
-  const currentHours = osloTime.getHours();
-  const currentMinutes = osloTime.getMinutes();
-  const currentTotalMinutes = currentHours * 60 + currentMinutes;
-  const autoLogoutTotalMinutes = hours * 60 + minutes;
-  const isOvertime = currentTotalMinutes >= autoLogoutTotalMinutes;
-  
   const result = await db.insert(timeEntries).values({
     staffId,
     clockIn: new Date(),
-    isOvertime,
-    notes: isOvertime ? `Clocked in after ${autoLogoutTime} (overtime)` : undefined,
   });
   
-  return { success: true, id: result[0].insertId, isOvertime };
+  return { success: true, id: result[0].insertId };
 }
 
 // Clock out employee

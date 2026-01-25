@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from "lucide-react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, parseISO } from "date-fns";
 import { nb } from "date-fns/locale";
-import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, closestCenter, useDroppable, useDraggable } from "@dnd-kit/core";
-
+import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, closestCenter } from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
+import { useSortable } from "@dnd-kit/sortable";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
@@ -57,42 +58,15 @@ function AppointmentCard({ appointment, isDragging }: AppointmentCardProps) {
   );
 }
 
-function DroppableDay({ dateKey, children, isToday, isCurrentMonth }: { dateKey: string; children: React.ReactNode; isToday: boolean; isCurrentMonth: boolean }) {
-  // Check if date is in the past
-  const dayDate = parseISO(dateKey);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const isPastDate = dayDate < today;
-
-  const { setNodeRef, isOver } = useDroppable({
-    id: dateKey,
-    disabled: isPastDate, // Disable drop on past dates
-  });
-
-  return (
-    <div
-      ref={setNodeRef}
-      className={`min-h-[120px] border rounded p-2 transition-colors ${
-        isToday ? "bg-purple-50 border-purple-300" : "bg-white"
-      } ${!isCurrentMonth ? "opacity-50" : ""} ${
-        isPastDate ? "bg-gray-100 cursor-not-allowed" : ""
-      } ${
-        isOver && !isPastDate ? "ring-2 ring-purple-400 bg-purple-100" : ""
-      }`}
-    >
-      {children}
-    </div>
-  );
-}
-
 function DraggableAppointment({ appointment }: { appointment: Appointment }) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: appointment.id.toString(),
     data: appointment,
   });
 
   const style = {
-    transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
+    transform: CSS.Transform.toString(transform),
+    transition,
   };
 
   return (
@@ -170,16 +144,6 @@ export function MonthlyCalendar() {
 
     const appointmentId = parseInt(active.id.toString());
     const newDate = over.id.toString();
-
-    // Check if target date is in the past
-    const targetDate = parseISO(newDate);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Reset time to start of day
-    
-    if (targetDate < today) {
-      toast.error("Kan ikke flytte avtale til en dato i fortiden");
-      return;
-    }
 
     // Find the appointment to get its current time
     const appointment = appointments.find((apt: any) => apt.id === appointmentId);
@@ -259,11 +223,12 @@ export function MonthlyCalendar() {
               const isCurrentMonth = isSameMonth(day, currentDate);
 
               return (
-                <DroppableDay
+                <div
                   key={dateKey}
-                  dateKey={dateKey}
-                  isToday={isToday}
-                  isCurrentMonth={isCurrentMonth}
+                  id={dateKey}
+                  className={`min-h-[120px] border rounded p-2 ${
+                    isToday ? "bg-purple-50 border-purple-300" : "bg-white"
+                  } ${!isCurrentMonth ? "opacity-50" : ""}`}
                 >
                   <div className={`text-sm font-semibold mb-1 ${isToday ? "text-purple-600" : ""}`}>
                     {format(day, "d")}
@@ -273,7 +238,7 @@ export function MonthlyCalendar() {
                       <DraggableAppointment key={appointment.id} appointment={appointment} />
                     ))}
                   </div>
-                </DroppableDay>
+                </div>
               );
             })}
           </div>

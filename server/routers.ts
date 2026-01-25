@@ -67,6 +67,7 @@ export const appRouter = router({
         isActive: z.boolean().optional(),
         skillLevel: z.enum(["beginner", "intermediate", "expert"]).optional(),
         durationMultiplier: z.string().optional(),
+        bookingSlotInterval: z.number().optional(),
       }))
       .mutation(async ({ input }) => {
         const { id, ...data } = input;
@@ -278,7 +279,6 @@ export const appRouter = router({
         startTime: z.string().optional(),
         endTime: z.string().optional(),
         status: z.enum(["pending", "confirmed", "checked_in", "no_show", "cancelled", "completed"]).optional(),
-        paymentStatus: z.enum(["pending", "paid", "refunded"]).optional(),
         notes: z.string().optional(),
         cancellationReason: z.string().optional(),
       }))
@@ -368,13 +368,12 @@ export const appRouter = router({
           const vipps = await import("./vipps");
           const customer = await db.getCustomerById(input.customerId);
           
-          const paymentResult = await vipps.initiatePayment({
-            amount: Number(service.price),
-            customerPhone: customer?.phone,
-            reference: `APT-${appointmentId}`,
-            description: `Booking: ${service.name}`,
-            returnUrl: `${process.env.VITE_APP_URL || "http://localhost:3000"}/payment-callback`,
-          });
+          const paymentResult = await vipps.initiateVippsPayment(
+            `APT-${appointmentId}`,
+            Number(service.price),
+            `Booking: ${service.name}`,
+            customer?.phone
+          );
           
           if (paymentResult.orderId && appointmentId) {
             await db.updateAppointment(appointmentId, {
@@ -384,7 +383,7 @@ export const appRouter = router({
             return {
               appointmentId,
               requiresPayment: true,
-              vippsUrl: paymentResult.redirectUrl,
+              vippsUrl: paymentResult.url,
               orderId: paymentResult.orderId,
             };
           } else {
@@ -396,31 +395,6 @@ export const appRouter = router({
           appointmentId,
           requiresPayment: false,
         };
-      }),
-    
-    // List all appointments
-    list: protectedProcedure
-      .query(async () => {
-        const today = new Date();
-        const endDate = new Date(today);
-        endDate.setMonth(endDate.getMonth() + 3); // Next 3 months
-        
-        return await db.getAppointmentsByDateRange(
-          today.toISOString().split('T')[0],
-          endDate.toISOString().split('T')[0]
-        );
-      }),
-    
-    // Cancel appointment
-    cancel: protectedProcedure
-      .input(z.object({ id: z.number() }))
-      .mutation(async ({ input, ctx }) => {
-        await db.updateAppointment(input.id, {
-          status: "cancelled",
-          cancelledAt: new Date(),
-          cancelledBy: ctx.user!.id
-        });
-        return { success: true };
       }),
     
     // Check payment status
@@ -515,7 +489,7 @@ export const appRouter = router({
         firstName: z.string(),
         lastName: z.string(),
         phone: z.string(),
-        email: z.string().email().optional().or(z.literal('')),
+        email: z.string().email().optional(),
         dateOfBirth: z.date().optional(),
         address: z.string().optional(),
         preferredStaffId: z.number().optional(),
@@ -1035,17 +1009,6 @@ export const appRouter = router({
   }),
 
   payments: router({
-    list: protectedProcedure
-      .input(z.object({
-        startDate: z.string().optional(),
-        endDate: z.string().optional(),
-        status: z.enum(["pending", "initiated", "authorized", "captured", "refunded", "failed", "cancelled", "expired"]).optional(),
-        method: z.string().optional(),
-      }))
-      .query(async ({ input }) => {
-        return await db.getPayments(input);
-      }),
-    
     create: protectedProcedure
       .input(z.object({
         orderId: z.number().optional(),
@@ -1122,10 +1085,6 @@ export const appRouter = router({
         reminder24hEnabled: z.boolean().optional(),
         reminder2hEnabled: z.boolean().optional(),
         vippsEnabled: z.boolean().optional(),
-        vippsClientId: z.string().optional(),
-        vippsClientSecret: z.string().optional(),
-        vippsMerchantSerialNumber: z.string().optional(),
-        vippsSubscriptionKey: z.string().optional(),
         requirePaymentForBooking: z.boolean().optional(),
         autoLogoutTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/).optional(), // HH:MM format
         universalPin: z.string().length(4).or(z.string().length(6)).optional(),
@@ -1370,13 +1329,20 @@ export const appRouter = router({
     // Verify PIN and clock in
     clockIn: publicProcedure
       .input(z.object({ 
-        pin: z.string().length(4).or(z.string().length(6))
+        pin: z.string().length(4).or(z.string().length(6)),
+        employeeId: z.number()
       }))
       .mutation(async ({ input }) => {
-        // Find employee by PIN
-        const employee = await db.getUserByPin(input.pin);
-        if (!employee || !employee.isActive) {
+        // Verify universal PIN
+        const settings = await db.getSalonSettings();
+        if (!settings || input.pin !== settings.universalPin) {
           throw new TRPCError({ code: "UNAUTHORIZED", message: "Ugyldig PIN" });
+        }
+        
+        // Get employee
+        const employee = await db.getUserById(input.employeeId);
+        if (!employee || !employee.isActive) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Ansatt ikke funnet" });
         }
         
         const result = await db.clockInEmployee(employee.id);
@@ -1384,23 +1350,26 @@ export const appRouter = router({
           throw new TRPCError({ code: "BAD_REQUEST", message: result.error });
         }
         
-        if (!result || !('entry' in result)) {
-          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to clock in" });
-        }
-        
-        return { success: true, employee: { id: employee.id, name: employee.name, role: employee.role }, timeEntry: result.entry };
+        return { success: true, employee: { id: employee.id, name: employee.name, role: employee.role } };
       }),
     
     // Clock out
     clockOut: publicProcedure
       .input(z.object({ 
-        pin: z.string().length(4).or(z.string().length(6))
+        pin: z.string().length(4).or(z.string().length(6)),
+        employeeId: z.number()
       }))
       .mutation(async ({ input }) => {
-        // Find employee by PIN
-        const employee = await db.getUserByPin(input.pin);
-        if (!employee || !employee.isActive) {
+        // Verify universal PIN
+        const settings = await db.getSalonSettings();
+        if (!settings || input.pin !== settings.universalPin) {
           throw new TRPCError({ code: "UNAUTHORIZED", message: "Ugyldig PIN" });
+        }
+        
+        // Get employee
+        const employee = await db.getUserById(input.employeeId);
+        if (!employee || !employee.isActive) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Ansatt ikke funnet" });
         }
         
         const result = await db.clockOutEmployee(employee.id);
@@ -1408,11 +1377,7 @@ export const appRouter = router({
           throw new TRPCError({ code: "BAD_REQUEST", message: result.error });
         }
         
-        if (!result) {
-          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to clock out" });
-        }
-        
-        return { success: true, employee: { id: employee.id, name: employee.name, role: employee.role }, totalMinutes: result.totalMinutes, overtimeMinutes: result.overtimeMinutes };
+        return { success: true, ...result };
       }),
     
     // Get currently clocked in employees
@@ -1614,119 +1579,6 @@ export const appRouter = router({
           filename: `tidsrapport_${input.from}_${input.to}.pdf`,
           mimeType: "application/pdf",
         };
-      }),
-  }),
-
-  vipps: router({
-    /**
-     * Initiate a Vipps payment
-     */
-    initiatePayment: publicProcedure
-      .input(z.object({
-        appointmentId: z.number(),
-        amount: z.number().positive(),
-        customerPhone: z.string().optional(),
-        description: z.string(),
-      }))
-      .mutation(async ({ input }) => {
-        const { initiatePayment } = await import("./vipps");
-        
-        // Generate unique reference
-        const reference = `APT-${input.appointmentId}-${Date.now()}`;
-        
-        // Get return URL (current origin + callback path)
-        const returnUrl = `${process.env.VITE_APP_URL || "http://localhost:3000"}/book-online/payment-callback`;
-        
-        try {
-          const response = await initiatePayment({
-            amount: input.amount,
-            customerPhone: input.customerPhone,
-            reference,
-            description: input.description,
-            returnUrl,
-          });
-          
-          // Store payment record in database
-          await db.createPayment({
-            appointmentId: input.appointmentId,
-            amount: input.amount.toString(),
-            currency: "NOK",
-            method: "vipps",
-            status: "initiated",
-            provider: "vipps",
-            providerTransactionId: response.orderId,
-            providerPaymentIntentId: reference,
-          });
-          
-          return {
-            success: true,
-            redirectUrl: response.redirectUrl,
-            reference,
-            orderId: response.orderId,
-          };
-        } catch (error: any) {
-          console.error("Failed to initiate Vipps payment:", error);
-          throw new TRPCError({ 
-            code: "INTERNAL_SERVER_ERROR", 
-            message: error.message || "Failed to initiate payment" 
-          });
-        }
-      }),
-    
-    /**
-     * Get payment status
-     */
-    getPaymentStatus: publicProcedure
-      .input(z.object({
-        reference: z.string(),
-      }))
-      .query(async ({ input }) => {
-        const { getPaymentStatus } = await import("./vipps");
-        
-        try {
-          const status = await getPaymentStatus(input.reference);
-          
-          return {
-            success: true,
-            state: status.state,
-            authorizedAmount: status.aggregate.authorizedAmount.value / 100, // Convert øre to NOK
-            capturedAmount: status.aggregate.capturedAmount.value / 100,
-            refundedAmount: status.aggregate.refundedAmount.value / 100,
-          };
-        } catch (error: any) {
-          console.error("Failed to get Vipps payment status:", error);
-          throw new TRPCError({ 
-            code: "INTERNAL_SERVER_ERROR", 
-            message: error.message || "Failed to get payment status" 
-          });
-        }
-      }),
-    
-    /**
-     * Capture payment (finalize transaction)
-     */
-    capturePayment: protectedProcedure
-      .input(z.object({
-        reference: z.string(),
-        amount: z.number().positive().optional(),
-      }))
-      .mutation(async ({ input }) => {
-        const { capturePayment } = await import("./vipps");
-        
-        try {
-          await capturePayment(input.reference, input.amount);
-          
-          // Update payment status in database
-          await db.updatePaymentStatus(input.reference, "captured");
-          
-          return { success: true };
-        } catch (error: any) {
-          console.error("Failed to capture Vipps payment:", error);
-          throw new TRPCError({ 
-            code: "INTERNAL_SERVER_ERROR", 
-            message: error.message || "Failed to capture payment" 
-          });
-        }
       }),
   }),
 });

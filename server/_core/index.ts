@@ -85,11 +85,6 @@ async function startServer() {
     import("../cron/fikenAutoSync").then((module) => {
       module.startFikenAutoSyncCron();
     }).catch(console.error);
-    
-    // Start auto clock-out job
-    import("../jobs").then((module) => {
-      module.startAllJobs();
-    }).catch(console.error);
   });
 }
 

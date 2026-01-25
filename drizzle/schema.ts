@@ -18,6 +18,7 @@ export const users = mysqlTable("users", {
   pin: varchar("pin", { length: 6 }), // For employee POS login
   skillLevel: mysqlEnum("skillLevel", ["beginner", "intermediate", "expert"]).default("intermediate"),
   durationMultiplier: decimal("durationMultiplier", { precision: 3, scale: 2 }).default("1.00"), // 1.0 = normal, 1.2 = 20% slower, 1.5 = 50% slower
+  bookingSlotInterval: int("bookingSlotInterval").default(15).notNull(), // minutes: 15 or 30
   twoFactorEnabled: boolean("twoFactorEnabled").default(false).notNull(),
   twoFactorSecret: text("twoFactorSecret"),
   isActive: boolean("isActive").default(true).notNull(),
@@ -56,7 +57,6 @@ export const services = mysqlTable("services", {
   mvaTax: decimal("mvaTax", { precision: 5, scale: 2 }).default("25.00").notNull(), // Norwegian VAT
   isActive: boolean("isActive").default(true).notNull(),
   category: varchar("category", { length: 100 }),
-  imageUrl: text("imageUrl"),
   notes: text("notes"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
@@ -143,25 +143,18 @@ export const payments = mysqlTable("payments", {
   appointmentId: int("appointmentId"),
   customerId: int("customerId"),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
-  currency: varchar("currency", { length: 3 }).default("NOK").notNull(),
   method: mysqlEnum("method", ["vipps", "stripe", "cash", "gift_card"]).notNull(),
-  status: mysqlEnum("status", ["pending", "initiated", "authorized", "captured", "refunded", "failed", "cancelled", "expired"]).default("pending").notNull(),
+  status: mysqlEnum("status", ["initiated", "authorized", "captured", "refunded", "failed"]).default("initiated").notNull(),
   provider: varchar("provider", { length: 50 }), // vipps or stripe
   providerTransactionId: varchar("providerTransactionId", { length: 255 }),
   providerPaymentIntentId: varchar("providerPaymentIntentId", { length: 255 }),
   metadata: json("metadata"),
-  paidAt: timestamp("paidAt"),
   refundedAmount: decimal("refundedAmount", { precision: 10, scale: 2 }).default("0.00"),
   refundReason: text("refundReason"),
   refundedAt: timestamp("refundedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-}, (table) => ({
-  appointmentIdIdx: index("payment_appointment_id_idx").on(table.appointmentId),
-  providerTransactionIdIdx: index("payment_provider_transaction_id_idx").on(table.providerTransactionId),
-  statusIdx: index("payment_status_idx").on(table.status),
-  createdAtIdx: index("payment_created_at_idx").on(table.createdAt),
-}));
+});
 
 export const orders = mysqlTable("orders", {
   id: int("id").autoincrement().primaryKey(),
@@ -211,7 +204,6 @@ export const timeEntries = mysqlTable("timeEntries", {
   totalBreakMinutes: int("totalBreakMinutes").default(0).notNull(),
   totalWorkMinutes: int("totalWorkMinutes").default(0).notNull(),
   overtimeMinutes: int("overtimeMinutes").default(0).notNull(),
-  isOvertime: boolean("isOvertime").default(false).notNull(),
   notes: text("notes"),
   editedBy: int("editedBy"),
   editReason: text("editReason"),
@@ -281,8 +273,6 @@ export const salonSettings = mysqlTable("salonSettings", {
   timezone: varchar("timezone", { length: 50 }).default("Europe/Oslo").notNull(),
   bookingSlotInterval: int("bookingSlotInterval").default(15).notNull(), // minutes
   bufferTimeBetweenAppointments: int("bufferTimeBetweenAppointments").default(5).notNull(), // minutes
-  onlineBookingBufferTime: int("onlineBookingBufferTime").default(15).notNull(), // Buffer time between online bookings (minutes)
-  dropInBufferTime: int("dropInBufferTime").default(15).notNull(), // Buffer time for drop-in customers (minutes)
   cancellationPolicyHours: int("cancellationPolicyHours").default(24).notNull(),
   lateCancellationFeePercent: decimal("lateCancellationFeePercent", { precision: 5, scale: 2 }).default("50.00"),
   noShowFeePercent: decimal("noShowFeePercent", { precision: 5, scale: 2 }).default("100.00"),

@@ -258,7 +258,7 @@ export default function Home() {
         <div>
           <h3 className="text-2xl font-bold text-gray-900 mb-6">Hurtighandlinger</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <Link href="/book-online">
+                <Link href="/book">
                   <Card className="hover:shadow-lg transition-shadow cursor-pointer">
                     <CardContent className="p-6">
                       <div className="flex items-center gap-4">
