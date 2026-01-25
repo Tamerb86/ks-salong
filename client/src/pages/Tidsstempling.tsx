@@ -303,10 +303,15 @@ export default function Tidsstempling() {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-amber-600">
-                {clockedIn?.reduce((total, entry) => {
-                  const diff = new Date().getTime() - new Date(entry.clockIn).getTime();
-                  return total + Math.floor(diff / (1000 * 60 * 60));
-                }, 0) || 0}t
+                {(() => {
+                  const totalMinutes = clockedIn?.reduce((total, entry) => {
+                    const diff = new Date().getTime() - new Date(entry.clockIn).getTime();
+                    return total + Math.floor(diff / (1000 * 60));
+                  }, 0) || 0;
+                  const hours = Math.floor(totalMinutes / 60);
+                  const minutes = totalMinutes % 60;
+                  return `${hours}t ${minutes}m`;
+                })()}
               </div>
             </CardContent>
           </Card>

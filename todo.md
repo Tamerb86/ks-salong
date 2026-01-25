@@ -1238,3 +1238,13 @@
 - [x] Add proper null checks to prevent the error (member.name?.charAt(0) || "?")
 - [x] Test the fix on /book page (works correctly)
 - [x] Create checkpoint after fix
+
+## Work Hours Calculation (60 minutes = 1 hour) ✅
+- [x] Review current Time Tracking (Tidsstempling) page implementation
+- [x] Add calculation logic to compute total hours worked (clockOut - clockIn) - already exists
+- [x] Display hours in format: "Xt Ym" (hours and minutes)
+- [x] Show total hours for each time entry in "Pålogget Nå" card
+- [x] Improved "Total Arbeidstid I Dag" to show both hours and minutes (511t 40m)
+- [x] Handle overnight shifts correctly (uses milliseconds diff)
+- [x] Test calculation with various scenarios (tested with 3 employees, works perfectly)
+- [x] Create checkpoint after testing
