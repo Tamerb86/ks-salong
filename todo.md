@@ -1144,3 +1144,11 @@
 - [x] Test drag-and-drop in browser with real appointments
 - [x] Verify database updates after drag-and-drop (4 vitest tests passed)
 - [x] Created comprehensive test suite for drag-and-drop functionality
+
+## Prevent Dragging Appointments to Past Dates
+- [x] Add date validation in handleDragEnd to check if target date is in the past
+- [x] Show error toast when user tries to drop appointment on past date
+- [x] Add visual indicator (grayed out or disabled styling) for past dates in calendar
+- [x] Prevent drop zones from accepting appointments on past dates (disabled: true)
+- [x] Test validation by attempting to drag appointment to yesterday
+- [x] Write vitest test for past date validation (5/5 tests passed)

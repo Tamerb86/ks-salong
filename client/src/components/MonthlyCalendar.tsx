@@ -58,8 +58,15 @@ function AppointmentCard({ appointment, isDragging }: AppointmentCardProps) {
 }
 
 function DroppableDay({ dateKey, children, isToday, isCurrentMonth }: { dateKey: string; children: React.ReactNode; isToday: boolean; isCurrentMonth: boolean }) {
+  // Check if date is in the past
+  const dayDate = parseISO(dateKey);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const isPastDate = dayDate < today;
+
   const { setNodeRef, isOver } = useDroppable({
     id: dateKey,
+    disabled: isPastDate, // Disable drop on past dates
   });
 
   return (
@@ -68,7 +75,9 @@ function DroppableDay({ dateKey, children, isToday, isCurrentMonth }: { dateKey:
       className={`min-h-[120px] border rounded p-2 transition-colors ${
         isToday ? "bg-purple-50 border-purple-300" : "bg-white"
       } ${!isCurrentMonth ? "opacity-50" : ""} ${
-        isOver ? "ring-2 ring-purple-400 bg-purple-100" : ""
+        isPastDate ? "bg-gray-100 cursor-not-allowed" : ""
+      } ${
+        isOver && !isPastDate ? "ring-2 ring-purple-400 bg-purple-100" : ""
       }`}
     >
       {children}
@@ -161,6 +170,16 @@ export function MonthlyCalendar() {
 
     const appointmentId = parseInt(active.id.toString());
     const newDate = over.id.toString();
+
+    // Check if target date is in the past
+    const targetDate = parseISO(newDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to start of day
+    
+    if (targetDate < today) {
+      toast.error("Kan ikke flytte avtale til en dato i fortiden");
+      return;
+    }
 
     // Find the appointment to get its current time
     const appointment = appointments.find((apt: any) => apt.id === appointmentId);
