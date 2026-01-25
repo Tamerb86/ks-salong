@@ -1348,3 +1348,21 @@
 - [x] Check appointments.list endpoint includes all appointment sources
 - [x] Test complete flow: book online → verify in Avtaler
 - [x] Ensure proper status display for online bookings
+
+## Quick Customer Creation in Appointment Dialog
+- [x] Add "+ Ny Kunde" button next to customer selection dropdown
+- [x] Create inline customer creation form (firstName, lastName, phone, email)
+- [x] Validate phone number format (Norwegian format)
+- [x] Save new customer and auto-select in appointment dialog
+- [x] Show success feedback when customer is created
+- [x] Handle duplicate phone number gracefully
+
+## Recurring Appointments Feature
+- [x] Add "Gjenta avtale" checkbox in CreateAppointmentDialog
+- [x] Add recurrence pattern selection (weekly/monthly)
+- [x] Add number of occurrences input (e.g., 4 weeks, 3 months)
+- [x] Show preview of generated appointment dates
+- [x] Create backend endpoint for bulk appointment creation
+- [x] Validate all appointments for conflicts before creation
+- [x] Show summary of created appointments after success
+- [ ] Link recurring appointments with a group ID for easy management
