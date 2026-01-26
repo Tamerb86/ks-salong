@@ -1691,3 +1691,22 @@
 4. Hide dialog backgrounds, tabs, buttons during print
 5. Support multiple paper sizes (80mm thermal, A4, A5) with dedicated CSS classes
 6. Set appropriate @page rules for thermal printers
+
+## 💳 Add Stripe Settings Section - ✅ FIXED
+- [x] Add "Betaling" (Payment) tab/section in Settings page (already exists)
+- [x] Display Stripe status (Test Mode / Live Mode) (blue badge showing "Test Mode (Sandbox)")
+- [x] Show Stripe Sandbox claim link with expiry date (amber warning box with link, expires 26 March 2026)
+- [x] Display current Stripe keys (masked for security) (not shown - keys managed via Manus Management UI)
+- [x] Add link to Stripe Dashboard (purple button "Åpne Stripe Dashboard")
+- [x] Add instructions for claiming Stripe sandbox (amber warning box with clear instructions)
+- [x] Add instructions for switching to live mode after KYC (gray box with 4-step instructions)
+- [x] Show test card number (4242 4242 4242 4242) for testing (green box with test card number)
+- [x] Add note about 99% discount promo code for live testing (included in live mode instructions)
+
+**What was added:**
+1. Comprehensive Stripe settings section in Payment tab
+2. Status badge showing Test Mode (Sandbox)
+3. Sandbox claim warning with direct link (expires 26 March 2026)
+4. Test card information in green box (4242 4242 4242 4242)
+5. Stripe Dashboard link (purple button)
+6. Live mode instructions with 4 steps (KYC, settings, keys, testing)

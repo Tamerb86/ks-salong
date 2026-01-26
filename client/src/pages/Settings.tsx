@@ -788,6 +788,89 @@ export default function Settings() {
                     </div>
                   )}
 
+                  {/* Stripe Settings Section */}
+                  <div className="mt-8 pt-6 border-t">
+                    <h3 className="text-lg font-semibold mb-4">Stripe Betalingsinnstillinger</h3>
+                    
+                    {/* Stripe Status */}
+                    <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-blue-900">Status:</span>
+                        <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
+                          Test Mode (Sandbox)
+                        </span>
+                      </div>
+                      <p className="text-sm text-blue-700 mt-2">
+                        Du bruker for øyeblikket Stripe test-miljø. Alle betalinger er simulerte.
+                      </p>
+                    </div>
+
+                    {/* Sandbox Claim Warning */}
+                    <div className="p-4 bg-amber-50 border border-amber-300 rounded-lg mb-4">
+                      <div className="flex items-start gap-3">
+                        <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
+                        <div className="flex-1">
+                          <h4 className="font-medium text-amber-900 mb-1">Viktig: Krev Stripe Sandbox</h4>
+                          <p className="text-sm text-amber-700 mb-3">
+                            Du må kreve Stripe sandbox før <strong>26. mars 2026</strong> for å aktivere test-miljøet.
+                          </p>
+                          <a
+                            href="https://dashboard.stripe.com/claim_sandbox/YWNjdF8xU3MzTUk1QTQ4TVdTa2wxLDE3Njk5ODg0NzEv1003jr9Z8zG"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors text-sm font-medium"
+                          >
+                            Krev Stripe Sandbox →
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Test Card Info */}
+                    <div className="p-4 bg-green-50 border border-green-200 rounded-lg mb-4">
+                      <h4 className="font-medium text-green-900 mb-2">Test-kortnummer</h4>
+                      <p className="text-sm text-green-700 mb-2">
+                        Bruk dette kortnummeret for å teste betalinger i test-miljøet:
+                      </p>
+                      <div className="bg-white p-3 rounded border border-green-300 font-mono text-sm">
+                        4242 4242 4242 4242
+                      </div>
+                      <p className="text-xs text-green-600 mt-2">
+                        Bruk hvilken som helst fremtidig dato for utløp og hvilken som helst 3-sifret CVC.
+                      </p>
+                    </div>
+
+                    {/* Stripe Dashboard Link */}
+                    <div className="p-4 border rounded-lg">
+                      <h4 className="font-medium mb-2">Stripe Dashboard</h4>
+                      <p className="text-sm text-gray-600 mb-3">
+                        Administrer betalinger, vis transaksjoner og konfigurer webhooks i Stripe Dashboard.
+                      </p>
+                      <a
+                        href="https://dashboard.stripe.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+                      >
+                        Åpne Stripe Dashboard →
+                      </a>
+                    </div>
+
+                    {/* Live Mode Instructions */}
+                    <div className="p-4 bg-gray-50 border rounded-lg mt-4">
+                      <h4 className="font-medium mb-2">Bytt til Live Mode</h4>
+                      <p className="text-sm text-gray-600 mb-2">
+                        For å aktivere ekte betalinger:
+                      </p>
+                      <ol className="text-sm text-gray-600 space-y-1 list-decimal list-inside">
+                        <li>Fullfør Stripe KYC (Know Your Customer) verifisering</li>
+                        <li>Gå til Settings → Payment i Manus Management UI</li>
+                        <li>Legg inn dine live API-nøkler</li>
+                        <li>Test med 99% rabattkode (minimum 0.50 USD påkrevd)</li>
+                      </ol>
+                    </div>
+                  </div>
+
                   <div className="flex justify-end pt-4">
                     <Button
                       type="submit"
