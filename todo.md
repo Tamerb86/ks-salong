@@ -1328,3 +1328,12 @@
 - [ ] Prevent invalid drops (past dates, outside business hours) - Future feature
 - [ ] Show confirmation dialog after successful reschedule - Future feature
 - [ ] Test drag-and-drop on touch devices (mobile/tablet) - Future feature
+
+## BookOnline Calendar Picker Enhancement
+- [x] Replace text input date field with visual calendar picker in BookOnline page
+- [x] Add interactive calendar grid showing days of the month
+- [x] Highlight selected date in calendar
+- [x] Add month navigation (previous/next month)
+- [x] Show current date indicator
+- [x] Disable past dates from selection
+- [x] Maintain responsive design for mobile devices
