@@ -10,7 +10,7 @@ import { Calendar, Clock, TrendingUp, Users, Download, FileText } from "lucide-r
 import { toast } from "sonner";
 
 export default function Reports() {
-  const [dateRange, setDateRange] = useState<"today" | "week" | "month">("today");
+  const [dateRange, setDateRange] = useState<"today" | "week" | "month" | "all">("all");
   const [selectedEmployee, setSelectedEmployee] = useState<string>("all");
   
   const { data: staff } = trpc.staff.list.useQuery();
@@ -30,6 +30,11 @@ export default function Reports() {
         return {
           from: format(startOfMonth(today), "yyyy-MM-dd"),
           to: format(endOfMonth(today), "yyyy-MM-dd"),
+        };
+      case "all":
+        return {
+          from: undefined,
+          to: undefined,
         };
     }
   };
@@ -177,6 +182,7 @@ export default function Reports() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="all">Alle tider</SelectItem>
                     <SelectItem value="today">I dag</SelectItem>
                     <SelectItem value="week">Denne uken</SelectItem>
                     <SelectItem value="month">Denne måneden</SelectItem>
@@ -271,7 +277,11 @@ export default function Reports() {
           <CardHeader>
             <CardTitle>Tidsstemplinger</CardTitle>
             <CardDescription>
-              {format(new Date(from), "dd. MMMM", { locale: nb })} - {format(new Date(to), "dd. MMMM yyyy", { locale: nb })}
+              {from && to ? (
+                <>{format(new Date(from), "dd. MMMM", { locale: nb })} - {format(new Date(to), "dd. MMMM yyyy", { locale: nb })}</>
+              ) : (
+                "Alle tider"
+              )}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -400,6 +410,51 @@ export default function Reports() {
                     </div>
                   </div>
                 </div>
+                
+                {/* Item Breakdown Section */}
+                {salesWithoutCustomer.itemBreakdown && salesWithoutCustomer.itemBreakdown.length > 0 && (
+                  <div className="border-t pt-4">
+                    <h4 className="font-semibold mb-3">Solgte varer og tjenester</h4>
+                    <div className="bg-white border rounded-lg overflow-hidden">
+                      <table className="w-full">
+                        <thead className="bg-gray-50 border-b">
+                          <tr>
+                            <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Navn</th>
+                            <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Type</th>
+                            <th className="px-4 py-3 text-right text-sm font-medium text-gray-700">Antall</th>
+                            <th className="px-4 py-3 text-right text-sm font-medium text-gray-700">Omsetning</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {salesWithoutCustomer.itemBreakdown.map((item: any, index: number) => (
+                            <tr key={index} className="border-b last:border-b-0 hover:bg-gray-50">
+                              <td className="px-4 py-3 text-sm font-medium text-gray-900">{item.itemName}</td>
+                              <td className="px-4 py-3 text-sm text-gray-600">
+                                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                  item.itemType === 'service' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
+                                }`}>
+                                  {item.itemType === 'service' ? 'Tjeneste' : 'Produkt'}
+                                </span>
+                              </td>
+                              <td className="px-4 py-3 text-sm text-right text-gray-900">{item.quantity}</td>
+                              <td className="px-4 py-3 text-sm text-right font-medium text-gray-900">
+                                {item.totalRevenue.toFixed(2)} kr
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                        <tfoot className="bg-gray-50 border-t">
+                          <tr>
+                            <td colSpan={3} className="px-4 py-3 text-sm font-bold text-gray-900">Total</td>
+                            <td className="px-4 py-3 text-sm text-right font-bold text-gray-900">
+                              {salesWithoutCustomer.grandTotal.toFixed(2)} kr
+                            </td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <p className="text-center text-gray-500 py-8">

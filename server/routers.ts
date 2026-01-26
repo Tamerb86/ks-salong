@@ -1322,6 +1322,41 @@ export const appRouter = router({
         
         const grandTotal = totalWithoutCustomer + totalWithCustomer;
         
+        // Get item breakdown (services/products sold)
+        const itemBreakdown = await Promise.all(
+          orders.map(async (order) => {
+            const items = await db.getOrderItems(order.id);
+            return items.map(item => ({
+              itemName: item.itemName,
+              itemType: item.itemType,
+              quantity: item.quantity,
+              unitPrice: parseFloat(item.unitPrice),
+              total: parseFloat(item.total),
+            }));
+          })
+        );
+        
+        // Flatten and group by item name
+        const flatItems = itemBreakdown.flat();
+        const groupedItems = flatItems.reduce((acc: any, item) => {
+          const key = item.itemName;
+          if (!acc[key]) {
+            acc[key] = {
+              itemName: item.itemName,
+              itemType: item.itemType,
+              quantity: 0,
+              totalRevenue: 0,
+            };
+          }
+          acc[key].quantity += item.quantity;
+          acc[key].totalRevenue += item.total;
+          return acc;
+        }, {});
+        
+        const itemBreakdownArray = Object.values(groupedItems).sort(
+          (a: any, b: any) => b.totalRevenue - a.totalRevenue
+        );
+        
         return {
           ordersWithoutCustomer: ordersWithoutCustomer.length,
           ordersWithCustomer: ordersWithCustomer.length,
@@ -1331,6 +1366,7 @@ export const appRouter = router({
           grandTotal,
           percentageWithoutCustomer: grandTotal > 0 ? (totalWithoutCustomer / grandTotal) * 100 : 0,
           percentageWithCustomer: grandTotal > 0 ? (totalWithCustomer / grandTotal) * 100 : 0,
+          itemBreakdown: itemBreakdownArray,
         };
       }),
   }),

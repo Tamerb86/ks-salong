@@ -1,0 +1,90 @@
+{
+  "query": "SELECT id, orderNumber, customerId, total, status, createdAt FROM orders ORDER BY createdAt DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZWkmDdVMGTAoV.aeceea61840d --database oUNZ2iw3V7HdbF8pGMTUk4 --execute SELECT id, orderNumber, customerId, total, status, createdAt FROM orders ORDER BY createdAt DESC LIMIT 10;",
+  "rows": [
+    {
+      "id": "90021",
+      "orderNumber": "INV-20260126-690",
+      "customerId": "NULL",
+      "total": "1100.00",
+      "status": "completed",
+      "createdAt": "2026-01-26 21:13:17"
+    },
+    {
+      "id": "90020",
+      "orderNumber": "INV-20260126-784",
+      "customerId": "NULL",
+      "total": "1050.00",
+      "status": "completed",
+      "createdAt": "2026-01-26 21:12:07"
+    },
+    {
+      "id": "90019",
+      "orderNumber": "INV-20260126-004",
+      "customerId": "NULL",
+      "total": "1500.00",
+      "status": "completed",
+      "createdAt": "2026-01-26 21:05:09"
+    },
+    {
+      "id": "90018",
+      "orderNumber": "INV-20260126-773",
+      "customerId": "NULL",
+      "total": "1500.00",
+      "status": "completed",
+      "createdAt": "2026-01-26 21:04:43"
+    },
+    {
+      "id": "90017",
+      "orderNumber": "INV-20260126-331",
+      "customerId": "NULL",
+      "total": "350.00",
+      "status": "completed",
+      "createdAt": "2026-01-26 20:57:13"
+    },
+    {
+      "id": "90016",
+      "orderNumber": "INV-20260126-772",
+      "customerId": "NULL",
+      "total": "1500.00",
+      "status": "completed",
+      "createdAt": "2026-01-26 20:50:56"
+    },
+    {
+      "id": "90015",
+      "orderNumber": "INV-20260126-501",
+      "customerId": "NULL",
+      "total": "1500.00",
+      "status": "completed",
+      "createdAt": "2026-01-26 20:49:42"
+    },
+    {
+      "id": "90014",
+      "orderNumber": "INV-20260126-255",
+      "customerId": "NULL",
+      "total": "350.00",
+      "status": "completed",
+      "createdAt": "2026-01-26 20:37:36"
+    },
+    {
+      "id": "90013",
+      "orderNumber": "INV-20260126-096",
+      "customerId": "NULL",
+      "total": "2550.00",
+      "status": "completed",
+      "createdAt": "2026-01-26 20:36:07"
+    },
+    {
+      "id": "90012",
+      "orderNumber": "INV-20260126-712",
+      "customerId": "NULL",
+      "total": "1500.00",
+      "status": "completed",
+      "createdAt": "2026-01-26 20:34:19"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\torderNumber\tcustomerId\ttotal\tstatus\tcreatedAt\n90021\tINV-20260126-690\tNULL\t1100.00\tcompleted\t2026-01-26 21:13:17\n90020\tINV-20260126-784\tNULL\t1050.00\tcompleted\t2026-01-26 21:12:07\n90019\tINV-20260126-004\tNULL\t1500.00\tcompleted\t2026-01-26 21:05:09\n90018\tINV-20260126-773\tNULL\t1500.00\tcompleted\t2026-01-26 21:04:43\n90017\tINV-20260126-331\tNULL\t350.00\tcompleted\t2026-01-26 20:57:13\n90016\tINV-20260126-772\tNULL\t1500.00\tcompleted\t2026-01-26 20:50:56\n90015\tINV-20260126-501\tNULL\t1500.00\tcompleted\t2026-01-26 20:49:42\n90014\tINV-20260126-255\tNULL\t350.00\tcompleted\t2026-01-26 20:37:36\n90013\tINV-20260126-096\tNULL\t2550.00\tcompleted\t2026-01-26 20:36:07\n90012\tINV-20260126-712\tNULL\t1500.00\tcompleted\t2026-01-26 20:34:19\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

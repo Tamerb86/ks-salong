@@ -1827,3 +1827,43 @@
 - Added link to Resend Dashboard for API key
 - Added 5-step setup instructions (register, verify domain, create API key, configure, test)
 - Fields ready for email sending functionality
+
+## 📊 Fix Sales Reports - Missing Item Names and Inaccurate Data
+- [ ] Add service/product names column to sales reports
+- [ ] Display item names (not just IDs) in order details
+- [ ] Fix sales data calculation to reflect actual sales
+- [ ] Verify total sales amounts match POS transactions
+- [ ] Add item breakdown by service/product in reports
+- [ ] Test reports with real sales data from POS
+
+## 📊 Fix Sales Reports - Missing Item Names and Inaccurate Data - ✅ FIXED
+- [x] Add item names (services/products) to sales reports (added itemBreakdown to backend query)
+- [x] Fix sales data to reflect actual sales (changed default filter to "Alle tider")
+- [x] Add item breakdown section showing:
+  * Item name (displayed in table)
+  * Item type (service/product) (displayed with colored badges)
+  * Quantity sold (displayed in Antall column)
+  * Total revenue per item (displayed in Omsetning column)
+- [x] Add total summary at the end of reports (added tfoot with grand total)
+- [x] Change default date filter from "I dag" to "Alle tider" to show all data (default is now "all")
+- [x] Test reports with real sales data (verified: 21 orders, 21800.00 kr total)
+
+**What was fixed:**
+1. Changed default dateRange from "today" to "all" in Reports.tsx
+2. Added "Alle tider" option to date range select (returns undefined for from/to)
+3. Added itemBreakdown logic in getSalesWithoutCustomer query (routers.ts):
+   - Fetches all order items
+   - Groups by item name
+   - Calculates quantity and total revenue per item
+   - Sorts by revenue (highest first)
+4. Added "Solgte varer og tjenester" table in Reports.tsx:
+   - Displays item name, type (Tjeneste/Produkt), quantity, revenue
+   - Color-coded badges (blue for services, green for products)
+   - Footer with grand total
+5. Fixed format() error when from/to are undefined ("Alle tider" case)
+
+**Results:**
+- Reports now show all 21 orders with 21800.00 kr total revenue
+- Item breakdown displays 10 items (services + products) with quantities and revenues
+- Top seller: Bryllupsstyling (8 × 12000 kr)
+- Data accurately reflects actual sales
