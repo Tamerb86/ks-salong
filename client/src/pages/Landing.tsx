@@ -536,7 +536,7 @@ export default function Landing() {
                   <div>
                     <h3 className="font-semibold text-lg mb-1">Åpningstider</h3>
                     <div className="text-purple-100 space-y-1">
-                      <p>Mandag - Lørdag: 10:00 – 19:00</p>
+                      <p>Mandag - Lørdag: 10:00 – 18:00</p>
                       <p>Søndag: Stengt</p>
                     </div>
                   </div>
