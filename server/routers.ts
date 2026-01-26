@@ -132,7 +132,7 @@ export const appRouter = router({
           startDate: new Date(input.startDate),
           endDate: new Date(input.endDate),
           reason: input.reason,
-          createdBy: ctx.user!.id,
+          createdBy: 0, // PIN auth - no OAuth user
         });
         return { success: true };
       }),
@@ -411,7 +411,7 @@ export const appRouter = router({
           status: "confirmed",
           paymentMethod: input.paymentMethod,
           notes: input.notes || null,
-          createdBy: ctx.user!.id,
+          createdBy: 0, // PIN auth - no OAuth user
         });
         return { id, success: true };
       }),
@@ -439,7 +439,7 @@ export const appRouter = router({
           await db.updateAppointment(id, {
             ...updateData,
             cancelledAt: new Date(),
-            cancelledBy: ctx.user!.id
+            cancelledBy: 0 // PIN auth - no OAuth user
           });
         } else {
           await db.updateAppointment(id, updateData);
@@ -889,7 +889,7 @@ export const appRouter = router({
         const orderId = await db.createOrder({
           orderNumber,
           customerId: input.customerId,
-          staffId: input.employeeId || ctx.user!.id, // Use logged-in employee or fallback to current user
+          staffId: input.employeeId || 0, // Use logged-in employee or default
           subtotal: input.subtotal,
           taxAmount: input.taxAmount,
           discountAmount: input.discountAmount || "0.00",
