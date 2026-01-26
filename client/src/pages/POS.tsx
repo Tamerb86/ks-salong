@@ -184,10 +184,7 @@ export default function POS() {
       return;
     }
 
-    if (!customerId) {
-      toast.error("Velg en kunde");
-      return;
-    }
+    // Customer is now optional for guest/walk-in sales
 
     const orderItems = cart.map((item) => ({
       itemType: item.type,
@@ -201,7 +198,7 @@ export default function POS() {
     }));
 
     createOrderMutation.mutate({
-      customerId,
+      customerId: customerId || undefined,
       items: orderItems,
       subtotal: calculateSubtotal().toString(),
       taxAmount: calculateMVA().toString(),
@@ -340,11 +337,16 @@ export default function POS() {
                     </Button>
                   )}
                 </div>
-                {customerId && (
-                  <div className="mt-2">
+                <div className="mt-2">
+                  {customerId ? (
                     <Badge className="bg-green-100 text-green-700">Kunde valgt</Badge>
-                  </div>
-                )}
+                  ) : (
+                    <Badge variant="outline" className="text-gray-600">
+                      <User className="h-3 w-3 mr-1" />
+                      Walk-in kunde (valgfritt)
+                    </Badge>
+                  )}
+                </div>
               </CardContent>
             </Card>
 

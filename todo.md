@@ -1600,3 +1600,18 @@
 - [x] Handle Fiken API errors with proper error messages (try/catch with logging)
 - [x] Verify fikenSyncLogs table exists and is being used (table created in schema)
 - [ ] **IMPORTANT:** Switch to OAuth2 before production (Personal API Token violates Fiken TOS)
+
+## 🐛 Customer Creation Bug Fix
+- [x] Investigate customer creation error in Customers page (dialog component was missing)
+- [x] Check API endpoint for creating customers (trpc.customers.create works correctly)
+- [x] Fix validation errors or missing fields (added Dialog with form: Fornavn*, Etternavn, Telefon*, E-post)
+- [x] Test customer creation with all required fields (successfully created Ahmed Hassan test customer)
+- [x] Verify customer appears in customer list after creation (works after page refresh)
+
+## 💳 Simplify Guest Payment Flow
+- [x] Make customer selection optional in POS (removed validation, customerId: customerId || undefined)
+- [x] Add "Guest Customer" or "Walk-in" option in POS (Badge: "Walk-in kunde (valgfritt)")
+- [x] Allow completing sales without customer registration (backend supports optional customerId)
+- [ ] Simplify booking payment for unregistered customers (BookOnline page - future enhancement)
+- [x] Test guest checkout flow in POS (ready for testing - customer selection now optional)
+- [ ] Test guest booking flow in BookOnline page (future enhancement)

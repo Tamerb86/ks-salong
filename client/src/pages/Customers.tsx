@@ -34,12 +34,21 @@ import { useLocation } from "wouter";
 import { Layout } from "@/components/Layout";
 import { LiveBadge } from "@/components/ui/live-badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 export default function Customers() {
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
+  const [newCustomer, setNewCustomer] = useState({
+    firstName: "",
+    lastName: "",
+    phone: "",
+    email: "",
+  });
+
 
   const { data: customers, isLoading } = trpc.customers.list.useQuery(undefined, {
     refetchInterval: 30000, // Refetch every 30 seconds for real-time updates
@@ -56,6 +65,25 @@ export default function Customers() {
     { customerId: selectedCustomerId! },
     { enabled: !!selectedCustomerId }
   );
+
+  const createCustomerMutation = trpc.customers.create.useMutation({
+    onSuccess: () => {
+      toast.success("Kunde lagt til");
+      setIsAddDialogOpen(false);
+      setNewCustomer({ firstName: "", lastName: "", phone: "", email: "" });
+    },
+    onError: (error) => {
+      toast.error(error.message || "Kunne ikke legge til kunde");
+    },
+  });
+
+  const handleCreateCustomer = () => {
+    if (!newCustomer.firstName || !newCustomer.phone) {
+      toast.error("Fornavn og telefon er påkrevd");
+      return;
+    }
+    createCustomerMutation.mutate(newCustomer);
+  };
 
   const filteredCustomers = customers?.customers?.filter((customer: any) => {
     const query = searchQuery.toLowerCase();
@@ -443,6 +471,88 @@ export default function Customers() {
               )}
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Customer Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Legg til ny kunde</DialogTitle>
+            <DialogDescription>
+              Fyll inn kundeinformasjon nedenfor
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="firstName">Fornavn *</Label>
+              <Input
+                id="firstName"
+                value={newCustomer.firstName}
+                onChange={(e) =>
+                  setNewCustomer({ ...newCustomer, firstName: e.target.value })
+                }
+                placeholder="Ola"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="lastName">Etternavn</Label>
+              <Input
+                id="lastName"
+                value={newCustomer.lastName}
+                onChange={(e) =>
+                  setNewCustomer({ ...newCustomer, lastName: e.target.value })
+                }
+                placeholder="Nordmann"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone">Telefon *</Label>
+              <Input
+                id="phone"
+                type="tel"
+                value={newCustomer.phone}
+                onChange={(e) =>
+                  setNewCustomer({ ...newCustomer, phone: e.target.value })
+                }
+                placeholder="+47 123 45 678"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">E-post</Label>
+              <Input
+                id="email"
+                type="email"
+                value={newCustomer.email}
+                onChange={(e) =>
+                  setNewCustomer({ ...newCustomer, email: e.target.value })
+                }
+                placeholder="ola@example.com"
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-3">
+            <Button
+              variant="outline"
+              onClick={() => setIsAddDialogOpen(false)}
+            >
+              Avbryt
+            </Button>
+            <Button
+              onClick={handleCreateCustomer}
+              disabled={createCustomerMutation.isPending}
+              className="bg-gradient-to-r from-purple-600 to-amber-600 hover:from-purple-700 hover:to-amber-700"
+            >
+              {createCustomerMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Lagrer...
+                </>
+              ) : (
+                "Lagre kunde"
+              )}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
