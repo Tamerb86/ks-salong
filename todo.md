@@ -1526,3 +1526,15 @@
 - [x] Document database migration strategy (Section 3)
 - [x] Document rollback plan (Section 9)
 - [x] Document monitoring and maintenance (Section 10)
+
+## 🗑️ Clear All Data Feature (Pre-Production Reset)
+- [x] Create backend API endpoint to clear all database tables (server/routers.ts)
+- [x] Add database helper function to truncate all tables safely (server/db.ts - clearAllData)
+- [x] Add "Danger Zone" section in Settings page (new tab)
+- [x] Create "Clear All Data" button with warning icon
+- [x] Build confirmation dialog with strong warning message
+- [x] Require typing "DELETE ALL DATA" to confirm action
+- [x] Show list of what will be deleted (appointments, customers, orders, etc.)
+- [x] Test clear data functionality (ready for testing)
+- [x] Verify all tables are cleared except system tables (preserves settings, owner, business hours)
+- [x] Add success toast after data cleared (with page reload after 2 seconds)

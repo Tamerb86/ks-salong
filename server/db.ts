@@ -1648,3 +1648,106 @@ export async function createUser(data: any): Promise<number> {
   const result = await db.insert(users).values(insertData);
   return Number(result[0].insertId);
 }
+
+/**
+ * ============================================
+ * DANGER ZONE - CLEAR ALL DATA
+ * ============================================
+ */
+
+/**
+ * Clear all data from the database (except system settings)
+ * WARNING: This is irreversible! Use only for resetting before production.
+ */
+export async function clearAllData(): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  try {
+    // Delete in order to respect foreign key constraints
+    console.log("[ClearData] Starting database wipe...");
+    
+    // 1. Delete all transactional data
+    await db.delete(orderItems);
+    console.log("[ClearData] Deleted orderItems");
+    
+    await db.delete(orders);
+    console.log("[ClearData] Deleted orders");
+    
+    await db.delete(payments);
+    console.log("[ClearData] Deleted payments");
+    
+    // 2. Delete appointments and queue
+    await db.delete(appointments);
+    console.log("[ClearData] Deleted appointments");
+    
+    await db.delete(dropInQueue);
+    console.log("[ClearData] Deleted dropInQueue");
+    
+    // 3. Delete time tracking
+    await db.delete(timeEntries);
+    console.log("[ClearData] Deleted timeEntries");
+    
+    // 4. Delete customer data
+    await db.delete(customerNotes);
+    console.log("[ClearData] Deleted customerNotes");
+    
+    await db.delete(customerTags);
+    console.log("[ClearData] Deleted customerTags");
+    
+    await db.delete(customers);
+    console.log("[ClearData] Deleted customers");
+    
+    // 5. Delete staff-related data
+    await db.delete(staffLeaves);
+    console.log("[ClearData] Deleted staffLeaves");
+    
+    await db.delete(serviceStaff);
+    console.log("[ClearData] Deleted serviceStaff");
+    
+    await db.delete(permissions);
+    console.log("[ClearData] Deleted permissions");
+    
+    // 6. Delete services and products
+    await db.delete(services);
+    console.log("[ClearData] Deleted services");
+    
+    await db.delete(products);
+    console.log("[ClearData] Deleted products");
+    
+    // 7. Delete logs and reports
+    await db.delete(auditLogs);
+    console.log("[ClearData] Deleted auditLogs");
+    
+    await db.delete(dailyReports);
+    console.log("[ClearData] Deleted dailyReports");
+    
+    await db.delete(dashboardAccessLogs);
+    console.log("[ClearData] Deleted dashboardAccessLogs");
+    
+    await db.delete(fikenSyncLogs);
+    console.log("[ClearData] Deleted fikenSyncLogs");
+    
+    // 8. Delete terminal readers
+    await db.delete(terminalReaders);
+    console.log("[ClearData] Deleted terminalReaders");
+    
+    // 9. Delete users (except owner)
+    await db.delete(users).where(ne(users.role, 'owner'));
+    console.log("[ClearData] Deleted non-owner users");
+    
+    // NOTE: We keep these tables:
+    // - salonSettings (system configuration)
+    // - businessHours (business configuration)
+    // - holidays (business configuration)
+    // - notificationTemplates (system templates)
+    // - users with role='owner' (system owner)
+    
+    console.log("[ClearData] ✅ Database wipe completed successfully");
+  } catch (error) {
+    console.error("[ClearData] ❌ Failed to clear data:", error);
+    throw error;
+  }
+}

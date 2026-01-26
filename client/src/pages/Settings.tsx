@@ -9,6 +9,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { trpc } from "@/lib/trpc";
 import { 
   Loader2, 
@@ -26,6 +36,8 @@ import {
   Calculator,
   CheckCircle,
   XCircle,
+  AlertTriangle,
+  Trash2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -34,7 +46,7 @@ import { FikenTab } from "@/components/FikenTab";
 import { BusinessHoursTab } from "@/components/BusinessHoursTab";
 import { QRCodeSVG } from "qrcode.react";
 
-type TabId = "overview" | "google-calendar" | "notifications" | "booking" | "payment" | "staff" | "fiken" | "goals" | "workplan" | "conflicts" | "reports" | "history" | "business-hours";
+type TabId = "overview" | "google-calendar" | "notifications" | "booking" | "payment" | "staff" | "fiken" | "goals" | "workplan" | "conflicts" | "reports" | "history" | "business-hours" | "danger-zone";
 
 interface Tab {
   id: TabId;
@@ -52,6 +64,7 @@ const tabs: Tab[] = [
   { id: "staff", label: "Ansatte", icon: <Users className="h-4 w-4" /> },
   { id: "fiken", label: "Fiken Regnskap", icon: <Calculator className="h-4 w-4" /> },
   { id: "reports", label: "Rapporter", icon: <BarChart3 className="h-4 w-4" /> },
+  { id: "danger-zone", label: "Faresone", icon: <AlertTriangle className="h-4 w-4" /> },
 ];
 
 export default function Settings() {
@@ -104,6 +117,24 @@ export default function Settings() {
       return false;
     }
   };
+
+  // Clear data dialog
+  const [showClearDataDialog, setShowClearDataDialog] = useState(false);
+  const [confirmationText, setConfirmationText] = useState("");
+  const clearDataMutation = trpc.settings.clearAllData.useMutation({
+    onSuccess: () => {
+      toast.success("Alle data er slettet! Systemet er nullstilt.");
+      setShowClearDataDialog(false);
+      setConfirmationText("");
+      // Reload page after 2 seconds
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    },
+    onError: (error) => {
+      toast.error("Feil ved sletting: " + error.message);
+    },
+  });
 
   // Google Calendar settings
   const [googleSyncEnabled, setGoogleSyncEnabled] = useState(false);
@@ -813,7 +844,157 @@ export default function Settings() {
                 </CardContent>
               </Card>
             )}
+
+            {activeTab === "danger-zone" && (
+              <Card className="border-red-300">
+                <CardHeader className="bg-red-50">
+                  <CardTitle className="flex items-center gap-2 text-red-700">
+                    <AlertTriangle className="h-5 w-5" />
+                    Faresone
+                  </CardTitle>
+                  <CardDescription className="text-red-600">
+                    Disse handlingene kan ikke angres. Vær ekstremt forsiktig!
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6 pt-6">
+                  {/* Clear All Data Section */}
+                  <div className="border-2 border-red-300 rounded-lg p-6 bg-red-50">
+                    <div className="flex items-start gap-4">
+                      <div className="p-3 bg-red-600 rounded-lg">
+                        <Trash2 className="h-6 w-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-red-900 mb-2">
+                          Slett alle data
+                        </h3>
+                        <p className="text-sm text-red-700 mb-4">
+                          Dette vil permanent slette alle data fra systemet:
+                        </p>
+                        <ul className="text-sm text-red-700 space-y-1 mb-4 ml-4 list-disc">
+                          <li>Alle avtaler (bookinger)</li>
+                          <li>Alle kunder</li>
+                          <li>Alle ordrer og salg</li>
+                          <li>Alle betalinger</li>
+                          <li>Alle tidsstempler</li>
+                          <li>Drop-in kø</li>
+                          <li>Tjenester og produkter</li>
+                          <li>Ansatte (unntatt eier)</li>
+                          <li>Alle rapporter og logger</li>
+                        </ul>
+                        <div className="p-3 bg-yellow-50 border border-yellow-300 rounded-lg mb-4">
+                          <p className="text-sm text-yellow-800 font-medium">
+                            ⚠️ Følgende data vil IKKE bli slettet:
+                          </p>
+                          <ul className="text-sm text-yellow-700 mt-2 ml-4 list-disc">
+                            <li>Salonginformasjon og innstillinger</li>
+                            <li>Åpningstider</li>
+                            <li>Eier-konto</li>
+                          </ul>
+                        </div>
+                        <p className="text-sm text-red-800 font-semibold mb-4">
+                          ⚠️ ADVARSEL: Denne handlingen kan IKKE angres!
+                        </p>
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          onClick={() => setShowClearDataDialog(true)}
+                          className="bg-red-600 hover:bg-red-700"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Slett alle data
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Info Box */}
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-sm text-blue-800">
+                      💡 <strong>Tips:</strong> Bruk denne funksjonen før du går i produksjon for å fjerne testdata.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </form>
+
+          {/* Clear Data Confirmation Dialog */}
+          <AlertDialog open={showClearDataDialog} onOpenChange={setShowClearDataDialog}>
+            <AlertDialogContent className="max-w-2xl">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="flex items-center gap-2 text-red-700">
+                  <AlertTriangle className="h-6 w-6" />
+                  Er du helt sikker?
+                </AlertDialogTitle>
+                <AlertDialogDescription className="space-y-4">
+                  <p className="text-base font-semibold text-red-600">
+                    Denne handlingen vil PERMANENT slette alle data fra systemet!
+                  </p>
+                  <p className="text-sm text-gray-700">
+                    Følgende data vil bli slettet:
+                  </p>
+                  <ul className="text-sm text-gray-700 space-y-1 ml-4 list-disc">
+                    <li>Alle avtaler (bookinger) - {"inkludert fremtidige avtaler"}</li>
+                    <li>Alle kunder - {"inkludert kontaktinformasjon og historikk"}</li>
+                    <li>Alle ordrer og salg - {"inkludert inntektsdata"}</li>
+                    <li>Alle betalinger - {"inkludert transaksjonshistorikk"}</li>
+                    <li>Alle tidsstempler - {"inkludert arbeidstimer"}</li>
+                    <li>Drop-in kø - {"alle ventende kunder"}</li>
+                    <li>Tjenester og produkter - {"inkludert priser"}</li>
+                    <li>Ansatte - {"unntatt eier-kontoen"}</li>
+                    <li>Alle rapporter og logger</li>
+                  </ul>
+                  <div className="p-3 bg-red-50 border-2 border-red-300 rounded-lg">
+                    <p className="text-sm text-red-800 font-bold">
+                      ⚠️ DENNE HANDLINGEN KAN IKKE ANGRES!
+                    </p>
+                    <p className="text-sm text-red-700 mt-2">
+                      Det finnes ingen måte å gjenopprette dataene etter sletting.
+                    </p>
+                  </div>
+                  <div className="space-y-2 pt-4">
+                    <Label htmlFor="confirmText" className="text-base font-semibold">
+                      Skriv <span className="font-mono bg-red-100 px-2 py-1 rounded">DELETE ALL DATA</span> for å bekrefte:
+                    </Label>
+                    <Input
+                      id="confirmText"
+                      value={confirmationText}
+                      onChange={(e) => setConfirmationText(e.target.value)}
+                      placeholder="Skriv DELETE ALL DATA her"
+                      className="font-mono"
+                      autoComplete="off"
+                    />
+                  </div>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => {
+                  setConfirmationText("");
+                  setShowClearDataDialog(false);
+                }}>
+                  Avbryt
+                </AlertDialogCancel>
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    if (confirmationText === "DELETE ALL DATA") {
+                      clearDataMutation.mutate({ confirmation: "DELETE ALL DATA" });
+                    } else {
+                      toast.error("Du må skrive 'DELETE ALL DATA' for å bekrefte");
+                    }
+                  }}
+                  disabled={confirmationText !== "DELETE ALL DATA" || clearDataMutation.isPending}
+                  className="bg-red-600 hover:bg-red-700"
+                >
+                  {clearDataMutation.isPending && (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  )}
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Ja, slett alt permanent
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
     </Layout>

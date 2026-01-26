@@ -1426,6 +1426,31 @@ export const appRouter = router({
         const logs = await db.getFikenSyncLogs(input?.limit || 100);
         return logs;
       }),
+    
+    // DANGER ZONE: Clear all data
+    clearAllData: adminProcedure
+      .input(z.object({
+        confirmation: z.literal("DELETE ALL DATA"),
+      }))
+      .mutation(async ({ input }) => {
+        if (input.confirmation !== "DELETE ALL DATA") {
+          throw new TRPCError({ 
+            code: "BAD_REQUEST", 
+            message: "Bekreftelse er feil. Skriv 'DELETE ALL DATA' for å fortsette." 
+          });
+        }
+        
+        try {
+          await db.clearAllData();
+          return { success: true, message: "Alle data er slettet" };
+        } catch (error) {
+          console.error("[ClearData] Error:", error);
+          throw new TRPCError({ 
+            code: "INTERNAL_SERVER_ERROR", 
+            message: "Kunne ikke slette data. Se server-logger for detaljer." 
+          });
+        }
+      }),
   }),
 
   terminal: router({
