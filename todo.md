@@ -1285,3 +1285,15 @@
 - [x] Add working hours fields (start time, end time for each day)
 - [x] Fix SQL query error in createUser function (VALUES with ? placeholders)
 - [x] Test employee creation with all fields populated
+
+## Fix Staff Page TypeError
+- [x] Fix workingDays.map() error when workingDays is undefined or string
+- [x] Add proper type checking before calling array methods
+- [x] Test staff page loads correctly after fix
+
+## Admin Booking System
+- [x] Add "Legg til avtale" button in Appointments page for admin
+- [x] Create admin booking dialog with all fields (customer, service, staff, date, time)
+- [x] Add payment method selection (Cash, Card, Vipps, Stripe, Pay Later)
+- [x] Allow admin to create appointments without payment requirement
+- [x] Test admin booking flow end-to-end

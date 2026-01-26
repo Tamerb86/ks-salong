@@ -101,16 +101,18 @@ export const products = mysqlTable("products", {
 export const appointments = mysqlTable("appointments", {
   id: int("id").autoincrement().primaryKey(),
   customerId: int("customerId").notNull(),
-  staffId: int("staffId").notNull(),
+  staffId: int("staffId"), // Nullable - can be null for "first available"
   serviceId: int("serviceId").notNull(),
   appointmentDate: timestamp("appointmentDate").notNull(),
   startTime: varchar("startTime", { length: 5 }).notNull(), // HH:MM format
   endTime: varchar("endTime", { length: 5 }).notNull(),
   status: mysqlEnum("status", ["pending", "confirmed", "checked_in", "no_show", "cancelled", "completed"]).default("pending").notNull(),
+  paymentMethod: varchar("paymentMethod", { length: 50 }), // cash, card, vipps, stripe, later
   notes: text("notes"),
   cancellationReason: text("cancellationReason"),
   cancelledAt: timestamp("cancelledAt"),
   cancelledBy: int("cancelledBy"),
+  createdBy: int("createdBy"), // User who created the appointment
   reminderSent24h: boolean("reminderSent24h").default(false).notNull(),
   reminderSent2h: boolean("reminderSent2h").default(false).notNull(),
   // Vipps Payment Integration

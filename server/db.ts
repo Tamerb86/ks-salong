@@ -458,6 +458,13 @@ export async function searchCustomers(query: string) {
     .limit(20);
 }
 
+export async function getCustomerByPhone(phone: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(customers).where(eq(customers.phone, phone)).limit(1);
+  return result[0] || null;
+}
+
 export async function createCustomer(data: typeof customers.$inferInsert) {
   const db = await getDb();
   if (!db) return;

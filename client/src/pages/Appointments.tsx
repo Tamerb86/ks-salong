@@ -10,7 +10,7 @@ import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { format } from "date-fns";
 import { nb } from "date-fns/locale";
-import { Pencil, Trash2, Calendar, Clock, User, Phone } from "lucide-react";
+import { Pencil, Trash2, Calendar, Clock, User, Phone, Plus } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -39,6 +39,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 
 export default function Appointments() {
@@ -46,12 +48,26 @@ export default function Appointments() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
   const [editDate, setEditDate] = useState("");
   const [editTime, setEditTime] = useState("");
+  const [addFormData, setAddFormData] = useState({
+    customerName: "",
+    customerPhone: "",
+    customerEmail: "",
+    serviceId: "",
+    staffId: "0",
+    appointmentDate: "",
+    appointmentTime: "",
+    paymentMethod: "cash",
+    notes: ""
+  });
 
-  // Fetch appointments
+  // Fetch data
   const { data: appointments, isLoading, refetch } = trpc.appointments.list.useQuery();
+  const { data: services } = trpc.services.list.useQuery();
+  const { data: staff } = trpc.staff.list.useQuery();
   const updateMutation = trpc.appointments.update.useMutation({
     onSuccess: () => {
       toast.success("Avtale oppdatert!");
@@ -70,6 +86,27 @@ export default function Appointments() {
     },
     onError: () => {
       toast.error("Kunne ikke kansellere avtale");
+    },
+  });
+  const createMutation = trpc.appointments.create.useMutation({
+    onSuccess: () => {
+      toast.success("Avtale opprettet!");
+      refetch();
+      setAddDialogOpen(false);
+      setAddFormData({
+        customerName: "",
+        customerPhone: "",
+        customerEmail: "",
+        serviceId: "",
+        staffId: "0",
+        appointmentDate: "",
+        appointmentTime: "",
+        paymentMethod: "cash",
+        notes: ""
+      });
+    },
+    onError: (error) => {
+      toast.error("Kunne ikke opprette avtale: " + error.message);
     },
   });
 
@@ -98,6 +135,19 @@ export default function Appointments() {
   const handleConfirmCancel = () => {
     if (!selectedAppointment) return;
     cancelMutation.mutate({ id: selectedAppointment.id });
+  };
+
+  const handleAddAppointment = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!addFormData.customerName || !addFormData.customerPhone || !addFormData.serviceId || !addFormData.appointmentDate || !addFormData.appointmentTime) {
+      toast.error("Vennligst fyll ut alle obligatoriske felt");
+      return;
+    }
+    createMutation.mutate({
+      ...addFormData,
+      serviceId: parseInt(addFormData.serviceId),
+      staffId: addFormData.staffId && addFormData.staffId !== "0" ? parseInt(addFormData.staffId) : undefined,
+    })
   };
 
   if (authLoading) {
@@ -137,6 +187,10 @@ export default function Appointments() {
               </div>
               <p className="text-gray-600 mt-1">Administrer avtaler med kalender- eller listevisning</p>
             </div>
+            <Button onClick={() => setAddDialogOpen(true)} className="bg-purple-600 hover:bg-purple-700">
+              <Plus className="h-4 w-4 mr-2" />
+              Legg til avtale
+            </Button>
           </div>
 
           {/* Tabs for different views */}
@@ -254,6 +308,159 @@ export default function Appointments() {
             </TabsContent>
           </Tabs>
         </div>
+
+        {/* Add Appointment Dialog */}
+        <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+            <form onSubmit={handleAddAppointment}>
+              <DialogHeader>
+                <DialogTitle>Legg til ny avtale</DialogTitle>
+                <DialogDescription>
+                  Fyll ut informasjonen nedenfor for å opprette en ny avtale
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                {/* Customer Information */}
+                <div className="space-y-2">
+                  <Label htmlFor="customerName">Kundenavn *</Label>
+                  <Input
+                    id="customerName"
+                    value={addFormData.customerName}
+                    onChange={(e) => setAddFormData({ ...addFormData, customerName: e.target.value })}
+                    placeholder="Fullt navn"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="customerPhone">Telefon *</Label>
+                  <Input
+                    id="customerPhone"
+                    type="tel"
+                    value={addFormData.customerPhone}
+                    onChange={(e) => setAddFormData({ ...addFormData, customerPhone: e.target.value })}
+                    placeholder="+47 xxx xx xxx"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="customerEmail">E-post</Label>
+                  <Input
+                    id="customerEmail"
+                    type="email"
+                    value={addFormData.customerEmail}
+                    onChange={(e) => setAddFormData({ ...addFormData, customerEmail: e.target.value })}
+                    placeholder="epost@eksempel.no"
+                  />
+                </div>
+
+                {/* Service Selection */}
+                <div className="space-y-2">
+                  <Label htmlFor="service">Tjeneste *</Label>
+                  <Select
+                    value={addFormData.serviceId}
+                    onValueChange={(value) => setAddFormData({ ...addFormData, serviceId: value })}
+                  >
+                    <SelectTrigger id="service">
+                      <SelectValue placeholder="Velg tjeneste" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {services?.map((service: any) => (
+                        <SelectItem key={service.id} value={service.id.toString()}>
+                          {service.name} ({service.duration} min - {service.price} kr)
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Staff Selection */}
+                <div className="space-y-2">
+                  <Label htmlFor="staff">Ansatt</Label>
+                  <Select
+                    value={addFormData.staffId}
+                    onValueChange={(value) => setAddFormData({ ...addFormData, staffId: value })}
+                  >
+                    <SelectTrigger id="staff">
+                      <SelectValue placeholder="Første ledige" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="0">Første ledige</SelectItem>
+                      {staff?.filter((s: any) => s.role === 'barber' && s.isActive).map((s: any) => (
+                        <SelectItem key={s.id} value={s.id.toString()}>
+                          {s.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Date and Time */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="appointmentDate">Dato *</Label>
+                    <Input
+                      id="appointmentDate"
+                      type="date"
+                      value={addFormData.appointmentDate}
+                      onChange={(e) => setAddFormData({ ...addFormData, appointmentDate: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="appointmentTime">Tid *</Label>
+                    <Input
+                      id="appointmentTime"
+                      type="time"
+                      value={addFormData.appointmentTime}
+                      onChange={(e) => setAddFormData({ ...addFormData, appointmentTime: e.target.value })}
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Payment Method */}
+                <div className="space-y-2">
+                  <Label htmlFor="paymentMethod">Betalingsmetode *</Label>
+                  <Select
+                    value={addFormData.paymentMethod}
+                    onValueChange={(value) => setAddFormData({ ...addFormData, paymentMethod: value })}
+                  >
+                    <SelectTrigger id="paymentMethod">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cash">Kontant</SelectItem>
+                      <SelectItem value="card">Kort</SelectItem>
+                      <SelectItem value="vipps">Vipps</SelectItem>
+                      <SelectItem value="stripe">Stripe</SelectItem>
+                      <SelectItem value="later">Betal senere</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Notes */}
+                <div className="space-y-2">
+                  <Label htmlFor="notes">Notater</Label>
+                  <Textarea
+                    id="notes"
+                    value={addFormData.notes}
+                    onChange={(e) => setAddFormData({ ...addFormData, notes: e.target.value })}
+                    placeholder="Eventuelle notater..."
+                    rows={3}
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setAddDialogOpen(false)}>
+                  Avbryt
+                </Button>
+                <Button type="submit" className="bg-purple-600 hover:bg-purple-700" disabled={createMutation.isPending}>
+                  {createMutation.isPending ? "Oppretter..." : "Opprett avtale"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     </Layout>
   );

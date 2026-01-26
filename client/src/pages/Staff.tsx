@@ -43,7 +43,6 @@ export default function Staff() {
     isActive: true,
     skillLevel: "intermediate" as "beginner" | "intermediate" | "expert",
     durationMultiplier: "1.00",
-    bookingSlotInterval: 15,
     breakStartTime: "",
     breakEndTime: "",
   });
@@ -68,7 +67,6 @@ export default function Staff() {
     role: "barber" as "barber" | "cashier" | "manager",
     skillLevel: "intermediate" as "beginner" | "intermediate" | "expert",
     durationMultiplier: "1.00",
-    bookingSlotInterval: "15",
     breakStartTime: "",
     breakEndTime: "",
     workingHoursStart: "09:00",
@@ -119,7 +117,11 @@ export default function Staff() {
         role: "barber",
         skillLevel: "intermediate",
         durationMultiplier: "1.00",
-        bookingSlotInterval: "15",
+        breakStartTime: "",
+        breakEndTime: "",
+        workingHoursStart: "09:00",
+        workingHoursEnd: "18:00",
+        workingDays: [true, true, true, true, true, true, false],
       });
     },
     onError: (error) => {
@@ -181,7 +183,6 @@ export default function Staff() {
       isActive: staffMember.isActive ?? true,
       skillLevel: staffMember.skillLevel || "intermediate",
       durationMultiplier: staffMember.durationMultiplier || "1.00",
-      bookingSlotInterval: staffMember.bookingSlotInterval || 15,
       breakStartTime: staffMember.breakStartTime || "",
       breakEndTime: staffMember.breakEndTime || "",
     });
@@ -237,7 +238,6 @@ export default function Staff() {
     }
     createStaffMutation.mutate({
       ...addEmployeeFormData,
-      bookingSlotInterval: parseInt(addEmployeeFormData.bookingSlotInterval),
       workingDays: addEmployeeFormData.workingDays.map(d => d ? 1 : 0).join(','),
     });
   };
@@ -563,21 +563,7 @@ export default function Staff() {
                   </p>
                 </div>
                 
-                <div className="space-y-2">
-                  <Label htmlFor="edit-slot-interval">Tidsintervall for booking (minutter)</Label>
-                  <select
-                    id="edit-slot-interval"
-                    value={editFormData.bookingSlotInterval}
-                    onChange={(e) => setEditFormData({ ...editFormData, bookingSlotInterval: parseInt(e.target.value) })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  >
-                    <option value="15">15 minutter</option>
-                    <option value="30">30 minutter</option>
-                  </select>
-                  <p className="text-xs text-gray-500">
-                    Bestemmer hvor ofte tidspunkter vises i online booking
-                  </p>
-                </div>
+
                 
                 <div className="space-y-2">
                   <Label htmlFor="edit-break-start">Pausetid start (valgfritt)</Label>
@@ -840,29 +826,16 @@ export default function Staff() {
                   </select>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="add-durationMultiplier">Varighetsmultiplikator</Label>
-                    <Input
-                      id="add-durationMultiplier"
-                      type="text"
-                      value={addEmployeeFormData.durationMultiplier}
-                      onChange={(e) => setAddEmployeeFormData({ ...addEmployeeFormData, durationMultiplier: e.target.value })}
-                      placeholder="1.00"
-                    />
-                    <p className="text-xs text-gray-500">1.0 = normal, 1.2 = 20% langsommere</p>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="add-bookingSlotInterval">Tidsintervall (min)</Label>
-                    <Input
-                      id="add-bookingSlotInterval"
-                      type="number"
-                      value={addEmployeeFormData.bookingSlotInterval}
-                      onChange={(e) => setAddEmployeeFormData({ ...addEmployeeFormData, bookingSlotInterval: e.target.value })}
-                      placeholder="15"
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="add-durationMultiplier">Varighetsmultiplikator</Label>
+                  <Input
+                    id="add-durationMultiplier"
+                    type="text"
+                    value={addEmployeeFormData.durationMultiplier}
+                    onChange={(e) => setAddEmployeeFormData({ ...addEmployeeFormData, durationMultiplier: e.target.value })}
+                    placeholder="1.00"
+                  />
+                  <p className="text-xs text-gray-500">1.0 = normal, 1.2 = 20% langsommere</p>
                 </div>
                 
                 <div className="space-y-2">
