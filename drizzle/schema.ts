@@ -120,6 +120,7 @@ export const appointments = mysqlTable("appointments", {
   paymentStatus: mysqlEnum("paymentStatus", ["pending", "paid", "failed", "refunded", "expired"]).default("pending"),
   paymentAmount: decimal("paymentAmount", { precision: 10, scale: 2 }),
   paidAt: timestamp("paidAt"),
+  cancellationToken: varchar("cancellationToken", { length: 64 }).unique(), // Unique token for customer self-cancellation
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

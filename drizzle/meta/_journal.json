@@ -15,6 +15,13 @@
       "when": 1769389532600,
       "tag": "0001_ancient_miek",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1769420580772,
+      "tag": "0002_complex_vulcan",
+      "breakpoints": true
     }
   ]
 }

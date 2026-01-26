@@ -128,6 +128,15 @@ export async function getAllStaff() {
     .orderBy(asc(users.name));
 }
 
+export async function getStaffById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(users)
+    .where(eq(users.id, id))
+    .limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
 export async function updateUser(id: number, data: Partial<InsertUser>) {
   const db = await getDb();
   if (!db) return;
@@ -365,6 +374,18 @@ export async function getAppointmentById(id: number) {
   .leftJoin(services, eq(appointments.serviceId, services.id))
   .where(eq(appointments.id, id))
   .limit(1);
+  
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getAppointmentByToken(token: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select()
+    .from(appointments)
+    .where(eq(appointments.cancellationToken, token))
+    .limit(1);
   
   return result.length > 0 ? result[0] : undefined;
 }

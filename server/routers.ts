@@ -481,6 +481,10 @@ export const appRouter = router({
           throw new TRPCError({ code: "NOT_FOUND", message: "Service not found" });
         }
         
+        // Generate unique cancellation token
+        const crypto = await import("crypto");
+        const cancellationToken = crypto.randomBytes(32).toString("hex");
+        
         // Create appointment
         const appointmentId = await db.createAppointment({
           customerId: input.customerId,
@@ -493,6 +497,7 @@ export const appRouter = router({
           status: input.requirePayment ? "pending" : "confirmed",
           paymentStatus: input.requirePayment ? "pending" : undefined,
           paymentAmount: input.requirePayment ? service.price : undefined,
+          cancellationToken,
         });
         
         // If payment required, initiate Vipps payment
@@ -531,6 +536,7 @@ export const appRouter = router({
         return {
           appointmentId,
           requiresPayment: false,
+          cancellationToken,
         };
       }),
     
@@ -549,6 +555,77 @@ export const appRouter = router({
           paymentStatus: (appointment as any).paymentStatus || "pending",
           status: appointment.status,
         };
+      }),
+    
+    // Get appointment by cancellation token
+    getByToken: publicProcedure
+      .input(z.object({
+        token: z.string(),
+      }))
+      .query(async ({ input }) => {
+        const appointment = await db.getAppointmentByToken(input.token);
+        if (!appointment) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Ugyldig avbestillingskode" });
+        }
+        
+        // Get service and customer details
+        const service = await db.getServiceById(appointment.serviceId);
+        const customer = await db.getCustomerById(appointment.customerId);
+        const staff = appointment.staffId ? await db.getStaffById(appointment.staffId) : null;
+        
+        return {
+          ...appointment,
+          serviceName: service?.name,
+          customerName: customer ? `${customer.firstName} ${customer.lastName}` : undefined,
+          staffName: staff?.name,
+        };
+      }),
+    
+    // Cancel appointment via token
+    cancelByToken: publicProcedure
+      .input(z.object({
+        token: z.string(),
+        reason: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const appointment = await db.getAppointmentByToken(input.token);
+        if (!appointment) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Ugyldig avbestillingskode" });
+        }
+        
+        // Check if already cancelled
+        if (appointment.status === "cancelled") {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Denne avtalen er allerede avbestilt" });
+        }
+        
+        // Check if appointment is in the past
+        const appointmentDateTime = new Date(appointment.appointmentDate);
+        const [hours, minutes] = appointment.startTime.split(":");
+        appointmentDateTime.setHours(parseInt(hours), parseInt(minutes));
+        
+        if (appointmentDateTime < new Date()) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Kan ikke avbestille en avtale som allerede har passert" });
+        }
+        
+        // Check 24-hour cancellation policy
+        const now = new Date();
+        const hoursUntilAppointment = (appointmentDateTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+        
+        if (hoursUntilAppointment < 24) {
+          throw new TRPCError({ 
+            code: "BAD_REQUEST", 
+            message: "Avbestilling må gjøres minst 24 timer før avtalen. Vennligst ring oss på +47 929 81 628" 
+          });
+        }
+        
+        // Cancel the appointment
+        await db.updateAppointment(appointment.id, {
+          status: "cancelled",
+          cancellationReason: input.reason || "Avbestilt av kunde",
+          cancelledAt: new Date(),
+        });
+        
+        return { success: true };
       }),
   }),
 

@@ -23,6 +23,7 @@ import Staff from "./pages/Staff";
 import FikenSyncHistory from "./pages/FikenSyncHistory";
 import Landing from "./pages/Landing";
 import DashboardLogin from "./pages/DashboardLogin";
+import CancelAppointment from "./pages/CancelAppointment";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -32,6 +33,7 @@ function Router() {
       <Route path={"/dashboard-login"} component={DashboardLogin} />
       <Route path={"/dashboard"} component={Home} />
       <Route path={"/book-online"} component={BookOnline} />
+      <Route path={"/cancel-appointment/:token"} component={CancelAppointment} />
       <Route path={"/services"} component={Services} />
         <Route path="/products" component={Products} />
         <Route path="/sales" component={Sales} />

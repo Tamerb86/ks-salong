@@ -40,6 +40,7 @@ export default function BookOnline() {
     notes: "",
   });
   const [paymentMethod, setPaymentMethod] = useState<"vipps" | "pay_later">("vipps");
+  const [cancellationToken, setCancellationToken] = useState<string | null>(null);
 
   // Debug: Log selectedDate changes
   useEffect(() => {
@@ -78,6 +79,11 @@ export default function BookOnline() {
 
   const createBookingMutation = trpc.appointments.createWithPayment.useMutation({
     onSuccess: (data) => {
+      // Store cancellation token
+      if (data.cancellationToken) {
+        setCancellationToken(data.cancellationToken);
+      }
+      
       if (data.requiresPayment && data.vippsUrl) {
         // Redirect to Vipps payment
         toast.info("Omdirigerer til Vipps...");
@@ -721,6 +727,24 @@ export default function BookOnline() {
                   Storgata 122C, 3915 Porsgrunn
                 </p>
               </div>
+              {cancellationToken && (
+                <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg mb-6">
+                  <p className="text-sm font-medium text-amber-900 mb-2">
+                    🔒 Avbestilling
+                  </p>
+                  <p className="text-sm text-amber-800 mb-3">
+                    Du kan avbestille avtalen gratis inntil 24 timer før tiden. Bruk lenken nedenfor:
+                  </p>
+                  <a 
+                    href={`/cancel-appointment/${cancellationToken}`}
+                    className="text-sm text-purple-600 hover:text-purple-700 underline break-all"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {window.location.origin}/cancel-appointment/{cancellationToken}
+                  </a>
+                </div>
+              )}
               <Button
                 onClick={() => {
                   setStep(1);

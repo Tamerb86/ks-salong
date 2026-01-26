@@ -1348,3 +1348,14 @@
 - [x] Auto-refresh time slots after booking error to show updated availability
 - [ ] Test concurrent booking scenarios (two users booking same slot) - requires manual testing
 - [ ] Add visual feedback when time slots become unavailable - future enhancement
+
+## Appointment Cancellation Policy
+- [x] Add cancellationToken field to appointments table
+- [x] Generate unique cancellation token when creating appointment
+- [x] Create backend API endpoint for cancellation (validate 24-hour rule)
+- [x] Build public cancellation page at /cancel-appointment/:token
+- [x] Display appointment details and cancellation deadline
+- [x] Show success/error messages in Norwegian
+- [x] Update appointment status to "cancelled" in database
+- [x] Add cancellation link to booking confirmation page
+- [ ] Integrate cancellation link in email/SMS notifications - future feature
