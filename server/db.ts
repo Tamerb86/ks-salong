@@ -1597,11 +1597,15 @@ export async function getStaffLeavesForDate(staffId: number, date: Date) {
 
 
 export async function deleteOrderItems(orderId: number) {
-  await database.delete(orderItems).where(eq(orderItems.orderId, orderId));
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(orderItems).where(eq(orderItems.orderId, orderId));
 }
 
 export async function deleteOrder(orderId: number) {
-  await database.delete(orders).where(eq(orders.id, orderId));
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(orders).where(eq(orders.id, orderId));
 }
 
 export async function createUser(data: any): Promise<number> {

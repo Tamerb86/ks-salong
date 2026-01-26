@@ -362,7 +362,7 @@ export const appRouter = router({
             phone: input.customerPhone,
             email: input.customerEmail || null,
           });
-          customer = { id: customerId, firstName, lastName, phone: input.customerPhone, email: input.customerEmail };
+          customer = { id: customerId, firstName, lastName, phone: input.customerPhone, email: input.customerEmail || null };
         }
 
         // Calculate end time
@@ -392,6 +392,13 @@ export const appRouter = router({
               message: "This time slot is already booked"
             });
           }
+        }
+        
+        if (!customer) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create or find customer",
+          });
         }
         
         const id = await db.createAppointment({

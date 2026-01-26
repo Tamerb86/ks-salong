@@ -1375,3 +1375,13 @@
 - [x] Show total sales amount and count for orders without customer
 - [x] Display percentage of walk-in sales vs customer sales
 - [x] Backend endpoint getSalesWithoutCustomer filters and calculates statistics
+
+## 🔴 Critical Pre-Delivery Tasks
+- [x] Fix critical TypeScript errors (BarcodeScanner, Appointments, Customers, server/db.ts, server/routers.ts) - 4 cache errors remain (non-critical)
+- [ ] Test complete Stripe payment flow end-to-end - Vipps payment page shown instead
+- [x] Test complete Cash payment flow end-to-end - works correctly in POS
+- [x] Test booking flow from start to finish - works perfectly (service → staff → date/time → contact → payment)
+- [ ] Test cancellation flow with 24-hour validation - pending
+- [ ] Test cancellation link functionality - pending
+- [ ] Verify all error messages are in Norwegian - needs review
+- [ ] Verify mobile responsiveness - needs testing

@@ -63,7 +63,7 @@ export function BarcodeScanner({
 
       // Start decoding from video stream
       codeReaderRef.current.decodeFromVideoDevice(
-        undefined, // Use default device
+        null, // Use default device
         videoElement,
         (result, error) => {
           if (result) {

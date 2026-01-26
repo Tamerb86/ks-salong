@@ -83,7 +83,7 @@ export default function Appointments() {
       toast.error("Kunne ikke oppdatere avtale");
     },
   });
-  const cancelMutation = trpc.appointments.cancel.useMutation({
+  const cancelMutation = trpc.appointments.cancelByToken.useMutation({
     onSuccess: () => {
       toast.success("Avtale kansellert!");
       refetch();
@@ -133,7 +133,7 @@ export default function Appointments() {
     updateMutation.mutate({
       id: selectedAppointment.id,
       appointmentDate: editDate,
-      appointmentTime: editTime,
+      startTime: editTime,
     });
   };
 

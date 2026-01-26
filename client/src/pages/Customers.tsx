@@ -38,6 +38,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function Customers() {
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
 
   const { data: customers, isLoading } = trpc.customers.list.useQuery(undefined, {
