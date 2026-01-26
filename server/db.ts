@@ -1584,56 +1584,35 @@ export async function createUser(data: any): Promise<number> {
   const openId = data.openId || `manual_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   
   // Build fields and values arrays for dynamic SQL
-  const fields: string[] = ['openId', 'name'];
-  const values: any[] = [openId, data.name];
+  // Build insert object dynamically to avoid Drizzle inserting default values
+  const insertData: any = { openId, name: data.name };
   
-  if (data.email) {
-    fields.push('email');
-    values.push(data.email);
-  }
-  if (data.phone) {
-    fields.push('phone');
-    values.push(data.phone);
-  }
-  if (data.role) {
-    fields.push('role');
-    values.push(data.role);
-  }
-  if (data.pin) {
-    fields.push('pin');
-    values.push(data.pin);
-  }
-  if (data.skillLevel) {
-    fields.push('skillLevel');
-    values.push(data.skillLevel);
-  }
-  if (data.loginMethod) {
-    fields.push('loginMethod');
-    values.push(data.loginMethod);
-  }
+  if (data.email) insertData.email = data.email;
+  if (data.phone) insertData.phone = data.phone;
+  if (data.role) insertData.role = data.role;
+  if (data.pin) insertData.pin = data.pin;
+  if (data.skillLevel) insertData.skillLevel = data.skillLevel;
+  if (data.loginMethod) insertData.loginMethod = data.loginMethod;
   if (data.durationMultiplier) {
-    fields.push('durationMultiplier');
-    const multiplier = typeof data.durationMultiplier === 'string' 
+    insertData.durationMultiplier = typeof data.durationMultiplier === 'string' 
       ? parseFloat(data.durationMultiplier) 
       : data.durationMultiplier;
-    values.push(multiplier);
   }
   if (data.bookingSlotInterval) {
-    fields.push('bookingSlotInterval');
-    const interval = typeof data.bookingSlotInterval === 'string'
+    insertData.bookingSlotInterval = typeof data.bookingSlotInterval === 'string'
       ? parseInt(data.bookingSlotInterval)
       : data.bookingSlotInterval;
-    values.push(interval);
   }
-  if (data.isActive !== undefined) {
-    fields.push('isActive');
-    values.push(data.isActive);
+  // Only add break times if both are provided
+  if (data.breakStartTime && data.breakEndTime) {
+    insertData.breakStartTime = data.breakStartTime;
+    insertData.breakEndTime = data.breakEndTime;
   }
+  if (data.workingHoursStart) insertData.workingHoursStart = data.workingHoursStart;
+  if (data.workingHoursEnd) insertData.workingHoursEnd = data.workingHoursEnd;
+  if (data.workingDays) insertData.workingDays = data.workingDays;
+  if (data.isActive !== undefined) insertData.isActive = data.isActive;
   
-  // Use raw SQL to avoid Drizzle inserting default values
-  const placeholders = values.map(() => '?').join(', ');
-  const query = `INSERT INTO users (${fields.join(', ')}) VALUES (${placeholders})`;
-  
-  const result: any = await db.execute(sql.raw(query, values));
+  const result = await db.insert(users).values(insertData);
   return Number(result[0].insertId);
 }

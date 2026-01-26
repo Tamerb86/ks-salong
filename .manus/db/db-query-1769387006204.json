@@ -1,0 +1,19 @@
+{
+  "query": "SELECT name, email, breakStartTime, breakEndTime, workingHoursStart, workingHoursEnd, workingDays FROM users WHERE email = 'lisa@ks-salong.no';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZWkmDdVMGTAoV.aeceea61840d --database oUNZ2iw3V7HdbF8pGMTUk4 --execute SELECT name, email, breakStartTime, breakEndTime, workingHoursStart, workingHoursEnd, workingDays FROM users WHERE email = 'lisa@ks-salong.no';",
+  "rows": [
+    {
+      "name": "Lisa Andersen",
+      "email": "lisa@ks-salong.no",
+      "breakStartTime": "NULL",
+      "breakEndTime": "NULL",
+      "workingHoursStart": "NULL",
+      "workingHoursEnd": "NULL",
+      "workingDays": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "name\temail\tbreakStartTime\tbreakEndTime\tworkingHoursStart\tworkingHoursEnd\tworkingDays\nLisa Andersen\tlisa@ks-salong.no\tNULL\tNULL\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 69
+}

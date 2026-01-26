@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE users ADD COLUMN workingHoursEnd VARCHAR(5) AFTER workingHoursStart;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZWkmDdVMGTAoV.aeceea61840d --database oUNZ2iw3V7HdbF8pGMTUk4 --execute ALTER TABLE users ADD COLUMN workingHoursEnd VARCHAR(5) AFTER workingHoursStart;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 436
+}

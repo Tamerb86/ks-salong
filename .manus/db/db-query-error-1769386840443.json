@@ -1,0 +1,8 @@
+{
+  "query": "SELECT id, name, email, phone, role, skillLevel, breakStartTime, breakEndTime, workingHoursStart, workingHoursEnd, workingDays FROM users WHERE email = 'lisa@ks-salong.no';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZWkmDdVMGTAoV.aeceea61840d --database oUNZ2iw3V7HdbF8pGMTUk4 --execute SELECT id, name, email, phone, role, skillLevel, breakStartTime, breakEndTime, workingHoursStart, workingHoursEnd, workingDays FROM users WHERE email = 'lisa@ks-salong.no';",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'workinghoursstart' in 'field list'"
+  ]
+}

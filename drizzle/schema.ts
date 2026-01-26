@@ -21,6 +21,9 @@ export const users = mysqlTable("users", {
   bookingSlotInterval: int("bookingSlotInterval").default(15).notNull(), // minutes: 15 or 30
   breakStartTime: varchar("breakStartTime", { length: 5 }), // Format: HH:MM (e.g., "12:00")
   breakEndTime: varchar("breakEndTime", { length: 5 }), // Format: HH:MM (e.g., "13:00")
+  workingHoursStart: varchar("workingHoursStart", { length: 5 }), // Format: HH:MM (e.g., "09:00")
+  workingHoursEnd: varchar("workingHoursEnd", { length: 5 }), // Format: HH:MM (e.g., "18:00")
+  workingDays: varchar("workingDays", { length: 20 }), // Format: "1,1,1,1,1,1,0" (Mon-Sun)
   twoFactorEnabled: boolean("twoFactorEnabled").default(false).notNull(),
   twoFactorSecret: text("twoFactorSecret"),
   isActive: boolean("isActive").default(true).notNull(),

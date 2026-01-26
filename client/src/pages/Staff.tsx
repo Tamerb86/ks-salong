@@ -69,6 +69,11 @@ export default function Staff() {
     skillLevel: "intermediate" as "beginner" | "intermediate" | "expert",
     durationMultiplier: "1.00",
     bookingSlotInterval: "15",
+    breakStartTime: "",
+    breakEndTime: "",
+    workingHoursStart: "09:00",
+    workingHoursEnd: "18:00",
+    workingDays: [true, true, true, true, true, true, false], // Mon-Sat by default
   });
 
   const updatePinMutation = trpc.staff.update.useMutation({
@@ -233,6 +238,7 @@ export default function Staff() {
     createStaffMutation.mutate({
       ...addEmployeeFormData,
       bookingSlotInterval: parseInt(addEmployeeFormData.bookingSlotInterval),
+      workingDays: addEmployeeFormData.workingDays.map(d => d ? 1 : 0).join(','),
     });
   };
 
@@ -728,7 +734,7 @@ export default function Staff() {
                     onChange={(e) => setLeaveFormData({ ...leaveFormData, reason: e.target.value })}
                     placeholder="F.eks. Sommerferie"
                   />
-                </div>
+                  </div>
               </div>
               
               <div className="flex gap-3 justify-end">
@@ -856,6 +862,79 @@ export default function Staff() {
                       onChange={(e) => setAddEmployeeFormData({ ...addEmployeeFormData, bookingSlotInterval: e.target.value })}
                       placeholder="15"
                     />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Pause tid</Label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="add-breakStartTime" className="text-sm text-gray-600">Start</Label>
+                      <Input
+                        id="add-breakStartTime"
+                        type="time"
+                        value={addEmployeeFormData.breakStartTime}
+                        onChange={(e) => setAddEmployeeFormData({ ...addEmployeeFormData, breakStartTime: e.target.value })}
+                        placeholder="12:00"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="add-breakEndTime" className="text-sm text-gray-600">Slutt</Label>
+                      <Input
+                        id="add-breakEndTime"
+                        type="time"
+                        value={addEmployeeFormData.breakEndTime}
+                        onChange={(e) => setAddEmployeeFormData({ ...addEmployeeFormData, breakEndTime: e.target.value })}
+                        placeholder="13:00"
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Arbeidstid</Label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="add-workingHoursStart" className="text-sm text-gray-600">Start</Label>
+                      <Input
+                        id="add-workingHoursStart"
+                        type="time"
+                        value={addEmployeeFormData.workingHoursStart}
+                        onChange={(e) => setAddEmployeeFormData({ ...addEmployeeFormData, workingHoursStart: e.target.value })}
+                        placeholder="09:00"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="add-workingHoursEnd" className="text-sm text-gray-600">Slutt</Label>
+                      <Input
+                        id="add-workingHoursEnd"
+                        type="time"
+                        value={addEmployeeFormData.workingHoursEnd}
+                        onChange={(e) => setAddEmployeeFormData({ ...addEmployeeFormData, workingHoursEnd: e.target.value })}
+                        placeholder="18:00"
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Arbeidsdager</Label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {['Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag', 'Søndag'].map((day, index) => (
+                      <label key={day} className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={addEmployeeFormData.workingDays[index]}
+                          onChange={(e) => {
+                            const newWorkingDays = [...addEmployeeFormData.workingDays];
+                            newWorkingDays[index] = e.target.checked;
+                            setAddEmployeeFormData({ ...addEmployeeFormData, workingDays: newWorkingDays });
+                          }}
+                          className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                        />
+                        <span className="text-sm">{day.slice(0, 3)}</span>
+                      </label>
+                    ))}
                   </div>
                 </div>
               </div>

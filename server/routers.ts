@@ -65,6 +65,11 @@ export const appRouter = router({
         skillLevel: z.enum(["beginner", "intermediate", "expert"]).optional(),
         durationMultiplier: z.string().optional(),
         bookingSlotInterval: z.number().optional(),
+        breakStartTime: z.string().optional(),
+        breakEndTime: z.string().optional(),
+        workingHoursStart: z.string().optional(),
+        workingHoursEnd: z.string().optional(),
+        workingDays: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
         const userId = await db.createUser({

@@ -1,0 +1,8 @@
+{
+  "query": "ALTER TABLE users \nADD COLUMN workingHoursStart VARCHAR(5) AFTER breakEndTime,\nADD COLUMN workingHoursEnd VARCHAR(5) AFTER workingHoursStart,\nADD COLUMN workingDays VARCHAR(20) AFTER workingHoursEnd;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZWkmDdVMGTAoV.aeceea61840d --database oUNZ2iw3V7HdbF8pGMTUk4 --execute ALTER TABLE users \nADD COLUMN workingHoursStart VARCHAR(5) AFTER breakEndTime,\nADD COLUMN workingHoursEnd VARCHAR(5) AFTER workingHoursStart,\nADD COLUMN workingDays VARCHAR(20) AFTER workingHoursEnd;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'workinghoursstart' in 'users'"
+  ]
+}

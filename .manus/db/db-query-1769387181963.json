@@ -1,0 +1,20 @@
+{
+  "query": "SELECT name, email, phone, breakStartTime, breakEndTime, workingHoursStart, workingHoursEnd, workingDays FROM users WHERE email = 'kari@ks-salong.no';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZWkmDdVMGTAoV.aeceea61840d --database oUNZ2iw3V7HdbF8pGMTUk4 --execute SELECT name, email, phone, breakStartTime, breakEndTime, workingHoursStart, workingHoursEnd, workingDays FROM users WHERE email = 'kari@ks-salong.no';",
+  "rows": [
+    {
+      "name": "Kari Olsen",
+      "email": "kari@ks-salong.no",
+      "phone": "+47 777 88 999",
+      "breakStartTime": "NULL",
+      "breakEndTime": "NULL",
+      "workingHoursStart": "09:00",
+      "workingHoursEnd": "18:00",
+      "workingDays": "1,1,1,1,1,1,1"
+    }
+  ],
+  "messages": [],
+  "stdout": "name\temail\tphone\tbreakStartTime\tbreakEndTime\tworkingHoursStart\tworkingHoursEnd\tworkingDays\nKari Olsen\tkari@ks-salong.no\t+47 777 88 999\tNULL\tNULL\t09:00\t18:00\t1,1,1,1,1,1,1\n",
+  "stderr": "",
+  "execution_time_ms": 59
+}
