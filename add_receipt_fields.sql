@@ -1,0 +1,3 @@
+ALTER TABLE salonSettings 
+ADD COLUMN receiptMessage TEXT NULL,
+ADD COLUMN mvaNumber VARCHAR(50) NULL;

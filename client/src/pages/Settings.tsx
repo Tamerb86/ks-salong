@@ -95,6 +95,8 @@ export default function Settings() {
     autoLogoutTime: "22:00",
     universalPin: "1234",
     customBookingUrl: "",
+    receiptMessage: "",
+    mvaNumber: "",
   });
 
   const [urlError, setUrlError] = useState("");
@@ -175,6 +177,8 @@ export default function Settings() {
         autoLogoutTime: settings.autoLogoutTime || "22:00",
         universalPin: settings.universalPin || "1234",
         customBookingUrl: settings.customBookingUrl || "",
+        receiptMessage: settings.receiptMessage || "",
+        mvaNumber: settings.mvaNumber || "",
       });
     }
   }, [settings]);
@@ -300,6 +304,38 @@ export default function Settings() {
                         setFormData({ ...formData, defaultMvaTax: e.target.value })
                       }
                     />
+                  </div>
+
+                  <div className="border-t pt-4 mt-4">
+                    <h3 className="text-lg font-medium mb-4">Kvitteringsinnstillinger</h3>
+                    
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="mvaNumber">MVA-nummer (org.nr.)</Label>
+                        <Input
+                          id="mvaNumber"
+                          placeholder="NO 123 456 789 MVA"
+                          value={formData.mvaNumber}
+                          onChange={(e) =>
+                            setFormData({ ...formData, mvaNumber: e.target.value })
+                          }
+                        />
+                        <p className="text-xs text-gray-500">Vises på kvitteringer og fakturaer</p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="receiptMessage">Tilpasset melding på kvittering</Label>
+                        <Input
+                          id="receiptMessage"
+                          placeholder="Takk for besøket! Velkommen tilbake!"
+                          value={formData.receiptMessage}
+                          onChange={(e) =>
+                            setFormData({ ...formData, receiptMessage: e.target.value })
+                          }
+                        />
+                        <p className="text-xs text-gray-500">Vises nederst på alle kvitteringer</p>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="flex justify-end pt-4">

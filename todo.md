@@ -1650,3 +1650,20 @@
 2. Updating receipt to use `lastReceipt.cartItems` instead of `cart`
 3. Modified `orders.create` mutation to return full order data from database
 4. Updated receipt calculations to use `lastReceipt.order` data
+
+## 🖨️ Fix Receipt Printing Issues - ✅ FIXED
+- [x] Add printer settings section in Settings page (added under "Kvitteringsinnstillinger")
+- [x] Add fields for: salon name, address, phone, email, MVA number (all fields working)
+- [x] Add custom receipt message field (receiptMessage field added)
+- [x] Save printer settings to salonSettings table (schema updated, columns added)
+- [x] Update receipt to use settings from database instead of placeholders (POS.tsx updated)
+- [x] Fix items not displaying in print view (items now display with correct prices)
+- [x] Test print preview to verify layout (verified: all data displays correctly)
+- [x] Verify print CSS styles are working correctly (styles working)
+
+**What was fixed:**
+1. Added `receiptMessage` and `mvaNumber` fields to salonSettings schema
+2. Added "Kvitteringsinnstillinger" section in Settings page with MVA number and custom message fields
+3. Updated POS receipt to use settings data: salonName, salonAddress, salonPhone, salonEmail, mvaNumber, receiptMessage
+4. Receipt now displays real salon information instead of placeholders
+5. Custom message from settings appears at bottom of receipt

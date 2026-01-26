@@ -32,6 +32,9 @@ interface CartItem {
 export default function POS() {
   const { user, loading: authLoading } = useAuth();
   
+  // Fetch salon settings for receipt
+  const { data: settings } = trpc.settings.get.useQuery();
+  
   // Employee state - default to current logged-in user
   const [activeEmployee, setActiveEmployee] = useState<any>(user);
   const [isSwitchEmployeeOpen, setIsSwitchEmployeeOpen] = useState(false);
@@ -715,12 +718,22 @@ export default function POS() {
               <div className="text-center border-b pb-4 print:border-dashed">
                 {printOptions.showLogo && (
                   <div className="mb-2">
-                    <h2 className="text-xl font-bold print:text-2xl">K.S Salong</h2>
+                    <h2 className="text-xl font-bold print:text-2xl">{settings?.salonName || 'K.S Salong'}</h2>
                     <p className="text-sm text-gray-600">Professional Hair Salon</p>
                   </div>
                 )}
-                <p className="text-xs text-gray-500 mt-1">Adresse: [Din adresse]</p>
-                <p className="text-xs text-gray-500">Telefon: [Ditt telefonnummer]</p>
+                {settings?.salonAddress && (
+                  <p className="text-xs text-gray-500 mt-1">Adresse: {settings.salonAddress}</p>
+                )}
+                {settings?.salonPhone && (
+                  <p className="text-xs text-gray-500">Telefon: {settings.salonPhone}</p>
+                )}
+                {settings?.salonEmail && (
+                  <p className="text-xs text-gray-500">E-post: {settings.salonEmail}</p>
+                )}
+                {settings?.mvaNumber && (
+                  <p className="text-xs text-gray-500">MVA: {settings.mvaNumber}</p>
+                )}
                 <p className="text-xs text-gray-500 mt-2 font-mono">
                   Faktura: {lastReceipt.orderNumber}
                 </p>
@@ -786,7 +799,9 @@ export default function POS() {
                 {printOptions.showEmployee && lastReceipt?.employeeName && (
                   <p className="mt-1">Betjent av: {lastReceipt.employeeName}</p>
                 )}
-                {printOptions.customMessage ? (
+                {settings?.receiptMessage ? (
+                  <p className="mt-3 font-medium whitespace-pre-line">{settings.receiptMessage}</p>
+                ) : printOptions.customMessage ? (
                   <p className="mt-3 font-medium">{printOptions.customMessage}</p>
                 ) : (
                   <>

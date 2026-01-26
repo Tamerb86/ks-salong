@@ -325,6 +325,9 @@ export const salonSettings = mysqlTable("salonSettings", {
   stripeTerminalLocationId: varchar("stripeTerminalLocationId", { length: 255 }),
   // Custom Booking URL
   customBookingUrl: varchar("customBookingUrl", { length: 500 }), // Custom subdomain or full URL for booking page
+  // Receipt/Invoice Settings
+  receiptMessage: text("receiptMessage"), // Custom message to display on receipts
+  mvaNumber: varchar("mvaNumber", { length: 50 }), // MVA/VAT registration number
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
