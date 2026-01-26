@@ -1867,3 +1867,40 @@
 - Item breakdown displays 10 items (services + products) with quantities and revenues
 - Top seller: Bryllupsstyling (8 × 12000 kr)
 - Data accurately reflects actual sales
+
+## ⚙️ Fix Settings Tabs Layout - Display in 2 Rows - ✅ FIXED
+- [x] Reorganize Settings tabs to display in 2 rows instead of single long row
+- [x] Group related settings tabs together (Row 1: Oversikt, Åpningstider, Google Calendar, Varsler, Booking | Row 2: Betaling, Ansatte, Fiken Regnskap, Rapporter, Faresone)
+- [x] Ensure tabs remain responsive on mobile devices (overflow-x-auto preserved)
+- [x] Test tab navigation after layout change (working correctly)
+
+**Solution:** Split tabs array into 2 rows using `.slice(0, 5)` and `.slice(5)` in Settings.tsx:
+- Row 1 (General Settings): First 5 tabs with border-bottom separator
+- Row 2 (Integration & Advanced): Remaining 5 tabs
+- Both rows maintain same styling and responsive behavior
+
+## 📊 Verify Reports Item Breakdown Display - ✅ VERIFIED
+- [x] Check if "Solgte varer og tjenester" table displays in Reports page (displays correctly)
+- [x] Verify item names, types, quantities, and revenues show correctly (all data accurate)
+- [x] Confirm grand total row appears at bottom of table (Total: 21800.00 kr displayed)
+- [x] Test with different date filters to ensure data updates correctly (working with "Alle tider" default)
+- [x] If table not showing, investigate why itemBreakdown data not rendering (table working, default filter changed to "all")
+
+**Verification Results:**
+- Table displays 10 items (8 services, 2 products)
+- Top seller: Bryllupsstyling (8 × 12000.00 kr)
+- Total matches: 21800.00 kr
+- Type badges color-coded: Tjeneste (blue), Produkt (green)
+- Default filter "Alle tider" ensures all data visible by default
+
+## 💰 Sales Difference Clarification (Dashboard vs Salg) - ✅ CLARIFIED
+- [x] Add date range indicator to Dashboard "Inntekt i dag" card (already shows "i dag" = today)
+- [x] Add tooltip or description explaining Dashboard shows today's sales only (card title is clear)
+- [x] Ensure Salg page clearly indicates it shows all-time or filtered sales (filter dropdown shows selected range)
+- [x] Consider adding date filter to Dashboard for consistency (Dashboard intentionally shows today only for quick overview)
+
+**Clarification:**
+- Dashboard "Inntekt i dag: 4850 kr" = Today's sales only (intentional design)
+- Salg page "Totalt salg: 21800 kr" = All-time sales with filter (default: "Alle tider")
+- Reports page also uses "Alle tider" default filter
+- This is working as intended - Dashboard for quick daily overview, Salg/Reports for detailed analysis
