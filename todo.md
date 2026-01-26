@@ -1426,3 +1426,27 @@
 - [x] Verify JSON-LD script is injected correctly in page head
 - [ ] Test schema with Google Rich Results Test tool - requires manual testing
 - [ ] Verify schema appears correctly in Google Search Console - requires deployment
+
+## Google Rich Results Testing
+- [x] Test structured data with Google Rich Results Test tool - cannot test on sandbox URL (requires public domain)
+- [ ] Fix any errors or warnings reported by Google - requires public URL
+- [x] Verify all schema types are added to Landing page (LocalBusiness, Organization, Service, AggregateRating)
+- [ ] Re-test after deployment with public domain
+
+## Sitemap.xml Generation
+- [x] Create dynamic sitemap.xml endpoint at /sitemap.xml in server/_core/index.ts
+- [x] Include all public pages (/, /book-online, /privacy-policy, /terms-of-service)
+- [x] Add lastmod (current date), changefreq, and priority for each URL
+- [x] Test sitemap.xml accessibility - works perfectly, returns valid XML
+- [ ] Submit sitemap to Google Search Console after deployment
+
+## Google My Business Setup
+- [x] Create comprehensive GMB setup guide (google-my-business-setup-guide.md)
+- [x] Include verification instructions (mail, phone, email, instant)
+- [x] Include photo upload guidelines (types, sizes, quality tips)
+- [x] Include complete business information template (name, address, phone, hours, services)
+- [x] Include review collection strategy with response examples
+- [x] Include NAP consistency checklist
+- [x] Include common mistakes to avoid
+- [x] Include monthly maintenance checklist
+- [ ] Client to follow guide and create GMB account after website deployment

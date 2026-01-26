@@ -46,6 +46,32 @@ async function startServer() {
   app.post("/api/webhooks/vipps", webhooks.handleVippsCallback);
   app.post("/api/webhooks/stripe", webhooks.handleStripeWebhook);
   
+  // Sitemap.xml for SEO
+  app.get("/sitemap.xml", (req, res) => {
+    const baseUrl = req.protocol + "://" + req.get("host");
+    const today = new Date().toISOString().split("T")[0];
+    
+    const urls = [
+      { loc: "/", priority: "1.0", changefreq: "weekly" },
+      { loc: "/book-online", priority: "0.9", changefreq: "daily" },
+      { loc: "/privacy-policy", priority: "0.3", changefreq: "monthly" },
+      { loc: "/terms-of-service", priority: "0.3", changefreq: "monthly" },
+    ];
+    
+    const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls.map(url => `  <url>
+    <loc>${baseUrl}${url.loc}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>${url.changefreq}</changefreq>
+    <priority>${url.priority}</priority>
+  </url>`).join("\n")}
+</urlset>`;
+    
+    res.header("Content-Type", "application/xml");
+    res.send(sitemap);
+  });
+  
   // tRPC API
   app.use(
     "/api/trpc",
