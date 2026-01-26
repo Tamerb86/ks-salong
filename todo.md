@@ -1941,3 +1941,13 @@
 - [x] Use smaller font sizes (9-11pt)
 - [x] Simple vertical layout
 - [ ] Test printing
+
+## 🔒 Fix Permission Error (10002)
+- [ ] Find permission check in Products API
+- [ ] Remove all OAuth permission checks
+- [ ] Test Products page editing
+
+## 🖨️ Thermal Printer Still Not Working
+- [x] Check published site receipt CSS
+- [x] Verify font sizes are applied
+- [ ] Test actual print output
