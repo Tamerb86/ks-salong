@@ -1411,3 +1411,6 @@
 - [x] Include cancellation policy (24-hour rule) in Terms of Service
 - [x] Include payment terms and refund policy
 - [x] Include liability limitations and dispute resolution
+
+## Bug Fixes
+- [x] Fix nested anchor tag error in Landing page footer (wrapped text in span instead of direct children)

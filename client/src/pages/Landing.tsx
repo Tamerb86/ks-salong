@@ -470,9 +470,13 @@ export default function Landing() {
 
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm">
             <div className="flex justify-center gap-4 mb-4">
-              <Link href="/privacy-policy" className="hover:text-white transition">Personvernerklæring</Link>
+                <Link href="/privacy-policy">
+                <span className="hover:text-white transition cursor-pointer">Personvernerklæring</span>
+              </Link>
               <span>|</span>
-              <Link href="/terms-of-service" className="hover:text-white transition">Vilkår for bruk</Link>
+              <Link href="/terms-of-service">
+                <span className="hover:text-white transition cursor-pointer">Vilkår for bruk</span>
+              </Link>
             </div>
             <p>&copy; 2026 K.S Frisør. Alle rettigheter reservert.</p>
             <Link href="/dashboard-login">
