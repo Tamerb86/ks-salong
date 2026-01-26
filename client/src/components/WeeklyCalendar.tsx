@@ -84,16 +84,17 @@ export function WeeklyCalendar({ currentWeek, appointments, onAppointmentClick }
 
   return (
     <div className="overflow-x-auto">
-      <div className="min-w-[1000px]">
+      <div className="min-w-[800px] lg:min-w-[1000px]">
         {/* Header with days */}
-        <div className="grid grid-cols-8 gap-2 mb-2">
-          <div className="text-sm font-medium text-gray-500 p-2">Tid</div>
+        <div className="grid grid-cols-8 gap-1 md:gap-2 mb-2">
+          <div className="text-xs md:text-sm font-medium text-gray-500 p-1 md:p-2">Tid</div>
           {weekDays.map((day) => (
             <div key={day.toISOString()} className="text-center">
-              <div className="text-sm font-semibold">
-                {format(day, "EEEE", { locale: nb })}
+              <div className="text-xs md:text-sm font-semibold">
+                <span className="hidden sm:inline">{format(day, "EEEE", { locale: nb })}</span>
+                <span className="sm:hidden">{format(day, "EEE", { locale: nb })}</span>
               </div>
-              <div className="text-xs text-gray-500">
+              <div className="text-[10px] md:text-xs text-gray-500">
                 {format(day, "d MMM", { locale: nb })}
               </div>
             </div>
@@ -103,9 +104,9 @@ export function WeeklyCalendar({ currentWeek, appointments, onAppointmentClick }
         {/* Time slots grid */}
         <div className="space-y-1">
           {WORKING_HOURS.map((hour) => (
-            <div key={hour} className="grid grid-cols-8 gap-2">
+            <div key={hour} className="grid grid-cols-8 gap-1 md:gap-2">
               {/* Time label */}
-              <div className="text-sm text-gray-600 p-2 flex items-start">
+              <div className="text-xs md:text-sm text-gray-600 p-1 md:p-2 flex items-start">
                 {String(hour).padStart(2, "0")}:00
               </div>
 
@@ -115,36 +116,36 @@ export function WeeklyCalendar({ currentWeek, appointments, onAppointmentClick }
                 return (
                   <div
                     key={`${day.toISOString()}-${hour}`}
-                    className="min-h-[80px] border border-gray-200 rounded-md p-1 bg-white hover:bg-gray-50 transition-colors"
+                    className="min-h-[60px] md:min-h-[80px] border border-gray-200 rounded-md p-0.5 md:p-1 bg-white hover:bg-gray-50 transition-colors"
                   >
                     {dayAppointments.map((apt) => (
                       <Card
                         key={apt.id}
-                        className={`p-2 cursor-pointer hover:shadow-md transition-shadow border-l-4 ${getStatusColor(
+                        className={`p-1 md:p-2 cursor-pointer hover:shadow-md transition-shadow border-l-2 md:border-l-4 ${getStatusColor(
                           apt.status
                         )}`}
                         onClick={() => onAppointmentClick(apt)}
                       >
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-1 text-xs">
-                            <Clock className="h-3 w-3" />
+                        <div className="space-y-0.5 md:space-y-1">
+                          <div className="flex items-center gap-0.5 md:gap-1 text-[10px] md:text-xs">
+                            <Clock className="h-2 w-2 md:h-3 md:w-3" />
                             <span className="font-medium">
                               {apt.startTime} - {apt.endTime}
                             </span>
                           </div>
-                          <div className="font-semibold text-sm">
+                          <div className="font-semibold text-xs md:text-sm truncate">
                             {apt.customer ? `${apt.customer.firstName} ${apt.customer.lastName}` : 'Ukjent kunde'}
                           </div>
-                          <div className="text-xs text-gray-600">
+                          <div className="text-[10px] md:text-xs text-gray-600 truncate hidden sm:block">
                             {apt.service ? apt.service.name : 'Ukjent tjeneste'}
                           </div>
                           {apt.staff && (
-                            <div className="flex items-center gap-1 text-xs text-gray-500">
-                              <User className="h-3 w-3" />
-                              <span>{apt.staff.name}</span>
+                            <div className="flex items-center gap-0.5 md:gap-1 text-[10px] md:text-xs text-gray-500 hidden md:flex">
+                              <User className="h-2 w-2 md:h-3 md:w-3" />
+                              <span className="truncate">{apt.staff.name}</span>
                             </div>
                           )}
-                          <Badge variant="outline" className="text-xs">
+                          <Badge variant="outline" className="text-[9px] md:text-xs hidden sm:inline-flex">
                             {getStatusLabel(apt.status)}
                           </Badge>
                         </div>

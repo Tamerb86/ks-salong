@@ -2,6 +2,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Layout } from "@/components/Layout";
 import { MonthlyCalendar } from "@/components/MonthlyCalendar";
 import { WeeklyCalendar } from "@/components/WeeklyCalendar";
+import { DailyCalendar } from "@/components/DailyCalendar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LiveBadge } from "@/components/ui/live-badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -48,7 +49,8 @@ export default function Appointments() {
   const { user, loading: authLoading } = useAuth();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [currentWeek, setCurrentWeek] = useState(new Date());
-  const [calendarView, setCalendarView] = useState<"monthly" | "weekly">("monthly");
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [calendarView, setCalendarView] = useState<'monthly' | 'weekly' | 'daily'>('monthly');
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
@@ -150,6 +152,28 @@ export default function Appointments() {
     setCurrentWeek(newWeek);
   };
 
+  const handlePreviousDay = () => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(newDate.getDate() - 1);
+    setSelectedDate(newDate);
+  };
+
+  const handleNextDay = () => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(newDate.getDate() + 1);
+    setSelectedDate(newDate);
+  };
+
+  const handleTimeSlotClick = (time: string) => {
+    // Open add appointment dialog with pre-filled time
+    setAddFormData(prev => ({
+      ...prev,
+      appointmentDate: format(selectedDate, 'yyyy-MM-dd'),
+      appointmentTime: time
+    }));
+    setAddDialogOpen(true);
+  };
+
   const handleAppointmentClick = (appointment: any) => {
     setSelectedAppointment(appointment);
     setEditDate(appointment.appointmentDate);
@@ -241,6 +265,13 @@ export default function Appointments() {
                   >
                     Ukesvisning
                   </Button>
+                  <Button
+                    variant={calendarView === "daily" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCalendarView("daily")}
+                  >
+                    Dagsvisning
+                  </Button>
                 </div>
                 {calendarView === "weekly" && (
                   <div className="flex items-center gap-2">
@@ -257,16 +288,38 @@ export default function Appointments() {
                     </Button>
                   </div>
                 )}
+                {calendarView === "daily" && (
+                  <div className="flex items-center gap-2">
+                    <Button variant="outline" size="sm" onClick={handlePreviousDay}>
+                      <ChevronLeft className="h-4 w-4" />
+                      Forrige dag
+                    </Button>
+                    <span className="text-sm font-medium px-4">
+                      {format(selectedDate, "d MMMM yyyy", { locale: nb })}
+                    </span>
+                    <Button variant="outline" size="sm" onClick={handleNextDay}>
+                      Neste dag
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
               </div>
               
               {/* Calendar views */}
               {calendarView === "monthly" ? (
                 <MonthlyCalendar />
-              ) : (
+              ) : calendarView === "weekly" ? (
                 <WeeklyCalendar
                   currentWeek={currentWeek}
                   appointments={appointments || []}
                   onAppointmentClick={handleAppointmentClick}
+                />
+              ) : (
+                <DailyCalendar
+                  selectedDate={selectedDate}
+                  appointments={appointments || []}
+                  onAppointmentClick={handleAppointmentClick}
+                  onTimeSlotClick={handleTimeSlotClick}
                 />
               )}
             </TabsContent>

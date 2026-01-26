@@ -1309,3 +1309,22 @@
 - [x] Add time slot labels (09:00-18:00 working hours)
 - [x] Test weekly view with multiple appointments
 - [ ] Ensure responsive design for weekly view
+
+## Calendar View Enhancements
+- [x] Improve responsive design for weekly calendar on mobile devices
+- [x] Optimize weekly calendar layout for tablet screens
+- [x] Add horizontal scrolling for weekly view on small screens
+- [x] Reduce font sizes and padding for mobile view
+- [x] Create daily calendar view (Dagsvisning) component
+- [x] Add day view toggle button alongside monthly/weekly buttons
+- [x] Display detailed time slots in daily view (every 15 minutes)
+- [x] Show all appointments for selected day with full details
+- [x] Highlight empty time slots in daily view
+- [ ] Implement drag-and-drop library (react-dnd or dnd-kit) - Future feature
+- [ ] Make appointments draggable in weekly and daily views - Future feature
+- [ ] Add drop zones for time slots - Future feature
+- [ ] Update appointment time when dropped to new slot - Future feature
+- [ ] Add visual feedback during drag operation - Future feature
+- [ ] Prevent invalid drops (past dates, outside business hours) - Future feature
+- [ ] Show confirmation dialog after successful reschedule - Future feature
+- [ ] Test drag-and-drop on touch devices (mobile/tablet) - Future feature
