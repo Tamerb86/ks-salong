@@ -50,9 +50,12 @@ export default function BookOnline() {
   const { data: businessHours } = trpc.settings.getBusinessHours.useQuery();
   const { data: staff, isLoading: staffLoading } = trpc.staff.list.useQuery();
   const { data: settings } = trpc.settings.get.useQuery();
-  const { data: appointments } = trpc.appointments.listByDate.useQuery(
+  const { data: appointments, refetch: refetchAppointments } = trpc.appointments.listByDate.useQuery(
     { date: selectedDate || new Date() },
-    { enabled: !!selectedDate }
+    { 
+      enabled: !!selectedDate,
+      refetchInterval: 30000, // Auto-refresh every 30 seconds to prevent double booking
+    }
   );
   
   // Get all staff leaves to filter out staff on leave
@@ -86,7 +89,15 @@ export default function BookOnline() {
       }
     },
     onError: (error) => {
-      toast.error("Feil ved booking: " + error.message);
+      // Refresh appointments to show updated availability
+      refetchAppointments();
+      
+      // Show user-friendly error message in Norwegian
+      if (error.message.includes("already booked") || error.message.includes("CONFLICT")) {
+        toast.error("Beklager, denne tiden er allerede booket av en annen kunde. Vennligst velg en annen tid.");
+      } else {
+        toast.error("Feil ved booking: " + error.message);
+      }
     },
   });
 

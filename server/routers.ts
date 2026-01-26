@@ -471,7 +471,7 @@ export const appRouter = router({
         if (hasConflict) {
           throw new TRPCError({
             code: "CONFLICT",
-            message: "This time slot is already booked"
+            message: "Denne tiden er allerede booket"
           });
         }
         
