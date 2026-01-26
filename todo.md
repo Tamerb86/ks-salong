@@ -1919,3 +1919,9 @@
 - [x] Keep landing page visible for non-authenticated users
 - [x] Test redirect functionality
 - [ ] Verify published site redirects correctly after republishing
+
+## 🔧 Remove OAuth Layer - Keep PIN Only
+- [x] Remove OAuth redirect from Landing.tsx
+- [x] Keep only PIN Dashboard authentication
+- [x] Test landing page displays correctly
+- [x] Verify staff can access dashboard via PIN
