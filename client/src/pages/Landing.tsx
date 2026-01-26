@@ -27,6 +27,142 @@ export default function Landing() {
       document.head.appendChild(metaKeywords);
     }
     metaKeywords.setAttribute('content', 'frisør porsgrunn, herreklipp, dameklipp, skjegg trim, hårfarge, K.S Frisør, norgesmester frisør, beste frisør porsgrunn');
+    
+    // Add JSON-LD structured data for SEO
+    const structuredData = {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "LocalBusiness",
+          "@id": "https://ks-salong.manus.space/#business",
+          "name": "K.S Frisør",
+          "image": "https://ks-salong.manus.space/logo.png",
+          "description": "Prisbeslønt frisørsalong i Porsgrunn. Norgesmester 2022. Profesjonelle tjenester for herre og dame.",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Storgata 150",
+            "addressLocality": "Porsgrunn",
+            "postalCode": "3915",
+            "addressCountry": "NO"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 59.1403,
+            "longitude": 9.6561
+          },
+          "telephone": "+4735555666",
+          "priceRange": "kr 250-800",
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+              "opens": "09:00",
+              "closes": "18:00"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": "Saturday",
+              "opens": "10:00",
+              "closes": "15:00"
+            }
+          ],
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "5.0",
+            "reviewCount": "55",
+            "bestRating": "5",
+            "worstRating": "1"
+          },
+          "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Frisørtjenester",
+            "itemListElement": [
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "Herreklipp",
+                  "description": "Profesjonell herreklipp med styling",
+                  "provider": {
+                    "@id": "https://ks-salong.manus.space/#business"
+                  }
+                },
+                "price": "350",
+                "priceCurrency": "NOK"
+              },
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "Dameklipp",
+                  "description": "Profesjonell dameklipp med styling",
+                  "provider": {
+                    "@id": "https://ks-salong.manus.space/#business"
+                  }
+                },
+                "price": "450",
+                "priceCurrency": "NOK"
+              },
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "Skjegg trim",
+                  "description": "Profesjonell skjegg trim og styling",
+                  "provider": {
+                    "@id": "https://ks-salong.manus.space/#business"
+                  }
+                },
+                "price": "200",
+                "priceCurrency": "NOK"
+              },
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "Hårfarge",
+                  "description": "Profesjonell hårfarge og behandling",
+                  "provider": {
+                    "@id": "https://ks-salong.manus.space/#business"
+                  }
+                },
+                "price": "600",
+                "priceCurrency": "NOK"
+              }
+            ]
+          },
+          "url": "https://ks-salong.manus.space",
+          "sameAs": [
+            "https://www.facebook.com/p/K-s-fris%C3%B8r-100067165725839/",
+            "https://www.instagram.com/k_s_frisor/"
+          ]
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://ks-salong.manus.space/#organization",
+          "name": "K.S Frisør",
+          "url": "https://ks-salong.manus.space",
+          "logo": "https://ks-salong.manus.space/logo.png",
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+4735555666",
+            "contactType": "customer service",
+            "areaServed": "NO",
+            "availableLanguage": ["Norwegian", "English"]
+          },
+          "award": "Norgesmester 2022 i frisørfaget"
+        }
+      ]
+    };
+    
+    // Add or update JSON-LD script
+    let script = document.querySelector('script[type="application/ld+json"]');
+    if (!script) {
+      script = document.createElement('script');
+      script.setAttribute('type', 'application/ld+json');
+      document.head.appendChild(script);
+    }
+    script.textContent = JSON.stringify(structuredData);
   }, []);
 
   return (

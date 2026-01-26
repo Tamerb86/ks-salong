@@ -1414,3 +1414,15 @@
 
 ## Bug Fixes
 - [x] Fix nested anchor tag error in Landing page footer (wrapped text in span instead of direct children)
+
+## SEO Structured Data (JSON-LD Schema)
+- [x] Add LocalBusiness schema with salon details (name, address, phone, hours)
+- [x] Add Organization schema for company information
+- [x] Add Service schema for all salon services (Herreklipp, Dameklipp, Skjegg trim, Hårfarge)
+- [x] Add AggregateRating schema for customer testimonials (5.0/5.0 from 55+ reviews)
+- [x] Add geo coordinates for Google Maps integration (59.1403, 9.6561)
+- [x] Add OfferCatalog with prices for all services
+- [x] Add social media links (Facebook, Instagram)
+- [x] Verify JSON-LD script is injected correctly in page head
+- [ ] Test schema with Google Rich Results Test tool - requires manual testing
+- [ ] Verify schema appears correctly in Google Search Console - requires deployment
