@@ -1,10 +1,8 @@
-import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
-import { getLoginUrl } from "@/const";
 import { Link } from "wouter";
 import { Layout } from "@/components/Layout";
 import { LiveBadge } from "@/components/ui/live-badge";
@@ -27,10 +25,12 @@ import {
 import { FikenSyncStatusCard } from "@/components/FikenSyncStatusCard";
 
 export default function Home() {
-  const { user, loading, error, isAuthenticated, logout } = useAuth();
   const [, setLocation] = useLocation();
+  const [staffName, setStaffName] = useState<string>("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Check PIN authentication
+  // Check PIN authentication only - no OAuth
   useEffect(() => {
     const dashboardAuth = sessionStorage.getItem("dashboardAuth");
     if (!dashboardAuth) {
@@ -45,18 +45,30 @@ export default function Home() {
       if (Date.now() - auth.timestamp > expiryTime) {
         sessionStorage.removeItem("dashboardAuth");
         setLocation("/dashboard-login");
+        return;
       }
+      setStaffName(auth.staffName || "Ansatt");
+      setIsAuthenticated(true);
     } catch (e) {
       sessionStorage.removeItem("dashboardAuth");
       setLocation("/dashboard-login");
+      return;
     }
+    setIsLoading(false);
   }, [setLocation]);
+
   const { data: stats, isLoading: statsLoading } = trpc.dashboard.getStats.useQuery(undefined, {
-    enabled: !!user,
+    enabled: isAuthenticated,
     refetchInterval: 30000, // Refetch every 30 seconds for real-time updates
   });
 
-  if (loading) {
+  // Handle logout - clear PIN session
+  const handleLogout = () => {
+    sessionStorage.removeItem("dashboardAuth");
+    setLocation("/dashboard-login");
+  };
+
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-900 via-purple-700 to-amber-600">
         <div className="text-center space-y-4">
@@ -70,64 +82,8 @@ export default function Home() {
     );
   }
 
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-700 to-amber-600 flex items-center justify-center p-4">
-        <Card className="w-full max-w-2xl border-0 shadow-2xl bg-white/95 backdrop-blur">
-          <CardHeader className="text-center space-y-4 pb-8">
-            <div className="mx-auto w-20 h-20 bg-gradient-to-br from-purple-600 to-amber-600 rounded-2xl flex items-center justify-center shadow-lg">
-              <Scissors className="h-10 w-10 text-white" />
-            </div>
-            <div>
-              <CardTitle className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-amber-600 bg-clip-text text-transparent">
-                K.S Salong
-              </CardTitle>
-              <CardDescription className="text-lg mt-2">
-                Profesjonelt Salong Administrasjonssystem
-              </CardDescription>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-2 gap-4 py-6">
-              <div className="text-center p-4 bg-purple-50 rounded-xl">
-                <Calendar className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-                <p className="font-semibold text-purple-900">Avtaler</p>
-                <p className="text-sm text-purple-600">Smart Booking</p>
-              </div>
-              <div className="text-center p-4 bg-amber-50 rounded-xl">
-                <Users className="h-8 w-8 text-amber-600 mx-auto mb-2" />
-                <p className="font-semibold text-amber-900">Kø</p>
-                <p className="text-sm text-amber-600">Walk-in Håndtering</p>
-              </div>
-              <div className="text-center p-4 bg-purple-50 rounded-xl">
-                <DollarSign className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-                <p className="font-semibold text-purple-900">POS</p>
-                <p className="text-sm text-purple-600">Salgssted</p>
-              </div>
-              <div className="text-center p-4 bg-amber-50 rounded-xl">
-                <BarChart3 className="h-8 w-8 text-amber-600 mx-auto mb-2" />
-                <p className="font-semibold text-amber-900">Analyse</p>
-                <p className="text-sm text-amber-600">Forretningsinnsikt</p>
-              </div>
-            </div>
-
-            <a href={getLoginUrl()}>
-              <Button
-                size="lg"
-                className="w-full bg-gradient-to-r from-purple-600 to-amber-600 hover:from-purple-700 hover:to-amber-700 text-white font-semibold py-6 text-lg shadow-lg hover:shadow-xl transition-all"
-              >
-                Logg inn for å fortsette
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </a>
-
-            <p className="text-center text-sm text-gray-500">
-              Sikker autentisering drevet av Manus
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    );
+  if (!isAuthenticated) {
+    return null; // Will redirect to PIN login
   }
 
   return (
@@ -137,7 +93,7 @@ export default function Home() {
         {/* Welcome Section */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Velkommen tilbake, {user.name?.split(" ")[0]}!
+            Velkommen tilbake, {staffName}!
           </h2>
           <p className="text-gray-600">Her er hva som skjer på K.S Salong i dag</p>
         </div>

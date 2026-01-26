@@ -1925,3 +1925,8 @@
 - [x] Keep only PIN Dashboard authentication
 - [x] Test landing page displays correctly
 - [x] Verify staff can access dashboard via PIN
+
+## 🔧 Remove OAuth from Dashboard - Direct PIN Login
+- [x] Modify /dashboard route to redirect to PIN login
+- [x] Remove OAuth requirement from dashboard access
+- [x] Test PIN login flow works correctly
