@@ -939,7 +939,18 @@ export const appRouter = router({
           console.error(`[Fiken-Sync] Error syncing order ${orderNumber}:`, error.message);
         }
         
-        return { orderId, orderNumber };
+        // Fetch the complete order with items for receipt display
+        const order = await db.getOrderById(orderId!);
+        const items = await db.getOrderItems(orderId!);
+        
+        return { 
+          orderId, 
+          orderNumber,
+          order: {
+            ...order,
+            items
+          }
+        };
       }),
     
     list: protectedProcedure

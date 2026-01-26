@@ -1,0 +1,40 @@
+{
+  "query": "SELECT id, name, price, duration FROM services ORDER BY id LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZWkmDdVMGTAoV.aeceea61840d --database oUNZ2iw3V7HdbF8pGMTUk4 --execute SELECT id, name, price, duration FROM services ORDER BY id LIMIT 5;",
+  "rows": [
+    {
+      "id": "210011",
+      "name": "Herreklipp",
+      "price": "350.00",
+      "duration": "30"
+    },
+    {
+      "id": "210012",
+      "name": "Dameklipp",
+      "price": "450.00",
+      "duration": "45"
+    },
+    {
+      "id": "210013",
+      "name": "Barneklipp",
+      "price": "250.00",
+      "duration": "20"
+    },
+    {
+      "id": "210014",
+      "name": "Farging",
+      "price": "800.00",
+      "duration": "90"
+    },
+    {
+      "id": "210015",
+      "name": "Highlights",
+      "price": "1200.00",
+      "duration": "120"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tprice\tduration\n210011\tHerreklipp\t350.00\t30\n210012\tDameklipp\t450.00\t45\n210013\tBarneklipp\t250.00\t20\n210014\tFarging\t800.00\t90\n210015\tHighlights\t1200.00\t120\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

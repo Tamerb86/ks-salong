@@ -70,9 +70,17 @@ export default function POS() {
   const createOrderMutation = trpc.orders.create.useMutation({
     onSuccess: (data) => {
       toast.success("Ordre opprettet!");
-      setLastReceipt(data);
+      // Store receipt data with current cart and payment info BEFORE clearing
+      setLastReceipt({
+        ...data,
+        cartItems: [...cart], // Save cart items before clearing
+        discount,
+        tip,
+        paymentMethod,
+        employeeName: activeEmployee?.name
+      });
       setIsReceiptOpen(true);
-      // Clear cart
+      // Clear cart AFTER saving to receipt
       setCart([]);
       setCustomerId(null);
       setDiscount(0);
@@ -186,16 +194,21 @@ export default function POS() {
 
     // Customer is now optional for guest/walk-in sales
 
-    const orderItems = cart.map((item) => ({
-      itemType: item.type,
-      itemId: item.id,
-      itemName: item.name,
-      quantity: item.quantity,
-      unitPrice: item.price.toString(),
-      costPrice: item.cost?.toString() || "0.00", // Add cost price for profit calculation
-      taxRate: "0.25",
-      total: (item.price * item.quantity).toString(),
-    }));
+    console.log('[POS] Cart before creating order:', cart);
+    const orderItems = cart.map((item) => {
+      console.log('[POS] Mapping item:', item.name, 'price:', item.price, 'type:', typeof item.price);
+      return {
+        itemType: item.type,
+        itemId: item.id,
+        itemName: item.name,
+        quantity: item.quantity,
+        unitPrice: item.price.toString(),
+        costPrice: item.cost?.toString() || "0.00", // Add cost price for profit calculation
+        taxRate: "0.25",
+        total: (item.price * item.quantity).toString(),
+      };
+    });
+    console.log('[POS] Order items to send:', orderItems);
 
     createOrderMutation.mutate({
       customerId: customerId || undefined,
@@ -373,6 +386,7 @@ export default function POS() {
                               // Show staff selection dialog
                               const staffId = staff.find(s => s.role === 'barber')?.id;
                               const staffName = staff.find(s => s.id === staffId)?.name || undefined;
+                              console.log('[POS] Adding service to cart:', service.name, 'price:', service.price, 'parsed:', parseFloat(service.price));
                               addToCart({
                                 type: "service",
                                 id: service.id,
@@ -720,7 +734,7 @@ export default function POS() {
                   <span>Vare/Tjeneste</span>
                   <span>Beløp</span>
                 </div>
-                {cart.map((item, index) => (
+                {(lastReceipt?.cartItems || []).map((item: any, index: number) => (
                   <div key={index} className="flex justify-between">
                     <span>
                       {item.name} × {item.quantity}
@@ -731,46 +745,46 @@ export default function POS() {
               </div>
 
               <div className="space-y-1 text-sm border-t pt-2 print:border-dashed">
-                {printOptions.showVAT && (
+                {printOptions.showVAT && lastReceipt?.order && (
                   <div className="flex justify-between">
                     <span>Delsum (eks. MVA):</span>
-                    <span>{(calculateSubtotal() / 1.25).toFixed(2)} kr</span>
+                    <span>{(parseFloat(lastReceipt.order.subtotal) / 1.25).toFixed(2)} kr</span>
                   </div>
                 )}
-                {discount > 0 && (
+                {lastReceipt?.discount && lastReceipt.discount > 0 && (
                   <div className="flex justify-between text-red-600">
                     <span>Rabatt:</span>
-                    <span>-{calculateDiscount().toFixed(2)} kr</span>
+                    <span>-{lastReceipt.discount.toFixed(2)} kr</span>
                   </div>
                 )}
-                {printOptions.showVAT && (
+                {printOptions.showVAT && lastReceipt?.order && (
                   <div className="flex justify-between font-medium">
                     <span>MVA (25%):</span>
-                    <span>{calculateMVA().toFixed(2)} kr</span>
+                    <span>{parseFloat(lastReceipt.order.taxAmount).toFixed(2)} kr</span>
                   </div>
                 )}
-                {printOptions.showVAT && (
+                {printOptions.showVAT && lastReceipt?.order && (
                   <div className="flex justify-between">
                     <span>Delsum (inkl. MVA):</span>
-                    <span>{calculateSubtotal().toFixed(2)} kr</span>
+                    <span>{parseFloat(lastReceipt.order.subtotal).toFixed(2)} kr</span>
                   </div>
                 )}
-                {tip > 0 && (
+                {lastReceipt?.tip && lastReceipt.tip > 0 && (
                   <div className="flex justify-between text-green-600">
                     <span>Tips:</span>
-                    <span>+{tip.toFixed(2)} kr</span>
+                    <span>+{lastReceipt.tip.toFixed(2)} kr</span>
                   </div>
                 )}
                 <div className="flex justify-between font-bold text-lg border-t pt-2 print:border-double print:border-t-2">
                   <span>Totalt å betale:</span>
-                  <span>{calculateTotal().toFixed(2)} kr</span>
+                  <span>{lastReceipt?.order ? parseFloat(lastReceipt.order.total).toFixed(2) : '0.00'} kr</span>
                 </div>
               </div>
 
               <div className="text-center text-xs text-gray-500 border-t pt-4 print:border-dashed">
-                <p className="font-medium">Betalingsmetode: {paymentMethod.toUpperCase()}</p>
-                {printOptions.showEmployee && activeEmployee && (
-                  <p className="mt-1">Betjent av: {activeEmployee.name}</p>
+                <p className="font-medium">Betalingsmetode: {lastReceipt?.paymentMethod?.toUpperCase() || 'KONTANT'}</p>
+                {printOptions.showEmployee && lastReceipt?.employeeName && (
+                  <p className="mt-1">Betjent av: {lastReceipt.employeeName}</p>
                 )}
                 {printOptions.customMessage ? (
                   <p className="mt-3 font-medium">{printOptions.customMessage}</p>

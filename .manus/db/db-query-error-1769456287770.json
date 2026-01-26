@@ -1,0 +1,8 @@
+{
+  "query": "SELECT oi.*, s.name as service_name, s.price as service_price FROM orderItems oi LEFT JOIN services s ON oi.serviceId = s.id WHERE oi.orderId = (SELECT id FROM orders ORDER BY createdAt DESC LIMIT 1);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZWkmDdVMGTAoV.aeceea61840d --database oUNZ2iw3V7HdbF8pGMTUk4 --execute SELECT oi.*, s.name as service_name, s.price as service_price FROM orderItems oi LEFT JOIN services s ON oi.serviceId = s.id WHERE oi.orderId = (SELECT id FROM orders ORDER BY createdAt DESC LIMIT 1);",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'oi.serviceid' in 'on clause'"
+  ]
+}

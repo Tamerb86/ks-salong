@@ -1,0 +1,23 @@
+{
+  "query": "SELECT * FROM orderItems WHERE orderId = (SELECT id FROM orders ORDER BY createdAt DESC LIMIT 1);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZWkmDdVMGTAoV.aeceea61840d --database oUNZ2iw3V7HdbF8pGMTUk4 --execute SELECT * FROM orderItems WHERE orderId = (SELECT id FROM orders ORDER BY createdAt DESC LIMIT 1);",
+  "rows": [
+    {
+      "id": "90006",
+      "orderId": "90005",
+      "itemType": "service",
+      "itemId": "210011",
+      "itemName": "Herreklipp",
+      "quantity": "1",
+      "unitPrice": "350.00",
+      "taxRate": "0.25",
+      "total": "350.00",
+      "createdAt": "2026-01-26 19:36:59",
+      "costPrice": "0.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\torderId\titemType\titemId\titemName\tquantity\tunitPrice\ttaxRate\ttotal\tcreatedAt\tcostPrice\n90006\t90005\tservice\t210011\tHerreklipp\t1\t350.00\t0.25\t350.00\t2026-01-26 19:36:59\t0.00\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

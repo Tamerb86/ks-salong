@@ -1624,3 +1624,29 @@
 - [x] Reload default data via Settings → Faresone → Last inn standarddata (10 services + 10 products inserted)
 - [x] Test POS with updated prices to verify amounts display correctly (350kr shown correctly)
 - [x] Verify MVA (25%) calculation works with new prices (280kr + 70kr MVA = 350kr total ✓)
+
+## 🐛 Fix TypeScript Errors
+- [ ] Fix server/routers.ts: getAppointmentByToken does not exist in db.ts
+- [ ] Fix server/routers.ts: getStaffById does not exist in db.ts
+- [ ] Fix server/routers.ts: clearAllData import error
+- [ ] Fix client/src/pages/Customers.tsx: Failed to resolve import "@/hooks/use-toast"
+- [ ] Run TypeScript check: `npx tsc --noEmit` to verify all errors are fixed
+
+## 🐛 Critical: POS Pricing Bug (0.00 kr on Receipts) - ✅ FIXED
+- [x] Debug why cart shows correct prices (450kr) but receipt shows 0.00 kr
+- [x] Add detailed logging to track price values through the flow:
+  * Log service.price when fetched from API
+  * Log item.price when added to cart
+  * Log cart items before creating order
+  * Log orderItems sent to backend
+- [x] Check if parseFloat(service.price) is returning NaN or 0
+- [x] Verify service.price type (string vs number) from API response
+- [x] Test with console.log in addToCart function
+- [x] Fix root cause of price conversion to 0 (cart was cleared before receipt opened)
+- [x] Test complete POS flow after fix (Herreklipp 350kr displays correctly in receipt)
+
+**Root Cause:** Receipt was using `cart` state which was cleared before dialog opened. Fixed by:
+1. Saving cart data to `lastReceipt` before clearing cart
+2. Updating receipt to use `lastReceipt.cartItems` instead of `cart`
+3. Modified `orders.create` mutation to return full order data from database
+4. Updated receipt calculations to use `lastReceipt.order` data
