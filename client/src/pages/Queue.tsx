@@ -1,4 +1,3 @@
-import { useAuth } from "@/_core/hooks/useAuth";
 import { Layout } from "@/components/Layout";
 import { LiveBadge } from "@/components/ui/live-badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -16,19 +15,19 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 
 export default function Queue() {
-  const { user, loading: authLoading } = useAuth();
+  
   const [isAddCustomerOpen, setIsAddCustomerOpen] = useState(false);
   const [selectedQueueItem, setSelectedQueueItem] = useState<any>(null);
 
   // Fetch active queue
   const { data: queue = [], refetch, isLoading: queueLoading } = trpc.queue.list.useQuery(undefined, { 
-    enabled: !authLoading,
+    enabled: true,
     refetchInterval: 10000, // Refetch every 10 seconds for real-time updates
   });
 
   // Fetch services and staff
-  const { data: services = [] } = trpc.services.list.useQuery(undefined, { enabled: !authLoading });
-  const { data: staff = [] } = trpc.staff.list.useQuery(undefined, { enabled: !authLoading });
+  const { data: services = [] } = trpc.services.list.useQuery(undefined, { enabled: true });
+  const { data: staff = [] } = trpc.staff.list.useQuery(undefined, { enabled: true });
 
   const addMutation = trpc.queue.add.useMutation({
     onSuccess: () => {
@@ -120,13 +119,6 @@ export default function Queue() {
     return `~${hours}t ${remainingMinutes}m`;
   };
 
-  if (authLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
-      </div>
-    );
-  }
 
   if (!user) {
     return (

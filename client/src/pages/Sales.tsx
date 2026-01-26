@@ -1,4 +1,3 @@
-import { useAuth } from "@/_core/hooks/useAuth";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,7 +20,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { toast } from "sonner";
 
 export default function Sales() {
-  const { user, loading: authLoading } = useAuth();
+  
   
   // Filter states - MUST declare all hooks before any conditional returns
   const [dateFrom, setDateFrom] = useState(format(new Date(), "yyyy-MM-dd"));
@@ -34,7 +33,7 @@ export default function Sales() {
   const [searchQuery, setSearchQuery] = useState("");
   
   // Fetch data
-  const { data: staff = [] } = trpc.staff.list.useQuery(undefined, { enabled: !authLoading });
+  const { data: staff = [] } = trpc.staff.list.useQuery(undefined, { enabled: true });
   
   const { data: sales = [], isLoading, refetch } = trpc.orders.list.useQuery({
       dateFrom,
@@ -42,7 +41,7 @@ export default function Sales() {
       staffId: selectedEmployee === "all" ? undefined : parseInt(selectedEmployee),
       paymentMethod: selectedPaymentMethod === "all" ? undefined : selectedPaymentMethod,
     },
-    { enabled: !authLoading, refetchInterval: 30000 }
+    { enabled: true, refetchInterval: 30000 }
   );
   
   const { data: profitability, isLoading: profitLoading } = trpc.orders.getProfitability.useQuery({
@@ -51,7 +50,7 @@ export default function Sales() {
       staffId: selectedEmployee === "all" ? undefined : parseInt(selectedEmployee),
       paymentMethod: selectedPaymentMethod === "all" ? undefined : selectedPaymentMethod,
     },
-    { enabled: !authLoading, refetchInterval: 30000 }
+    { enabled: true, refetchInterval: 30000 }
   );
   
   const refundMutation = trpc.orders.refund.useMutation({
@@ -243,13 +242,6 @@ export default function Sales() {
   };
   
   // Early returns AFTER all hooks
-  if (authLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
-      </div>
-    );
-  }
   
   if (!user) {
     return (

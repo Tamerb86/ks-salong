@@ -1,7 +1,7 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, protectedProcedure, adminProcedure, router } from "./_core/trpc";
+import { publicProcedure, adminProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
 import * as fiken from "./fiken";
@@ -41,7 +41,7 @@ export const appRouter = router({
   }),
 
   staff: router({
-    list: protectedProcedure.query(async () => {
+    list: publicProcedure.query(async () => {
       return await db.getAllStaff();
     }),
     
@@ -50,13 +50,13 @@ export const appRouter = router({
       return allStaff.filter(staff => staff.isActive);
     }),
     
-    getById: protectedProcedure
+    getById: publicProcedure
       .input(z.object({ id: z.number() }))
       .query(async ({ input }) => {
         return await db.getUserById(input.id);
       }),
     
-    create: protectedProcedure
+    create: publicProcedure
       .input(z.object({
         name: z.string(),
         email: z.string().email(),
@@ -108,7 +108,7 @@ export const appRouter = router({
       }),
     
     // Leave management
-    listLeaves: protectedProcedure
+    listLeaves: publicProcedure
       .input(z.object({ staffId: z.number().optional() }))
       .query(async ({ input }) => {
         // TODO: Implement getStaffLeaves in db.ts
@@ -168,11 +168,11 @@ export const appRouter = router({
   }),
 
   services: router({
-    list: protectedProcedure.query(async () => {
+    list: publicProcedure.query(async () => {
       return await db.getAllServices();
     }),
     
-    getById: protectedProcedure
+    getById: publicProcedure
       .input(z.object({ id: z.number() }))
       .query(async ({ input }) => {
         return await db.getServiceById(input.id);
@@ -220,11 +220,11 @@ export const appRouter = router({
   }),
 
   products: router({
-    list: protectedProcedure.query(async () => {
+    list: publicProcedure.query(async () => {
       return await db.getAllProducts();
     }),
     
-    getById: protectedProcedure
+    getById: publicProcedure
       .input(z.object({ id: z.number() }))
       .query(async ({ input }) => {
         return await db.getProductById(input.id);
@@ -290,13 +290,13 @@ export const appRouter = router({
   }),
 
   appointments: router({
-    listByDate: protectedProcedure
+    listByDate: publicProcedure
       .input(z.object({ date: z.date() }))
       .query(async ({ input }) => {
         return await db.getAppointmentsByDate(input.date);
       }),
     
-    listByDateRange: protectedProcedure
+    listByDateRange: publicProcedure
       .input(z.object({ 
         startDate: z.string(),
         endDate: z.string()
@@ -305,13 +305,13 @@ export const appRouter = router({
         return await db.getAppointmentsByDateRange(input.startDate, input.endDate);
       }),
     
-    listByStaffAndDate: protectedProcedure
+    listByStaffAndDate: publicProcedure
       .input(z.object({ staffId: z.number(), date: z.date() }))
       .query(async ({ input }) => {
         return await db.getAppointmentsByStaffAndDate(input.staffId, input.date);
       }),
     
-    list: protectedProcedure
+    list: publicProcedure
       .query(async () => {
         // Return all appointments for the calendar view
         const today = new Date();
@@ -320,13 +320,13 @@ export const appRouter = router({
         return await db.getAppointmentsByDateRange(startDate, endDate);
       }),
     
-    getById: protectedProcedure
+    getById: publicProcedure
       .input(z.object({ id: z.number() }))
       .query(async ({ input }) => {
         return await db.getAppointmentById(input.id);
       }),
     
-    create: protectedProcedure
+    create: publicProcedure
       .input(z.object({
         customerName: z.string(),
         customerPhone: z.string(),
@@ -416,7 +416,7 @@ export const appRouter = router({
         return { id, success: true };
       }),
     
-    update: protectedProcedure
+    update: publicProcedure
       .input(z.object({
         id: z.number(),
         appointmentDate: z.string().optional(),
@@ -637,11 +637,11 @@ export const appRouter = router({
   }),
 
   queue: router({
-    list: protectedProcedure.query(async () => {
+    list: publicProcedure.query(async () => {
       return await db.getActiveQueue();
     }),
     
-    add: protectedProcedure
+    add: publicProcedure
       .input(z.object({
         customerName: z.string(),
         customerPhone: z.string().optional(),
@@ -661,7 +661,7 @@ export const appRouter = router({
         return { id };
       }),
     
-    update: protectedProcedure
+    update: publicProcedure
       .input(z.object({
         id: z.number(),
         status: z.enum(["waiting", "in_service", "completed", "cancelled"]).optional(),
@@ -673,7 +673,7 @@ export const appRouter = router({
         return { success: true };
       }),
     
-    reorder: protectedProcedure
+    reorder: publicProcedure
       .input(z.array(z.object({ id: z.number(), position: z.number() })))
       .mutation(async ({ input }) => {
         await db.reorderQueue(input);
@@ -682,7 +682,7 @@ export const appRouter = router({
   }),
 
   customers: router({
-    list: protectedProcedure
+    list: publicProcedure
       .input(z.object({
         search: z.string().optional(),
         tag: z.string().optional(),
@@ -693,19 +693,19 @@ export const appRouter = router({
         return await db.getAllCustomers(input || {});
       }),
     
-    search: protectedProcedure
+    search: publicProcedure
       .input(z.object({ query: z.string() }))
       .query(async ({ input }) => {
         return await db.searchCustomers(input.query);
       }),
     
-    getById: protectedProcedure
+    getById: publicProcedure
       .input(z.object({ id: z.number() }))
       .query(async ({ input }) => {
         return await db.getCustomerById(input.id);
       }),
     
-    create: protectedProcedure
+    create: publicProcedure
       .input(z.object({
         firstName: z.string(),
         lastName: z.string(),
@@ -725,7 +725,7 @@ export const appRouter = router({
         return { id };
       }),
     
-    update: protectedProcedure
+    update: publicProcedure
       .input(z.object({
         id: z.number(),
         firstName: z.string().optional(),
@@ -747,20 +747,20 @@ export const appRouter = router({
         return { success: true };
       }),
     
-    getBookingHistory: protectedProcedure
+    getBookingHistory: publicProcedure
       .input(z.object({ customerId: z.number() }))
       .query(async ({ input }) => {
         return await db.getCustomerBookingHistory(input.customerId);
       }),
     
-    getStatistics: protectedProcedure
+    getStatistics: publicProcedure
       .input(z.object({ customerId: z.number() }))
       .query(async ({ input }) => {
         return await db.getCustomerStatistics(input.customerId);
       }),
 
     // Customer Notes
-    addNote: protectedProcedure
+    addNote: publicProcedure
       .input(z.object({
         customerId: z.number(),
         note: z.string(),
@@ -770,26 +770,26 @@ export const appRouter = router({
       .mutation(async ({ input, ctx }) => {
         const id = await db.addCustomerNote({
           ...input,
-          createdBy: ctx.user.id,
-          createdByName: ctx.user.name || 'Unknown',
+          createdBy: ctx.user?.id || 0,
+          createdByName: ctx.user?.name || 'Staff',
         });
         return { id };
       }),
 
-    getNotes: protectedProcedure
+    getNotes: publicProcedure
       .input(z.object({ customerId: z.number() }))
       .query(async ({ input }) => {
         return await db.getCustomerNotes(input.customerId);
       }),
 
-    updateNote: protectedProcedure
+    updateNote: publicProcedure
       .input(z.object({ id: z.number(), note: z.string() }))
       .mutation(async ({ input }) => {
         await db.updateCustomerNote(input.id, input.note);
         return { success: true };
       }),
 
-    deleteNote: protectedProcedure
+    deleteNote: publicProcedure
       .input(z.object({ id: z.number() }))
       .mutation(async ({ input }) => {
         await db.deleteCustomerNote(input.id);
@@ -797,7 +797,7 @@ export const appRouter = router({
       }),
 
     // Customer Tags
-    addTag: protectedProcedure
+    addTag: publicProcedure
       .input(z.object({
         customerId: z.number(),
         tag: z.enum(["VIP", "Regular", "New", "Inactive", "Loyal", "HighValue", "AtRisk"]),
@@ -805,51 +805,51 @@ export const appRouter = router({
       .mutation(async ({ input, ctx }) => {
         const id = await db.addCustomerTag({
           ...input,
-          addedBy: ctx.user.id,
-          addedByName: ctx.user.name || 'Unknown',
+          addedBy: ctx.user?.id || 0,
+          addedByName: ctx.user?.name || 'Staff',
         });
         return { id };
       }),
 
-    getTags: protectedProcedure
+    getTags: publicProcedure
       .input(z.object({ customerId: z.number() }))
       .query(async ({ input }) => {
         return await db.getCustomerTags(input.customerId);
       }),
 
-    deleteTag: protectedProcedure
+    deleteTag: publicProcedure
       .input(z.object({ id: z.number() }))
       .mutation(async ({ input }) => {
         await db.deleteCustomerTag(input.id);
         return { success: true };
       }),
 
-    getByTag: protectedProcedure
+    getByTag: publicProcedure
       .input(z.object({ tag: z.string() }))
       .query(async ({ input }) => {
         return await db.getCustomersByTag(input.tag);
       }),
 
     // Duplicate Management
-    findDuplicates: protectedProcedure
+    findDuplicates: publicProcedure
       .query(async () => {
         return await db.findDuplicateCustomers();
       }),
 
-    merge: protectedProcedure
+    merge: publicProcedure
       .input(z.object({ keepId: z.number(), deleteId: z.number() }))
       .mutation(async ({ input }) => {
         return await db.mergeCustomers(input.keepId, input.deleteId);
       }),
 
     // GDPR
-    exportData: protectedProcedure
+    exportData: publicProcedure
       .input(z.object({ customerId: z.number() }))
       .query(async ({ input }) => {
         return await db.exportCustomerData(input.customerId);
       }),
 
-    deleteData: protectedProcedure
+    deleteData: publicProcedure
       .input(z.object({ customerId: z.number() }))
       .mutation(async ({ input }) => {
         return await db.deleteCustomerData(input.customerId);
@@ -857,7 +857,7 @@ export const appRouter = router({
   }),
 
   orders: router({
-    create: protectedProcedure
+    create: publicProcedure
       .input(z.object({
         customerId: z.number().optional(),
         items: z.array(z.object({
@@ -953,7 +953,7 @@ export const appRouter = router({
         };
       }),
     
-    list: protectedProcedure
+    list: publicProcedure
       .input(z.object({
         dateFrom: z.string().optional(),
         dateTo: z.string().optional(),
@@ -964,7 +964,7 @@ export const appRouter = router({
         return await db.getOrdersByFilters(input);
       }),
     
-    getById: protectedProcedure
+    getById: publicProcedure
       .input(z.object({ id: z.number() }))
       .query(async ({ input }) => {
         const order = await db.getOrderById(input.id);
@@ -973,7 +973,7 @@ export const appRouter = router({
         return { ...order, items };
       }),
     
-    getProfitability: protectedProcedure
+    getProfitability: publicProcedure
       .input(z.object({
         dateFrom: z.string().optional(),
         dateTo: z.string().optional(),
@@ -1028,7 +1028,7 @@ export const appRouter = router({
         };
       }),
     
-    refund: protectedProcedure
+    refund: publicProcedure
       .input(z.object({
         orderId: z.number(),
         reason: z.string(),
@@ -1050,7 +1050,7 @@ export const appRouter = router({
         return { success: true };
       }),
     
-    delete: protectedProcedure
+    delete: publicProcedure
       .input(z.object({
         orderId: z.number(),
       }))
@@ -1074,7 +1074,7 @@ export const appRouter = router({
       }),
     
     // Fiken Integration
-    syncToFiken: protectedProcedure
+    syncToFiken: publicProcedure
       .input(z.object({
         orderId: z.number(),
       }))
@@ -1119,7 +1119,7 @@ export const appRouter = router({
         return { success: true, saleId: result.saleId };
       }),
     
-    syncDailyToFiken: protectedProcedure
+    syncDailyToFiken: publicProcedure
       .input(z.object({
         date: z.string(), // YYYY-MM-DD
       }))
@@ -1180,7 +1180,7 @@ export const appRouter = router({
         };
       }),
     
-    syncTodaySalesToFiken: protectedProcedure
+    syncTodaySalesToFiken: publicProcedure
       .mutation(async () => {
         // Get settings
         const settings = await db.getSalonSettings();
@@ -1255,7 +1255,7 @@ export const appRouter = router({
         };
       }),
     
-    verifyFikenTotals: protectedProcedure
+    verifyFikenTotals: publicProcedure
       .input(z.object({
         dateFrom: z.string(), // YYYY-MM-DD
         dateTo: z.string(), // YYYY-MM-DD
@@ -1295,7 +1295,7 @@ export const appRouter = router({
         return verification;
       }),
     
-    getSalesWithoutCustomer: protectedProcedure
+    getSalesWithoutCustomer: publicProcedure
       .input(z.object({
         dateFrom: z.string().optional(),
         dateTo: z.string().optional(),
@@ -1372,7 +1372,7 @@ export const appRouter = router({
   }),
 
   payments: router({
-    create: protectedProcedure
+    create: publicProcedure
       .input(z.object({
         orderId: z.number().optional(),
         appointmentId: z.number().optional(),
@@ -1392,7 +1392,7 @@ export const appRouter = router({
   }),
 
   oldTimeTracking: router({
-    getEntriesByStaffAndDate: protectedProcedure
+    getEntriesByStaffAndDate: publicProcedure
       .input(z.object({ staffId: z.number(), date: z.date() }))
       .query(async ({ input }) => {
         return await db.getTimeEntriesByStaffAndDate(input.staffId, input.date);
@@ -1413,7 +1413,7 @@ export const appRouter = router({
   }),
 
   dashboard: router({
-    getStats: protectedProcedure.query(async () => {
+    getStats: publicProcedure.query(async () => {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       
@@ -1431,7 +1431,7 @@ export const appRouter = router({
   }),
 
   settings: router({
-    get: protectedProcedure.query(async () => {
+    get: publicProcedure.query(async () => {
       return await db.getSalonSettings();
     }),
     
@@ -1463,7 +1463,7 @@ export const appRouter = router({
         return { success: true };
       }),
     
-    getBusinessHours: protectedProcedure.query(async () => {
+    getBusinessHours: publicProcedure.query(async () => {
       return await db.getBusinessHours();
     }),
     
@@ -1498,7 +1498,7 @@ export const appRouter = router({
         return result.companies || [];
       }),
     
-    getFikenSyncLogs: protectedProcedure
+    getFikenSyncLogs: publicProcedure
       .input(z.object({
         limit: z.number().optional(),
       }).optional())
@@ -1630,12 +1630,12 @@ export const appRouter = router({
       }),
     
     // List Terminal Readers
-    listReaders: protectedProcedure.query(async () => {
+    listReaders: publicProcedure.query(async () => {
       return await db.getTerminalReaders();
     }),
     
     // Get Reader Status
-    getReaderStatus: protectedProcedure
+    getReaderStatus: publicProcedure
       .input(z.object({
         readerId: z.string(),
       }))
@@ -1669,7 +1669,7 @@ export const appRouter = router({
       }),
     
     // Create Payment Intent for Terminal
-    createPaymentIntent: protectedProcedure
+    createPaymentIntent: publicProcedure
       .input(z.object({
         amount: z.number(),
         orderId: z.number().optional(),
@@ -1688,7 +1688,7 @@ export const appRouter = router({
       }),
     
     // Process Payment on Reader
-    processPayment: protectedProcedure
+    processPayment: publicProcedure
       .input(z.object({
         readerId: z.string(),
         paymentIntentId: z.string(),
@@ -1707,7 +1707,7 @@ export const appRouter = router({
       }),
     
     // Cancel Reader Action
-    cancelPayment: protectedProcedure
+    cancelPayment: publicProcedure
       .input(z.object({
         readerId: z.string(),
       }))
@@ -1721,7 +1721,7 @@ export const appRouter = router({
       }),
     
     // Get Payment Intent Status
-    getPaymentStatus: protectedProcedure
+    getPaymentStatus: publicProcedure
       .input(z.object({
         paymentIntentId: z.string(),
       }))
@@ -1791,12 +1791,12 @@ export const appRouter = router({
       }),
     
     // Get currently clocked in employees
-    getClockedIn: protectedProcedure.query(async () => {
+    getClockedIn: publicProcedure.query(async () => {
       return await db.getClockedInEmployees();
     }),
     
     // Get time entries for date range
-    getEntries: protectedProcedure
+    getEntries: publicProcedure
       .input(z.object({
         startDate: z.date(),
         endDate: z.date(),
@@ -1807,7 +1807,7 @@ export const appRouter = router({
       }),
     
     // Get employee work summary
-    getSummary: protectedProcedure
+    getSummary: publicProcedure
       .input(z.object({
         staffId: z.number(),
         startDate: z.date(),
@@ -1818,7 +1818,7 @@ export const appRouter = router({
       }),
     
     // Get time report for date range
-    getTimeReport: protectedProcedure
+    getTimeReport: publicProcedure
       .input(z.object({
         from: z.string(),
         to: z.string(),
@@ -1831,7 +1831,7 @@ export const appRouter = router({
       }),
 
     // Export time report to Excel
-    exportTimeReportExcel: protectedProcedure
+    exportTimeReportExcel: publicProcedure
       .input(z.object({
         from: z.string(),
         to: z.string(),
@@ -1909,7 +1909,7 @@ export const appRouter = router({
       }),
 
     // Export time report to PDF
-    exportTimeReportPDF: protectedProcedure
+    exportTimeReportPDF: publicProcedure
       .input(z.object({
         from: z.string(),
         to: z.string(),

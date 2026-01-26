@@ -1,4 +1,3 @@
-import { useAuth } from "@/_core/hooks/useAuth";
 import { Layout } from "@/components/Layout";
 import { MonthlyCalendar } from "@/components/MonthlyCalendar";
 import { WeeklyCalendar } from "@/components/WeeklyCalendar";
@@ -46,7 +45,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 
 export default function Appointments() {
-  const { user, loading: authLoading } = useAuth();
+  
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [currentWeek, setCurrentWeek] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -194,15 +193,6 @@ export default function Appointments() {
     })
   };
 
-  if (authLoading) {
-    return (
-      <Layout>
-        <div className="p-6">
-          <Skeleton className="h-96 w-full" />
-        </div>
-      </Layout>
-    );
-  }
 
   if (!user) {
     return (

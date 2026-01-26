@@ -1,6 +1,7 @@
-import { useAuth } from "@/_core/hooks/useAuth";
 import { Sidebar } from "./Sidebar";
 import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import { useLocation } from "wouter";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -8,10 +9,33 @@ interface LayoutProps {
 }
 
 export function Layout({ children, className }: LayoutProps) {
-  const { user } = useAuth();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [, setLocation] = useLocation();
 
-  // If no user, don't show sidebar (login page)
-  if (!user) {
+  useEffect(() => {
+    const dashboardAuth = sessionStorage.getItem("dashboardAuth");
+    if (!dashboardAuth) {
+      setLocation("/dashboard-login");
+      return;
+    }
+
+    try {
+      const auth = JSON.parse(dashboardAuth);
+      const expiryTime = 24 * 60 * 60 * 1000; // 24 hours
+      if (Date.now() - auth.timestamp > expiryTime) {
+        sessionStorage.removeItem("dashboardAuth");
+        setLocation("/dashboard-login");
+        return;
+      }
+      setIsAuthenticated(true);
+    } catch (e) {
+      sessionStorage.removeItem("dashboardAuth");
+      setLocation("/dashboard-login");
+    }
+  }, [setLocation]);
+
+  // If not authenticated, don't show sidebar
+  if (!isAuthenticated) {
     return <>{children}</>;
   }
 

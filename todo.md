@@ -1930,3 +1930,8 @@
 - [x] Modify /dashboard route to redirect to PIN login
 - [x] Remove OAuth requirement from dashboard access
 - [x] Test PIN login flow works correctly
+
+## 🔧 Remove OAuth from ALL API Endpoints
+- [x] Replace protectedProcedure with publicProcedure in routers.ts
+- [x] Remove useAuth from all frontend pages
+- [x] Test all pages work with PIN-only authentication

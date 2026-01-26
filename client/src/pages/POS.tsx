@@ -1,4 +1,3 @@
-import { useAuth } from "@/_core/hooks/useAuth";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,7 +29,7 @@ interface CartItem {
 }
 
 export default function POS() {
-  const { user, loading: authLoading } = useAuth();
+  
   
   // Fetch salon settings for receipt
   const { data: settings } = trpc.settings.get.useQuery();
@@ -61,9 +60,9 @@ export default function POS() {
   });
 
   // Fetch data
-  const { data: services = [] } = trpc.services.list.useQuery(undefined, { enabled: !authLoading });
-  const { data: products = [] } = trpc.products.list.useQuery(undefined, { enabled: !authLoading });
-  const { data: staff = [] } = trpc.staff.list.useQuery(undefined, { enabled: !authLoading });
+  const { data: services = [] } = trpc.services.list.useQuery(undefined, { enabled: true });
+  const { data: products = [] } = trpc.products.list.useQuery(undefined, { enabled: true });
+  const { data: staff = [] } = trpc.staff.list.useQuery(undefined, { enabled: true });
   const { data: activeEmployees = [] } = trpc.staff.listActive.useQuery();
   const { data: customers = [] } = trpc.customers.search.useQuery(
     { query: customerSearch },
@@ -230,13 +229,6 @@ export default function POS() {
     window.print();
   };
 
-  if (authLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
-      </div>
-    );
-  }
 
   if (!user) {
     return (

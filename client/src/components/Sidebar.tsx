@@ -1,4 +1,3 @@
-import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
@@ -19,7 +18,7 @@ import {
   Package,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface NavItem {
   title: string;
@@ -31,7 +30,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   {
     title: "Dashboard",
-    href: "/",
+    href: "/dashboard",
     icon: Home,
   },
   {
@@ -91,12 +90,34 @@ const navItems: NavItem[] = [
   },
 ];
 
+interface StaffInfo {
+  staffName: string;
+  staffId: number;
+  role: string;
+}
+
 export function Sidebar() {
-  const { user, logout } = useAuth();
   const [location] = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [staffInfo, setStaffInfo] = useState<StaffInfo | null>(null);
 
-  if (!user) return null;
+  useEffect(() => {
+    const dashboardAuth = sessionStorage.getItem("dashboardAuth");
+    if (dashboardAuth) {
+      try {
+        const auth = JSON.parse(dashboardAuth);
+        setStaffInfo({
+          staffName: auth.staffName || "Ansatt",
+          staffId: auth.staffId || 0,
+          role: auth.role || "user",
+        });
+      } catch (e) {
+        // Invalid auth data
+      }
+    }
+  }, []);
+
+  if (!staffInfo) return null;
 
   return (
     <>
@@ -124,7 +145,7 @@ export function Sidebar() {
           {/* Header */}
           <div className="flex h-20 items-center justify-between px-6 border-b border-white/10">
             {!isCollapsed && (
-              <Link href="/">
+              <Link href="/dashboard">
                 <div className="flex items-center gap-3 cursor-pointer">
                   <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl flex items-center justify-center shadow-lg">
                     <Scissors className="h-5 w-5 text-white" />
@@ -161,11 +182,11 @@ export function Sidebar() {
             <div className="px-6 py-4 bg-white/5">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                  {user.name?.charAt(0).toUpperCase()}
+                  {staffInfo.staffName?.charAt(0).toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-white truncate">{user.name}</p>
-                  <p className="text-sm text-purple-200 capitalize">{user.role}</p>
+                  <p className="font-semibold text-white truncate">{staffInfo.staffName}</p>
+                  <p className="text-sm text-purple-200 capitalize">{staffInfo.role}</p>
                 </div>
               </div>
             </div>
