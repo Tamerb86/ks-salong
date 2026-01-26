@@ -1935,3 +1935,9 @@
 - [x] Replace protectedProcedure with publicProcedure in routers.ts
 - [x] Remove useAuth from all frontend pages
 - [x] Test all pages work with PIN-only authentication
+
+## 🖨️ Fix Thermal Printer Receipt Layout
+- [x] Redesign receipt for 80mm thermal printer
+- [x] Use smaller font sizes (9-11pt)
+- [x] Simple vertical layout
+- [ ] Test printing

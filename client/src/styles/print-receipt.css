@@ -22,8 +22,8 @@
   .receipt-print.print-80mm {
     width: 80mm;
     max-width: 80mm;
-    padding: 5mm;
-    font-size: 12pt;
+    padding: 3mm;
+    font-size: 9pt;
   }
   
   /* A4 paper */
@@ -63,20 +63,20 @@
   }
   
   .receipt-header h2 {
-    font-size: 18pt;
+    font-size: 14pt;
     font-weight: bold;
     margin: 0 0 2mm 0;
   }
   
   .receipt-header p {
-    font-size: 10pt;
+    font-size: 8pt;
     margin: 1mm 0;
   }
   
   /* Receipt items */
   .receipt-items {
     margin: 3mm 0;
-    font-size: 11pt;
+    font-size: 9pt;
   }
   
   .receipt-item {
@@ -90,7 +90,7 @@
     margin-top: 3mm;
     border-top: 1px dashed #000;
     padding-top: 3mm;
-    font-size: 11pt;
+    font-size: 9pt;
   }
   
   .receipt-total-row {
@@ -100,7 +100,7 @@
   }
   
   .receipt-total-row.grand-total {
-    font-size: 14pt;
+    font-size: 11pt;
     font-weight: bold;
     border-top: 2px double #000;
     padding-top: 2mm;
@@ -113,7 +113,7 @@
     margin-top: 5mm;
     border-top: 1px dashed #000;
     padding-top: 3mm;
-    font-size: 10pt;
+    font-size: 8pt;
   }
   
   /* Remove colors for thermal printing */
