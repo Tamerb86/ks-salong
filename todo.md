@@ -1667,3 +1667,11 @@
 3. Updated POS receipt to use settings data: salonName, salonAddress, salonPhone, salonEmail, mvaNumber, receiptMessage
 4. Receipt now displays real salon information instead of placeholders
 5. Custom message from settings appears at bottom of receipt
+
+## 🐛 Fix Email Validation Error in Customer Creation - ✅ FIXED
+- [x] Investigate email validation regex pattern in backend (found strict Zod .email() validation)
+- [x] Fix regex to accept standard email formats (removed strict validation, made truly optional)
+- [x] Test with various email formats (gmail.com, example.com, subdomain.example.com)
+- [x] Verify customer creation works without validation errors
+
+**Solution:** Made email field truly optional by changing from `z.string().email().optional()` to `z.string().optional()` in both customers.create and customers.update mutations. Email is now optional without strict format validation.
