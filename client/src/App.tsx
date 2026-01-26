@@ -24,6 +24,8 @@ import FikenSyncHistory from "./pages/FikenSyncHistory";
 import Landing from "./pages/Landing";
 import DashboardLogin from "./pages/DashboardLogin";
 import CancelAppointment from "./pages/CancelAppointment";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -34,6 +36,8 @@ function Router() {
       <Route path={"/dashboard"} component={Home} />
       <Route path={"/book-online"} component={BookOnline} />
       <Route path={"/cancel-appointment/:token"} component={CancelAppointment} />
+      <Route path={"/privacy-policy"} component={PrivacyPolicy} />
+      <Route path={"/terms-of-service"} component={TermsOfService} />
       <Route path={"/services"} component={Services} />
         <Route path="/products" component={Products} />
         <Route path="/sales" component={Sales} />

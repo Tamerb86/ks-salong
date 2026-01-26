@@ -1385,3 +1385,29 @@
 - [ ] Test cancellation link functionality - pending
 - [ ] Verify all error messages are in Norwegian - needs review
 - [ ] Verify mobile responsiveness - needs testing
+
+## Mobile Responsiveness Testing
+- [x] Test Home page on mobile (375px viewport) - EXCELLENT (10/10)
+- [x] Test BookOnline page on mobile - calendar and cards responsive
+- [ ] Test POS page on mobile - verify cart, payment buttons, and keyboard input - deferred
+- [ ] Test Appointments calendar on mobile - verify month view and appointment details - deferred
+- [ ] Test Reports page on mobile - verify charts and tables - deferred
+- [ ] Test Dashboard/Sidebar navigation on mobile - verify collapsible menu - deferred
+- [ ] Test Queue page on mobile - deferred
+- [ ] Test Customers page on mobile - deferred
+- [ ] Test Staff page on mobile - deferred
+- [x] No responsive design issues found on tested pages
+
+## Legal Pages (GDPR Compliance)
+- [x] Create Privacy Policy page (Personvernerklæring) in Norwegian
+- [x] Create Terms of Service page (Vilkår for bruk) in Norwegian
+- [x] Add legal pages routes to App.tsx (/privacy-policy, /terms-of-service)
+- [x] Add Privacy Policy and Terms links to Landing page footer
+- [ ] Add Privacy Policy and Terms links to BookOnline page - optional enhancement
+- [x] Include data collection, storage, and deletion policies in Privacy Policy
+- [x] Include cookie usage policy
+- [x] Include user rights under GDPR (access, rectification, erasure, portability, etc.)
+- [x] Include contact information for data protection inquiries
+- [x] Include cancellation policy (24-hour rule) in Terms of Service
+- [x] Include payment terms and refund policy
+- [x] Include liability limitations and dispute resolution

@@ -469,6 +469,11 @@ export default function Landing() {
           </div>
 
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm">
+            <div className="flex justify-center gap-4 mb-4">
+              <Link href="/privacy-policy" className="hover:text-white transition">Personvernerklæring</Link>
+              <span>|</span>
+              <Link href="/terms-of-service" className="hover:text-white transition">Vilkår for bruk</Link>
+            </div>
             <p>&copy; 2026 K.S Frisør. Alle rettigheter reservert.</p>
             <Link href="/dashboard-login">
               <button className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-all shadow-md hover:shadow-lg">
