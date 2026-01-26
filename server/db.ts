@@ -1,5 +1,6 @@
 import { eq, and, gte, lte, desc, asc, sql, or, like, isNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
+import { ne } from "drizzle-orm";
 import { 
   InsertUser, users, permissions, services, products, serviceStaff,
   appointments, dropInQueue, payments, orders, orderItems, timeEntries,

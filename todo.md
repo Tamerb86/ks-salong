@@ -1538,3 +1538,9 @@
 - [x] Test clear data functionality (ready for testing)
 - [x] Verify all tables are cleared except system tables (preserves settings, owner, business hours)
 - [x] Add success toast after data cleared (with page reload after 2 seconds)
+
+## 🐛 Bug Fix: Clear All Data Export Error
+- [x] Verify clearAllData function is exported from server/db.ts
+- [x] Fix TypeScript import error in server/routers.ts (added import { ne } from "drizzle-orm")
+- [x] Test clear data functionality in browser (successfully cleared all test data)
+- [x] Verify error handling works correctly (confirmed via server logs)
