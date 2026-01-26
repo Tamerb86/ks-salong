@@ -906,6 +906,39 @@ export const appRouter = router({
           }
         }
         
+        // Mark order as completed immediately (POS orders are paid upfront)
+        if (orderId) {
+          await db.updateOrderStatus(orderId, "completed");
+        }
+        
+        // Automatic Fiken sync if enabled
+        try {
+          const settings = await db.getSalonSettings();
+          if (settings?.fikenEnabled && settings.fikenApiToken && settings.fikenCompanySlug) {
+            const fiken = await import("./fiken");
+            const syncResult = await fiken.syncOrderToFiken(
+              settings.fikenApiToken,
+              settings.fikenCompanySlug,
+              {
+                orderNumber,
+                createdAt: now,
+                orderItems: input.items,
+                customerId: input.customerId,
+              }
+            );
+            
+            // Log sync result
+            if (syncResult.success) {
+              console.log(`[Fiken-Sync] Order ${orderNumber} synced successfully to Fiken (Sale ID: ${syncResult.saleId})`);
+            } else {
+              console.error(`[Fiken-Sync] Failed to sync order ${orderNumber}:`, syncResult.error);
+            }
+          }
+        } catch (error: any) {
+          // Don't fail the order creation if Fiken sync fails
+          console.error(`[Fiken-Sync] Error syncing order ${orderNumber}:`, error.message);
+        }
+        
         return { orderId, orderNumber };
       }),
     

@@ -1585,3 +1585,18 @@
 - [x] Keep: services, products, settings, business hours, staff, owner
 - [x] Update Settings page warning text to reflect new behavior (green box shows preserved data)
 - [x] Test that services/products remain after clearing data (10 services + 10 products verified)
+
+## 🔄 Complete Fiken API Integration
+- [x] Research Fiken API v2 documentation for sales/invoice endpoints (POST /companies/{slug}/sales)
+- [x] Create server/fiken.ts service module with authentication (already exists - fully implemented)
+- [x] Implement createSale function to sync POS transactions to Fiken (syncOrderToFiken, syncDailySalesToFiken)
+- [x] Map POS order data to Fiken sale format (line items, VAT, customer) - MVA mapping: 25%=HIGH, 15%=MEDIUM, 12%=LOW
+- [x] Add automatic Fiken sync after successful POS checkout (orders.create mutation line 912-938)
+- [x] Test Fiken connection with API key: 11426751382.kgXqQlB3dfIAXNxox4DlDU6bAOns8iir (Company: Nexify Crm Systems AS)
+- [x] Get company slug from Fiken API: nexify-crm-systems-as
+- [x] Configure Fiken settings in Settings page (API key + company slug entered, connection tested)
+- [ ] Enable Fiken integration toggle and save settings (ready to enable)
+- [ ] Create test POS sale and verify automatic sync to Fiken dashboard
+- [x] Handle Fiken API errors with proper error messages (try/catch with logging)
+- [x] Verify fikenSyncLogs table exists and is being used (table created in schema)
+- [ ] **IMPORTANT:** Switch to OAuth2 before production (Personal API Token violates Fiken TOS)
