@@ -136,6 +136,19 @@ export default function Settings() {
     },
   });
 
+  const seedDefaultDataMutation = trpc.settings.seedDefaultData.useMutation({
+    onSuccess: (data) => {
+      toast.success(data.message || "Standarddata lastet inn!");
+      // Reload page to show new data
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+    },
+    onError: (error) => {
+      toast.error("Feil ved lasting av standarddata: " + error.message);
+    },
+  });
+
   // Google Calendar settings
   const [googleSyncEnabled, setGoogleSyncEnabled] = useState(false);
   const [autoSyncFrequency, setAutoSyncFrequency] = useState("15");
@@ -868,7 +881,7 @@ export default function Settings() {
                           Slett alle data
                         </h3>
                         <p className="text-sm text-red-700 mb-4">
-                          Dette vil permanent slette alle data fra systemet:
+                          Dette vil permanent slette alle transaksjonsdata:
                         </p>
                         <ul className="text-sm text-red-700 space-y-1 mb-4 ml-4 list-disc">
                           <li>Alle avtaler (bookinger)</li>
@@ -877,18 +890,17 @@ export default function Settings() {
                           <li>Alle betalinger</li>
                           <li>Alle tidsstempler</li>
                           <li>Drop-in kø</li>
-                          <li>Tjenester og produkter</li>
-                          <li>Ansatte (unntatt eier)</li>
                           <li>Alle rapporter og logger</li>
                         </ul>
-                        <div className="p-3 bg-yellow-50 border border-yellow-300 rounded-lg mb-4">
-                          <p className="text-sm text-yellow-800 font-medium">
-                            ⚠️ Følgende data vil IKKE bli slettet:
+                        <div className="p-3 bg-green-50 border border-green-300 rounded-lg mb-4">
+                          <p className="text-sm text-green-800 font-medium">
+                            ✓ Følgende data vil bli BEHOLDT:
                           </p>
-                          <ul className="text-sm text-yellow-700 mt-2 ml-4 list-disc">
+                          <ul className="text-sm text-green-700 mt-2 ml-4 list-disc">
+                            <li>Tjenester og produkter</li>
+                            <li>Ansatte (inkludert eier)</li>
                             <li>Salonginformasjon og innstillinger</li>
                             <li>Åpningstider</li>
-                            <li>Eier-konto</li>
                           </ul>
                         </div>
                         <p className="text-sm text-red-800 font-semibold mb-4">
@@ -907,10 +919,44 @@ export default function Settings() {
                     </div>
                   </div>
 
+                  {/* Seed Default Data Section */}
+                  <div className="border-2 border-purple-300 rounded-lg p-6 bg-purple-50">
+                    <div className="flex items-start gap-4">
+                      <div className="p-3 bg-purple-600 rounded-lg">
+                        <Briefcase className="h-6 w-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-purple-900 mb-2">
+                          Last inn standarddata
+                        </h3>
+                        <p className="text-sm text-purple-700 mb-4">
+                          Legg til populære frisørtjenester og produkter:
+                        </p>
+                        <ul className="text-sm text-purple-700 space-y-1 mb-4 ml-4 list-disc">
+                          <li>10 tjenester (Herreklipp, Dameklipp, Farging, Highlights, osv.)</li>
+                          <li>10 produkter (Shampoo, Conditioner, Wax, Spray, osv.)</li>
+                        </ul>
+                        <Button
+                          type="button"
+                          variant="default"
+                          onClick={() => seedDefaultDataMutation.mutate()}
+                          disabled={seedDefaultDataMutation.isPending}
+                          className="bg-purple-600 hover:bg-purple-700"
+                        >
+                          {seedDefaultDataMutation.isPending && (
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          )}
+                          <Briefcase className="h-4 w-4 mr-2" />
+                          Last inn standarddata
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Info Box */}
                   <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                     <p className="text-sm text-blue-800">
-                      💡 <strong>Tips:</strong> Bruk denne funksjonen før du går i produksjon for å fjerne testdata.
+                      💡 <strong>Tips:</strong> Last inn standarddata først, deretter slett testdata før produksjon.
                     </p>
                   </div>
                 </CardContent>
@@ -928,7 +974,7 @@ export default function Settings() {
                 </AlertDialogTitle>
                 <AlertDialogDescription className="space-y-4">
                   <p className="text-base font-semibold text-red-600">
-                    Denne handlingen vil PERMANENT slette alle data fra systemet!
+                    Denne handlingen vil PERMANENT slette alle transaksjonsdata!
                   </p>
                   <p className="text-sm text-gray-700">
                     Følgende data vil bli slettet:
@@ -940,9 +986,15 @@ export default function Settings() {
                     <li>Alle betalinger - {"inkludert transaksjonshistorikk"}</li>
                     <li>Alle tidsstempler - {"inkludert arbeidstimer"}</li>
                     <li>Drop-in kø - {"alle ventende kunder"}</li>
-                    <li>Tjenester og produkter - {"inkludert priser"}</li>
-                    <li>Ansatte - {"unntatt eier-kontoen"}</li>
                     <li>Alle rapporter og logger</li>
+                  </ul>
+                  <p className="text-sm text-green-700 font-semibold mt-3">
+                    ✓ Følgende data vil bli BEHOLDT:
+                  </p>
+                  <ul className="text-sm text-green-700 space-y-1 ml-4 list-disc">
+                    <li>Tjenester og produkter - {"inkludert priser"}</li>
+                    <li>Ansatte - {"inkludert eier-kontoen"}</li>
+                    <li>Innstillinger og åpningstider</li>
                   </ul>
                   <div className="p-3 bg-red-50 border-2 border-red-300 rounded-lg">
                     <p className="text-sm text-red-800 font-bold">

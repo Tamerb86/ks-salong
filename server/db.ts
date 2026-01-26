@@ -1657,8 +1657,10 @@ export async function createUser(data: any): Promise<number> {
  */
 
 /**
- * Clear all data from the database (except system settings)
- * WARNING: This is irreversible! Use only for resetting before production.
+ * Clear all accounting/transactional data from the database
+ * Preserves: services, products, settings, business hours, staff, owner
+ * Deletes: appointments, customers, orders, payments, queue, time entries, logs
+ * WARNING: This is irreversible! Use only for resetting test data before production.
  */
 export async function clearAllData(): Promise<void> {
   const db = await getDb();
@@ -1711,12 +1713,12 @@ export async function clearAllData(): Promise<void> {
     await db.delete(permissions);
     console.log("[ClearData] Deleted permissions");
     
-    // 6. Delete services and products
-    await db.delete(services);
-    console.log("[ClearData] Deleted services");
-    
-    await db.delete(products);
-    console.log("[ClearData] Deleted products");
+    // 6. Keep services and products (commented out)
+    // await db.delete(services);
+    // console.log("[ClearData] Deleted services");
+    // 
+    // await db.delete(products);
+    // console.log("[ClearData] Deleted products");
     
     // 7. Delete logs and reports
     await db.delete(auditLogs);
@@ -1745,6 +1747,9 @@ export async function clearAllData(): Promise<void> {
     // - holidays (business configuration)
     // - notificationTemplates (system templates)
     // - users with role='owner' (system owner)
+    // - services (salon services - preserved for production)
+    // - products (salon products - preserved for production)
+    // - users (all staff - preserved for production)
     
     console.log("[ClearData] ✅ Database wipe completed successfully");
   } catch (error) {

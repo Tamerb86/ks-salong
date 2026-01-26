@@ -1544,3 +1544,44 @@
 - [x] Fix TypeScript import error in server/routers.ts (added import { ne } from "drizzle-orm")
 - [x] Test clear data functionality in browser (successfully cleared all test data)
 - [x] Verify error handling works correctly (confirmed via server logs)
+
+## 🧾 Fiken API Integration (Automated Accounting)
+- [ ] Store Fiken API credentials in environment variables (FIKEN_API_KEY, FIKEN_COMPANY_SLUG)
+- [ ] Create Fiken API service module (server/fiken.ts)
+- [ ] Implement authentication with Fiken API
+- [ ] Create endpoint to sync sale/order to Fiken as invoice
+- [ ] Map POS products/services to Fiken accounts
+- [ ] Handle MVA tax rates (25%, 15%, 0%) in Fiken invoices
+- [ ] Add automatic sync on POS checkout completion
+- [ ] Create manual "Sync to Fiken" button in Settings page
+- [ ] Add sync status tracking in fikenSyncLogs table
+- [ ] Handle Fiken API errors gracefully with retry logic
+- [ ] Test invoice creation with real Fiken account
+- [ ] Add sync history view in Reports page
+
+## 🎨 Default Salon Services & Products (Seed Data)
+- [x] Create seed script with popular Norwegian salon services
+  - [ ] Herreklipp (Men's Haircut) - 30 min - 350 kr
+  - [ ] Dameklipp (Women's Haircut) - 45 min - 450 kr
+  - [ ] Barneklipp (Children's Haircut) - 20 min - 250 kr
+  - [ ] Farging (Hair Coloring) - 90 min - 800 kr
+  - [ ] Highlights - 120 min - 1200 kr
+  - [ ] Permanent (Perm) - 90 min - 900 kr
+  - [ ] Skjegg trim (Beard Trim) - 15 min - 150 kr
+  - [ ] Vask og føn (Wash & Blow-dry) - 30 min - 300 kr
+- [ ] Create seed script with popular salon products
+  - [ ] Shampoo (Professional) - 250 kr
+  - [ ] Conditioner (Professional) - 250 kr
+  - [ ] Hair Wax/Gel - 180 kr
+  - [ ] Hair Spray - 200 kr
+  - [ ] Hair Oil Treatment - 350 kr
+  - [ ] Beard Oil - 220 kr
+- [x] Add seed data API endpoint (settings.seedDefaultData mutation)
+- [x] Add "Last inn standarddata" button in Settings (Faresone tab)
+
+## 🗑️ Modify Clear Data Function
+- [x] Update clearAllData to preserve services and products (commented out delete statements)
+- [x] Only delete: appointments, customers, orders, payments, queue, time entries, logs
+- [x] Keep: services, products, settings, business hours, staff, owner
+- [x] Update Settings page warning text to reflect new behavior (green box shows preserved data)
+- [x] Test that services/products remain after clearing data (10 services + 10 products verified)

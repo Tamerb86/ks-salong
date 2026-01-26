@@ -1451,6 +1451,28 @@ export const appRouter = router({
           });
         }
       }),
+    
+    // Seed default services and products
+    seedDefaultData: adminProcedure
+      .mutation(async () => {
+        try {
+          const { seedDefaultData } = await import("./seedDefaults");
+          const result = await seedDefaultData();
+          return { 
+            message: `Lastet inn ${result.servicesInserted} tjenester og ${result.productsInserted} produkter`,
+            servicesInserted: result.servicesInserted,
+            productsInserted: result.productsInserted,
+            totalServices: result.totalServices,
+            totalProducts: result.totalProducts
+          };
+        } catch (error: any) {
+          console.error("[SeedDefaults] Error:", error);
+          throw new TRPCError({ 
+            code: "INTERNAL_SERVER_ERROR", 
+            message: "Kunne ikke laste inn standarddata: " + error.message 
+          });
+        }
+      }),
   }),
 
   terminal: router({
