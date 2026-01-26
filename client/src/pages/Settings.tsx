@@ -97,6 +97,11 @@ export default function Settings() {
     customBookingUrl: "",
     receiptMessage: "",
     mvaNumber: "",
+    bankAccountNumber: "",
+    vippsTestMode: true,
+    resendApiKey: "",
+    resendFromEmail: "",
+    resendFromName: "",
   });
 
   const [urlError, setUrlError] = useState("");
@@ -179,6 +184,11 @@ export default function Settings() {
         customBookingUrl: settings.customBookingUrl || "",
         receiptMessage: settings.receiptMessage || "",
         mvaNumber: settings.mvaNumber || "",
+        bankAccountNumber: settings.bankAccountNumber || "",
+        vippsTestMode: settings.vippsTestMode ?? true,
+        resendApiKey: settings.resendApiKey || "",
+        resendFromEmail: settings.resendFromEmail || "",
+        resendFromName: settings.resendFromName || "",
       });
     }
   }, [settings]);
@@ -856,20 +866,164 @@ export default function Settings() {
                       </a>
                     </div>
 
-                    {/* Live Mode Instructions */}
-                    <div className="p-4 bg-gray-50 border rounded-lg mt-4">
-                      <h4 className="font-medium mb-2">Bytt til Live Mode</h4>
-                      <p className="text-sm text-gray-600 mb-2">
-                        For å aktivere ekte betalinger:
+                  {/* Live Mode Instructions */}
+                  <div className="p-4 bg-gray-50 border rounded-lg mt-4">
+                    <h4 className="font-medium mb-2">Bytt til Live Mode</h4>
+                    <p className="text-sm text-gray-600 mb-2">
+                      For å aktivere ekte betalinger:
+                    </p>
+                    <ol className="text-sm text-gray-600 space-y-1 list-decimal list-inside">
+                      <li>Fullfør Stripe KYC (Know Your Customer) verifisering</li>
+                      <li>Gå til Settings → Payment i Manus Management UI</li>
+                      <li>Legg inn dine live API-nøkler</li>
+                      <li>Test med 99% rabattkode (minimum 0.50 USD påkrevd)</li>
+                    </ol>
+                  </div>
+
+                  {/* Bank Account Section */}
+                  <div className="mt-6 pt-6 border-t">
+                    <h4 className="font-medium mb-4">Bankkonto for utbetalinger</h4>
+                    <div className="space-y-2">
+                      <Label htmlFor="bankAccountNumber">Norsk kontonummer (11 siffer)</Label>
+                      <Input
+                        id="bankAccountNumber"
+                        placeholder="12345678901"
+                        maxLength={11}
+                        value={formData.bankAccountNumber}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, '');
+                          setFormData({ ...formData, bankAccountNumber: value });
+                        }}
+                        className="max-w-xs"
+                      />
+                      <p className="text-xs text-gray-500">Brukes for utbetalinger fra Stripe og Vipps</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Vipps Settings Section */}
+                <div className="mt-8 pt-6 border-t">
+                  <h3 className="text-lg font-semibold mb-4">Vipps Betalingsinnstillinger</h3>
+                  
+                  <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-medium text-orange-900">Status:</span>
+                      <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
+                        {formData.vippsTestMode ? 'Test Mode (MT)' : 'Production Mode'}
+                      </span>
+                    </div>
+                    <p className="text-sm text-orange-700 mt-2">
+                      {formData.vippsTestMode 
+                        ? 'Du bruker Vipps test-miljø (MT). Alle betalinger er simulerte.'
+                        : 'Du bruker Vipps produksjonsmiljø. Ekte betalinger aktivert.'}
+                    </p>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="space-y-0.5">
+                        <Label htmlFor="vippsTestMode" className="text-base">
+                          Test Mode (MT)
+                        </Label>
+                        <p className="text-sm text-gray-500">
+                          Bruk Vipps test-miljø for testing
+                        </p>
+                      </div>
+                      <Switch
+                        id="vippsTestMode"
+                        checked={formData.vippsTestMode}
+                        onCheckedChange={(checked) =>
+                          setFormData({ ...formData, vippsTestMode: checked })
+                        }
+                      />
+                    </div>
+
+                    <div className="p-4 border rounded-lg">
+                      <h4 className="font-medium mb-2">Vipps Credentials</h4>
+                      <p className="text-sm text-gray-600 mb-3">
+                        Konfigurer Vipps API-nøkler i Manus Management UI under Settings → Payment.
                       </p>
+                      <a
+                        href="https://portal.vipps.no"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm font-medium"
+                      >
+                        Åpne Vipps Portal →
+                      </a>
+                    </div>
+
+                    <div className="p-4 bg-gray-50 border rounded-lg">
+                      <h4 className="font-medium mb-2">Kom i gang med Vipps</h4>
                       <ol className="text-sm text-gray-600 space-y-1 list-decimal list-inside">
-                        <li>Fullfør Stripe KYC (Know Your Customer) verifisering</li>
-                        <li>Gå til Settings → Payment i Manus Management UI</li>
-                        <li>Legg inn dine live API-nøkler</li>
-                        <li>Test med 99% rabattkode (minimum 0.50 USD påkrevd)</li>
+                        <li>Registrer deg på <a href="https://portal.vipps.no" target="_blank" rel="noopener noreferrer" className="underline">Vipps Portal</a></li>
+                        <li>Opprett en Vipps-app (test eller produksjon)</li>
+                        <li>Hent Client ID, Client Secret, Merchant Serial Number, og Subscription Key</li>
+                        <li>Legg inn credentials i Manus Management UI → Settings → Payment</li>
+                        <li>Test betalinger med Vipps test-app</li>
                       </ol>
                     </div>
                   </div>
+                </div>
+
+                {/* Resend Email Settings Section */}
+                <div className="mt-8 pt-6 border-t">
+                  <h3 className="text-lg font-semibold mb-4">E-post Innstillinger (Resend)</h3>
+                  
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="resendApiKey">Resend API Key</Label>
+                      <Input
+                        id="resendApiKey"
+                        type="password"
+                        placeholder="re_xxxxxxxxxxxx"
+                        value={formData.resendApiKey}
+                        onChange={(e) =>
+                          setFormData({ ...formData, resendApiKey: e.target.value })
+                        }
+                      />
+                      <p className="text-xs text-gray-500">Hent fra <a href="https://resend.com/api-keys" target="_blank" rel="noopener noreferrer" className="underline">Resend Dashboard</a></p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="resendFromEmail">Fra E-post</Label>
+                      <Input
+                        id="resendFromEmail"
+                        type="email"
+                        placeholder="noreply@ks-salong.no"
+                        value={formData.resendFromEmail}
+                        onChange={(e) =>
+                          setFormData({ ...formData, resendFromEmail: e.target.value })
+                        }
+                      />
+                      <p className="text-xs text-gray-500">E-postadressen som vises som avsender</p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="resendFromName">Fra Navn</Label>
+                      <Input
+                        id="resendFromName"
+                        placeholder="K.S Salong"
+                        value={formData.resendFromName}
+                        onChange={(e) =>
+                          setFormData({ ...formData, resendFromName: e.target.value })
+                        }
+                      />
+                      <p className="text-xs text-gray-500">Navnet som vises som avsender</p>
+                    </div>
+
+                    <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                      <h4 className="font-medium mb-2">Kom i gang med Resend</h4>
+                      <ol className="text-sm text-blue-700 space-y-1 list-decimal list-inside">
+                        <li>Registrer deg på <a href="https://resend.com" target="_blank" rel="noopener noreferrer" className="underline">Resend.com</a></li>
+                        <li>Verifiser ditt domene (f.eks. ks-salong.no)</li>
+                        <li>Opprett en API-nøkkel</li>
+                        <li>Legg inn credentials ovenfor</li>
+                        <li>Test ved å sende en test-e-post</li>
+                      </ol>
+                    </div>
+                  </div>
+                </div>
 
                   <div className="flex justify-end pt-4">
                     <Button

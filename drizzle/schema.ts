@@ -328,6 +328,16 @@ export const salonSettings = mysqlTable("salonSettings", {
   // Receipt/Invoice Settings
   receiptMessage: text("receiptMessage"), // Custom message to display on receipts
   mvaNumber: varchar("mvaNumber", { length: 50 }), // MVA/VAT registration number
+  bankAccountNumber: varchar("bankAccountNumber", { length: 11 }), // Norwegian bank account (11 digits)
+  
+  // Vipps additional settings (beyond existing vipps fields)
+  vippsTestMode: boolean("vippsTestMode").default(true).notNull(),
+  
+  // Resend email settings
+  resendApiKey: text("resendApiKey"),
+  resendFromEmail: varchar("resendFromEmail", { length: 320 }),
+  resendFromName: varchar("resendFromName", { length: 255 }),
+  
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

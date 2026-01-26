@@ -282,8 +282,9 @@
     width: 100% !important;
     background: white !important;
     color: black !important;
-    font-size: 11pt !important;
-    padding: 5mm !important;
+    font-size: 13pt !important;
+    line-height: 1.5 !important;
+    padding: 8mm !important;
     margin: 0 !important;
   }
   
@@ -304,7 +305,21 @@
   .print-80mm {
     max-width: 80mm !important;
     margin: 0 auto !important;
-    font-size: 10pt !important;
+    font-size: 14pt !important;
+    line-height: 1.6 !important;
+  }
+  
+  .print-80mm .text-xl {
+    font-size: 18pt !important;
+  }
+  
+  .print-80mm .text-lg {
+    font-size: 16pt !important;
+  }
+  
+  .print-80mm .text-sm,
+  .print-80mm .text-xs {
+    font-size: 12pt !important;
   }
   
   /* A4 paper */

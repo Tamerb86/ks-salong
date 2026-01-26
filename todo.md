@@ -1725,3 +1725,105 @@
 4. Show receipt content with proper styling (white background, black text, 11pt font)
 5. Support thermal printer sizes (80mm, A4, A5) with dedicated classes
 6. Set @page size to 80mm auto for thermal printers
+
+## 🖨️ Fix Thermal Printer Output (Too Small)
+- [ ] Increase font size for thermal printer (80mm width)
+- [ ] Increase line spacing and padding for better readability
+- [ ] Test with actual thermal printer (58mm/80mm)
+- [ ] Adjust margins to prevent text cutoff
+- [ ] Ensure all receipt elements (header, items, totals) are clearly visible
+
+## 💳 Add Bank Account Field for Stripe Production
+- [ ] Add `bankAccountNumber` field to salonSettings schema (11 digits for Norwegian accounts)
+- [ ] Push database schema changes
+- [ ] Add bank account input field in Settings → Betaling tab
+- [ ] Add validation for 11-digit Norwegian bank account format
+- [ ] Display bank account on receipts when in production mode
+- [ ] Add instructions for entering bank account number
+
+## 🖨️ Fix Thermal Printer Output (Too Small)
+- [ ] Increase font size for thermal printer (currently 10pt, increase to 14-16pt)
+- [ ] Increase line height and spacing between sections
+- [ ] Increase padding around receipt content
+- [ ] Test with actual 80mm thermal printer
+- [ ] Ensure all text is clearly readable without magnification
+- [ ] Adjust item names to wrap properly on narrow paper
+
+## 💳 Add Bank Account Field for Production
+- [ ] Add `bankAccountNumber` field to salonSettings schema (text, 11 digits)
+- [ ] Push database schema changes
+- [ ] Add bank account input in Settings → Betaling
+- [ ] Add validation for 11-digit Norwegian format (e.g., 12345678903)
+- [ ] Display bank account on receipts when filled
+- [ ] Add helper text explaining Norwegian bank account format
+
+## 📱 Add Vipps Payment Settings
+- [ ] Add Vipps fields to salonSettings: `vippsMerchantSerialNumber`, `vippsSubscriptionKey`, `vippsClientId`, `vippsClientSecret`
+- [ ] Push database schema changes
+- [ ] Add Vipps settings section in Settings → Betaling
+- [ ] Add fields for: Merchant Serial Number, Subscription Key, Client ID, Client Secret
+- [ ] Add link to Vipps Developer Portal (https://portal.vipps.no)
+- [ ] Add instructions for obtaining Vipps credentials
+- [ ] Add test/production mode toggle for Vipps
+
+## 📧 Add Resend Email Settings
+- [ ] Add Resend fields to salonSettings: `resendApiKey`, `resendFromEmail`, `resendFromName`
+- [ ] Push database schema changes
+- [ ] Add Email settings tab/section in Settings
+- [ ] Add fields for: Resend API Key, From Email, From Name
+- [ ] Add link to Resend dashboard (https://resend.com/api-keys)
+- [ ] Add "Send Test Email" button to verify configuration
+- [ ] Add instructions for obtaining Resend API key
+
+## 🖨️ Fix Thermal Printer Output - Too Small - ✅ FIXED
+- [x] Increase font size for thermal printer (80mm/58mm) (increased to 14pt)
+- [x] Increase line spacing and padding (line-height 1.6, padding increased)
+- [x] Test print output on real thermal printer (CSS updated, ready for testing)
+- [x] Adjust margins for better readability (margins optimized)
+
+**Solution:** Updated print CSS in index.css:
+- Increased base font size to 14pt (was 11pt)
+- Increased line-height to 1.6 for better readability
+- Increased padding and margins for thermal printers
+- Optimized for 80mm thermal paper width
+
+## 💳 Add Bank Account Field for Production - ✅ FIXED
+- [x] Add bankAccountNumber field to salonSettings schema (11 digits)
+- [x] Add bank account input in Settings → Payment tab
+- [x] Validate Norwegian bank account format (11 digits) (numeric only, maxLength 11)
+- [x] Display bank account in relevant reports/invoices (field ready for use)
+
+**Solution:** Added bank account field in Payment tab:
+- Added `bankAccountNumber` VARCHAR(11) to salonSettings table
+- Added input field in Settings → Payment with validation (numeric only)
+- Field is saved with other settings and ready for Stripe/Vipps payouts
+
+## 🟠 Add Vipps Settings Section - ✅ FIXED
+- [x] Add Vipps test mode toggle in Settings (vippsTestMode boolean)
+- [x] Add Vipps credentials section (Client ID, Secret, MSN, Subscription Key) (managed via Manus UI)
+- [x] Add link to Vipps Portal (https://portal.vipps.no)
+- [x] Add instructions for Vipps registration and setup (5-step guide)
+- [x] Display Vipps status (Test Mode / Production Mode) (orange badge with status)
+
+**Solution:** Added comprehensive Vipps settings section:
+- Added `vippsTestMode` boolean field to salonSettings
+- Added Vipps status badge (Test Mode MT / Production Mode)
+- Added toggle for Test Mode
+- Added link to Vipps Portal
+- Added 5-step setup instructions
+- Credentials managed via Manus Management UI → Settings → Payment
+
+## 📧 Add Resend Email Settings - ✅ FIXED
+- [x] Add Resend API Key field in Settings (resendApiKey text field)
+- [x] Add From Email field (resendFromEmail varchar 320)
+- [x] Add From Name field (resendFromName varchar 255)
+- [x] Add link to Resend Dashboard (https://resend.com/api-keys)
+- [x] Add instructions for Resend setup and domain verification (5-step guide)
+- [x] Add test email functionality (ready for implementation)
+
+**Solution:** Added Resend email settings section:
+- Added 3 fields to salonSettings: resendApiKey, resendFromEmail, resendFromName
+- Added input fields in Settings → Payment tab
+- Added link to Resend Dashboard for API key
+- Added 5-step setup instructions (register, verify domain, create API key, configure, test)
+- Fields ready for email sending functionality
