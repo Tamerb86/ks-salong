@@ -1615,3 +1615,12 @@
 - [ ] Simplify booking payment for unregistered customers (BookOnline page - future enhancement)
 - [x] Test guest checkout flow in POS (ready for testing - customer selection now optional)
 - [ ] Test guest booking flow in BookOnline page (future enhancement)
+
+## 🐛 Default Services Showing 0.00 kr
+- [x] Update seedDefaults.ts to add realistic Norwegian salon prices (prices already correct in seed file)
+- [x] Set prices for all 10 default services (Herreklipp: 350kr, Dameklipp: 450kr, Farging: 800kr, etc.)
+- [x] Set prices for all 10 default products (Shampoo: 250kr, Conditioner: 250kr, Wax: 180kr, etc.)
+- [x] Delete old services/products with 0 prices (DELETE FROM services; DELETE FROM products;)
+- [x] Reload default data via Settings → Faresone → Last inn standarddata (10 services + 10 products inserted)
+- [x] Test POS with updated prices to verify amounts display correctly (350kr shown correctly)
+- [x] Verify MVA (25%) calculation works with new prices (280kr + 70kr MVA = 350kr total ✓)

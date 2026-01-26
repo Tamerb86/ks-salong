@@ -1,0 +1,80 @@
+{
+  "query": "SELECT id, name, price, mvaTax, isActive FROM services LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3VZWkmDdVMGTAoV.aeceea61840d --database oUNZ2iw3V7HdbF8pGMTUk4 --execute SELECT id, name, price, mvaTax, isActive FROM services LIMIT 10;",
+  "rows": [
+    {
+      "id": "210001",
+      "name": "Herreklipp",
+      "price": "350.00",
+      "mvaTax": "25.00",
+      "isActive": "1"
+    },
+    {
+      "id": "210002",
+      "name": "Dameklipp",
+      "price": "450.00",
+      "mvaTax": "25.00",
+      "isActive": "1"
+    },
+    {
+      "id": "210003",
+      "name": "Barneklipp",
+      "price": "250.00",
+      "mvaTax": "25.00",
+      "isActive": "1"
+    },
+    {
+      "id": "210004",
+      "name": "Farging",
+      "price": "800.00",
+      "mvaTax": "25.00",
+      "isActive": "1"
+    },
+    {
+      "id": "210005",
+      "name": "Highlights",
+      "price": "1200.00",
+      "mvaTax": "25.00",
+      "isActive": "1"
+    },
+    {
+      "id": "210006",
+      "name": "Permanent",
+      "price": "900.00",
+      "mvaTax": "25.00",
+      "isActive": "1"
+    },
+    {
+      "id": "210007",
+      "name": "Skjegg trim",
+      "price": "150.00",
+      "mvaTax": "25.00",
+      "isActive": "1"
+    },
+    {
+      "id": "210008",
+      "name": "Vask og føn",
+      "price": "300.00",
+      "mvaTax": "25.00",
+      "isActive": "1"
+    },
+    {
+      "id": "210009",
+      "name": "Bryllupsstyling",
+      "price": "1500.00",
+      "mvaTax": "25.00",
+      "isActive": "1"
+    },
+    {
+      "id": "210010",
+      "name": "Keratinbehandling",
+      "price": "1800.00",
+      "mvaTax": "25.00",
+      "isActive": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tprice\tmvaTax\tisActive\n210001\tHerreklipp\t350.00\t25.00\t1\n210002\tDameklipp\t450.00\t25.00\t1\n210003\tBarneklipp\t250.00\t25.00\t1\n210004\tFarging\t800.00\t25.00\t1\n210005\tHighlights\t1200.00\t25.00\t1\n210006\tPermanent\t900.00\t25.00\t1\n210007\tSkjegg trim\t150.00\t25.00\t1\n210008\tVask og føn\t300.00\t25.00\t1\n210009\tBryllupsstyling\t1500.00\t25.00\t1\n210010\tKeratinbehandling\t1800.00\t25.00\t1\n",
+  "stderr": "",
+  "execution_time_ms": 97
+}
