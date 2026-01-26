@@ -225,7 +225,7 @@
 
 /* Print styles for QR Code Poster */
 @media print {
-  /* Hide everything except QR code section */
+  /* Hide everything except QR code section or receipt */
   body * {
     visibility: hidden;
   }
@@ -257,9 +257,65 @@
     margin: 0 auto;
   }
   
+  /* Show receipt content */
+  .receipt-print,
+  .receipt-print * {
+    visibility: visible !important;
+  }
+  
+  /* Position receipt at top of page */
+  .receipt-print {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: white;
+    color: black;
+    font-size: 12pt;
+    padding: 10mm;
+  }
+  
+  /* Hide all dialog/modal backgrounds and UI elements */
+  [role="dialog"],
+  [data-radix-dialog-overlay],
+  [data-radix-dialog-content] {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+  
+  /* Hide tabs, buttons, and other UI elements */
+  [role="tablist"],
+  button,
+  .dialog-footer {
+    display: none !important;
+  }
+  
+  /* Thermal printer 80mm width */
+  .print-80mm {
+    max-width: 80mm !important;
+    margin: 0 auto;
+  }
+  
+  /* A4 paper */
+  .print-A4 {
+    max-width: 210mm !important;
+  }
+  
+  /* A5 paper */
+  .print-A5 {
+    max-width: 148mm !important;
+  }
+  
   /* Page setup */
   @page {
     size: A4 portrait;
-    margin: 2cm;
+    margin: 10mm;
+  }
+  
+  /* Thermal printer page setup */
+  @page :first {
+    size: 80mm auto;
+    margin: 0;
   }
 }

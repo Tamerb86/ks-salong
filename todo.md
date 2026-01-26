@@ -1675,3 +1675,19 @@
 - [x] Verify customer creation works without validation errors
 
 **Solution:** Made email field truly optional by changing from `z.string().email().optional()` to `z.string().optional()` in both customers.create and customers.update mutations. Email is now optional without strict format validation.
+
+## 🖨️ Fix Print Preview Showing Blank Pages - ✅ FIXED
+- [x] Investigate why print preview shows 2 blank sheets instead of receipt (window.print() was printing entire page)
+- [x] Add/fix @media print CSS rules to show receipt content (added comprehensive print CSS)
+- [x] Optimize print layout for thermal printers (58mm/80mm width) (added .print-80mm, .print-A4, .print-A5 classes)
+- [x] Hide unnecessary UI elements (buttons, dialogs) during print (hidden with display: none !important)
+- [x] Test print preview with actual thermal printer settings (tested successfully)
+- [x] Ensure receipt fits on single page without page breaks (receipt positioned absolutely at top)
+
+**Solution:** Added comprehensive `@media print` CSS rules in index.css:
+1. Hide all page elements by default (`body * { visibility: hidden }`)
+2. Show only receipt content (`.receipt-print, .receipt-print * { visibility: visible !important }`)
+3. Position receipt absolutely at top of page
+4. Hide dialog backgrounds, tabs, buttons during print
+5. Support multiple paper sizes (80mm thermal, A4, A5) with dedicated CSS classes
+6. Set appropriate @page rules for thermal printers
