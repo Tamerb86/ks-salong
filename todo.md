@@ -1904,3 +1904,18 @@
 - Salg page "Totalt salg: 21800 kr" = All-time sales with filter (default: "Alle tider")
 - Reports page also uses "Alle tider" default filter
 - This is working as intended - Dashboard for quick daily overview, Salg/Reports for detailed analysis
+
+## 🐛 Reports Page Not Showing Item Breakdown Changes
+- [ ] Investigate why Reports page doesn't show the item breakdown table changes
+- [ ] Check if Reports.tsx code was actually modified in previous session
+- [ ] Verify the "Solgte varer og tjenester" section exists in the code
+- [ ] Ensure the table displays item names, types, quantities, and revenues
+- [ ] Add grand total row at the bottom of the table
+- [ ] Test with actual data to confirm table displays correctly
+
+## 🔄 Auto-Redirect Authenticated Users to Dashboard
+- [x] Modify Landing.tsx to check if user is authenticated
+- [x] Add redirect logic to send logged-in users to /dashboard-login
+- [x] Keep landing page visible for non-authenticated users
+- [x] Test redirect functionality
+- [ ] Verify published site redirects correctly after republishing

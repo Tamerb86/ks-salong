@@ -1,11 +1,22 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Phone, MapPin, Clock, Star, Award, Users, Scissors, Lock } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useEffect } from "react";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import { useAuth } from "@/_core/hooks/useAuth";
 
 export default function Landing() {
+  const { isAuthenticated, loading } = useAuth();
+  const [, setLocation] = useLocation();
+
+  // Redirect authenticated users to dashboard login (PIN entry)
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      setLocation("/dashboard-login");
+    }
+  }, [isAuthenticated, loading, setLocation]);
+
   useEffect(() => {
     // Set SEO meta tags
     document.title = "K.S Frisør - Norgesmester 2022 | Frisørsalong i Porsgrunn";
