@@ -1297,3 +1297,15 @@
 - [x] Add payment method selection (Cash, Card, Vipps, Stripe, Pay Later)
 - [x] Allow admin to create appointments without payment requirement
 - [x] Test admin booking flow end-to-end
+
+## Weekly Calendar View for Appointments
+- [x] Design weekly calendar grid layout (days as columns, hours as rows)
+- [x] Add view toggle button (Monthly/Weekly)
+- [x] Implement week navigation (previous/next week)
+- [x] Display appointments in weekly grid with full details
+- [x] Show appointment details: customer name, service, staff, time
+- [x] Color-code appointments by status in weekly view
+- [x] Make appointments clickable in weekly view
+- [x] Add time slot labels (09:00-18:00 working hours)
+- [x] Test weekly view with multiple appointments
+- [ ] Ensure responsive design for weekly view

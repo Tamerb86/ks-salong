@@ -1,11 +1,12 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Layout } from "@/components/Layout";
 import { MonthlyCalendar } from "@/components/MonthlyCalendar";
+import { WeeklyCalendar } from "@/components/WeeklyCalendar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LiveBadge } from "@/components/ui/live-badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { format } from "date-fns";
@@ -46,6 +47,8 @@ import { toast } from "sonner";
 export default function Appointments() {
   const { user, loading: authLoading } = useAuth();
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [currentWeek, setCurrentWeek] = useState(new Date());
+  const [calendarView, setCalendarView] = useState<"monthly" | "weekly">("monthly");
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
@@ -135,6 +138,23 @@ export default function Appointments() {
   const handleConfirmCancel = () => {
     if (!selectedAppointment) return;
     cancelMutation.mutate({ id: selectedAppointment.id });
+  };  const handlePreviousWeek = () => {
+    const newWeek = new Date(currentWeek);
+    newWeek.setDate(newWeek.getDate() - 7);
+    setCurrentWeek(newWeek);
+  };
+
+  const handleNextWeek = () => {
+    const newWeek = new Date(currentWeek);
+    newWeek.setDate(newWeek.getDate() + 7);
+    setCurrentWeek(newWeek);
+  };
+
+  const handleAppointmentClick = (appointment: any) => {
+    setSelectedAppointment(appointment);
+    setEditDate(appointment.appointmentDate);
+    setEditTime(appointment.startTime);
+    setEditDialogOpen(true);
   };
 
   const handleAddAppointment = (e: React.FormEvent) => {
@@ -204,7 +224,51 @@ export default function Appointments() {
             </TabsList>
             
             <TabsContent value="calendar" className="mt-6">
-              <MonthlyCalendar />
+              {/* View toggle and navigation */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant={calendarView === "monthly" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCalendarView("monthly")}
+                  >
+                    Månedsvisning
+                  </Button>
+                  <Button
+                    variant={calendarView === "weekly" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCalendarView("weekly")}
+                  >
+                    Ukesvisning
+                  </Button>
+                </div>
+                {calendarView === "weekly" && (
+                  <div className="flex items-center gap-2">
+                    <Button variant="outline" size="sm" onClick={handlePreviousWeek}>
+                      <ChevronLeft className="h-4 w-4" />
+                      Forrige uke
+                    </Button>
+                    <span className="text-sm font-medium px-4">
+                      {format(currentWeek, "d MMM yyyy", { locale: nb })}
+                    </span>
+                    <Button variant="outline" size="sm" onClick={handleNextWeek}>
+                      Neste uke
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+              
+              {/* Calendar views */}
+              {calendarView === "monthly" ? (
+                <MonthlyCalendar />
+              ) : (
+                <WeeklyCalendar
+                  currentWeek={currentWeek}
+                  appointments={appointments || []}
+                  onAppointmentClick={handleAppointmentClick}
+                />
+              )}
             </TabsContent>
             
             <TabsContent value="list" className="mt-6">
