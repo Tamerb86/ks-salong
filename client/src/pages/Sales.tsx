@@ -241,21 +241,6 @@ export default function Sales() {
     toast.success('PDF-fil lastet ned!');
   };
   
-  // Early returns AFTER all hooks
-  
-  if (!user) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Card className="w-96">
-          <CardHeader>
-            <CardTitle>Ingen tilgang</CardTitle>
-            <CardDescription>Du må logge inn for å se denne siden</CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-    );
-  }
-  
   return (
     <>
     <Layout>

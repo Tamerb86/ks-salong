@@ -35,7 +35,7 @@ export default function POS() {
   const { data: settings } = trpc.settings.get.useQuery();
   
   // Employee state - default to current logged-in user
-  const [activeEmployee, setActiveEmployee] = useState<any>(user);
+  const [activeEmployee, setActiveEmployee] = useState<any>(null);
   const [isSwitchEmployeeOpen, setIsSwitchEmployeeOpen] = useState(false);
   
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -230,21 +230,6 @@ export default function POS() {
   };
 
 
-  if (!user) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Card className="w-96">
-          <CardHeader>
-            <CardTitle>Ingen tilgang</CardTitle>
-            <CardDescription>Du må logge inn for å se denne siden</CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-    );
-  }
-
-  // Direct access - no PIN required
-  
   return (
     <Layout>
       <div className="p-6">

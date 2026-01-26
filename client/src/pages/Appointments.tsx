@@ -194,18 +194,6 @@ export default function Appointments() {
   };
 
 
-  if (!user) {
-    return (
-      <Layout>
-        <div className="p-6">
-          <div className="text-center">
-            <p>Please log in to view appointments.</p>
-          </div>
-        </div>
-      </Layout>
-    );
-  }
-
   return (
     <Layout>
       <div className="p-6">

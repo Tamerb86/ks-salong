@@ -125,8 +125,6 @@ export default function Services() {
   };
 
 
-  if (!user) return null;
-
   if (isLoading) {
     return (
       <Layout>
