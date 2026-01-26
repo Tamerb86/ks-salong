@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
 import { format } from "date-fns";
-import { DollarSign, Minus, Plus, Printer, Search, ShoppingCart, Trash2, X, Scan } from "lucide-react";
+import { DollarSign, Minus, Plus, Printer, Search, ShoppingCart, Trash2, X, Scan, User } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import "@/styles/print-receipt.css";
@@ -283,6 +283,21 @@ export default function POS() {
                 <CardTitle className="text-lg">Kunde</CardTitle>
               </CardHeader>
               <CardContent>
+                <div className="flex gap-2 mb-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setCustomerId(null);
+                      setCustomerSearch("Walk-in Customer");
+                      toast.success("Walk-in kunde valgt");
+                    }}
+                    className="whitespace-nowrap"
+                  >
+                    <User className="h-4 w-4 mr-2" />
+                    Walk-in
+                  </Button>
+                </div>
                 <div className="flex gap-2">
                   <div className="flex-1 relative">
                     <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />

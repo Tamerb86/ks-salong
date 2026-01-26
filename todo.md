@@ -1366,3 +1366,12 @@
 - [x] Verify backend already handles null/undefined customer (customerId is optional)
 - [x] Button now enables when cart has items, regardless of customer selection
 - [ ] Test complete payment flow with and without customer selection - requires manual testing
+
+## Walk-in Customer Enhancements
+- [x] Add "Walk-in Customer" quick button in POS customer section
+- [x] Button sets customerSearch to "Walk-in Customer" for easy identification
+- [x] Customer info already not shown in receipt (no customer section exists)
+- [x] Add "Sales Without Customer" report section in Reports page
+- [x] Show total sales amount and count for orders without customer
+- [x] Display percentage of walk-in sales vs customer sales
+- [x] Backend endpoint getSalesWithoutCustomer filters and calculates statistics

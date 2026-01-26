@@ -1243,6 +1243,45 @@ export const appRouter = router({
         
         return verification;
       }),
+    
+    getSalesWithoutCustomer: protectedProcedure
+      .input(z.object({
+        dateFrom: z.string().optional(),
+        dateTo: z.string().optional(),
+      }))
+      .query(async ({ input }) => {
+        const orders = await db.getOrdersByFilters({
+          dateFrom: input.dateFrom,
+          dateTo: input.dateTo,
+        });
+        
+        // Filter orders without customer
+        const ordersWithoutCustomer = orders.filter(order => !order.customerId);
+        const ordersWithCustomer = orders.filter(order => order.customerId);
+        
+        const totalWithoutCustomer = ordersWithoutCustomer.reduce(
+          (sum, order) => sum + parseFloat(order.total),
+          0
+        );
+        
+        const totalWithCustomer = ordersWithCustomer.reduce(
+          (sum, order) => sum + parseFloat(order.total),
+          0
+        );
+        
+        const grandTotal = totalWithoutCustomer + totalWithCustomer;
+        
+        return {
+          ordersWithoutCustomer: ordersWithoutCustomer.length,
+          ordersWithCustomer: ordersWithCustomer.length,
+          totalOrders: orders.length,
+          totalWithoutCustomer,
+          totalWithCustomer,
+          grandTotal,
+          percentageWithoutCustomer: grandTotal > 0 ? (totalWithoutCustomer / grandTotal) * 100 : 0,
+          percentageWithCustomer: grandTotal > 0 ? (totalWithCustomer / grandTotal) * 100 : 0,
+        };
+      }),
   }),
 
   payments: router({

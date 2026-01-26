@@ -42,6 +42,12 @@ export default function Reports() {
     employeeId: selectedEmployee === "all" ? undefined : parseInt(selectedEmployee),
   });
   
+  // Get sales without customer data
+  const { data: salesWithoutCustomer } = trpc.orders.getSalesWithoutCustomer.useQuery({
+    dateFrom: from,
+    dateTo: to,
+  });
+  
   // Calculate totals
   const calculateTotals = () => {
     if (!timeEntries) return { totalHours: 0, regularHours: 0, overtimeHours: 0 };
@@ -319,6 +325,85 @@ export default function Reports() {
             ) : (
               <p className="text-center text-gray-500 py-8">
                 Ingen tidsstemplinger funnet for valgt periode
+              </p>
+            )}
+          </CardContent>
+        </Card>
+        
+        {/* Sales Without Customer Report */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              Salg uten kunde
+            </CardTitle>
+            <CardDescription>
+              Oversikt over salg registrert uten kundetilknytning (walk-in kunder)
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {salesWithoutCustomer ? (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-blue-50 p-4 rounded-lg">
+                    <p className="text-sm text-gray-600 mb-1">Totalt antall ordrer</p>
+                    <p className="text-2xl font-bold text-blue-600">
+                      {salesWithoutCustomer.totalOrders}
+                    </p>
+                  </div>
+                  <div className="bg-purple-50 p-4 rounded-lg">
+                    <p className="text-sm text-gray-600 mb-1">Ordrer uten kunde</p>
+                    <p className="text-2xl font-bold text-purple-600">
+                      {salesWithoutCustomer.ordersWithoutCustomer}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {salesWithoutCustomer.percentageWithoutCustomer.toFixed(1)}% av totalt
+                    </p>
+                  </div>
+                  <div className="bg-green-50 p-4 rounded-lg">
+                    <p className="text-sm text-gray-600 mb-1">Ordrer med kunde</p>
+                    <p className="text-2xl font-bold text-green-600">
+                      {salesWithoutCustomer.ordersWithCustomer}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {salesWithoutCustomer.percentageWithCustomer.toFixed(1)}% av totalt
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="border-t pt-4">
+                  <h4 className="font-semibold mb-3">Omsetning</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <p className="text-sm text-gray-600 mb-1">Total omsetning</p>
+                      <p className="text-xl font-bold text-gray-900">
+                        {salesWithoutCustomer.grandTotal.toFixed(2)} kr
+                      </p>
+                    </div>
+                    <div className="bg-amber-50 p-4 rounded-lg">
+                      <p className="text-sm text-gray-600 mb-1">Omsetning uten kunde</p>
+                      <p className="text-xl font-bold text-amber-600">
+                        {salesWithoutCustomer.totalWithoutCustomer.toFixed(2)} kr
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {salesWithoutCustomer.percentageWithoutCustomer.toFixed(1)}% av total
+                      </p>
+                    </div>
+                    <div className="bg-teal-50 p-4 rounded-lg">
+                      <p className="text-sm text-gray-600 mb-1">Omsetning med kunde</p>
+                      <p className="text-xl font-bold text-teal-600">
+                        {salesWithoutCustomer.totalWithCustomer.toFixed(2)} kr
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {salesWithoutCustomer.percentageWithCustomer.toFixed(1)}% av total
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <p className="text-center text-gray-500 py-8">
+                Laster data...
               </p>
             )}
           </CardContent>
