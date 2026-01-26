@@ -652,7 +652,7 @@ export default function POS() {
                     className="w-full bg-gradient-to-r from-purple-600 to-amber-600 hover:from-purple-700 hover:to-amber-700"
                     size="lg"
                     onClick={handleCheckout}
-                    disabled={createOrderMutation.isPending || !customerId}
+                    disabled={createOrderMutation.isPending || cart.length === 0}
                   >
                     <DollarSign className="h-5 w-5 mr-2" />
                     {createOrderMutation.isPending ? "Behandler..." : "Fullfør betaling"}

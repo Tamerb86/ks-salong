@@ -1359,3 +1359,10 @@
 - [x] Update appointment status to "cancelled" in database
 - [x] Add cancellation link to booking confirmation page
 - [ ] Integrate cancellation link in email/SMS notifications - future feature
+
+## POS Payment Button Enhancement
+- [x] Make customer selection optional (allow payment without selecting customer)
+- [x] Remove customer requirement from payment button disabled condition
+- [x] Verify backend already handles null/undefined customer (customerId is optional)
+- [x] Button now enables when cart has items, regardless of customer selection
+- [ ] Test complete payment flow with and without customer selection - requires manual testing
