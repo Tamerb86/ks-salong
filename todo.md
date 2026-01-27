@@ -1981,3 +1981,9 @@
 - [x] Add transmission delays between commands
 - [x] Add chunked data transmission
 - [x] Auto-retry with different baudRate values
+
+## 🖨️ Fix Digipos Thermal Printer Compatibility
+- [x] Add proper initialization commands
+- [x] Set correct codepage (PC437) for character encoding
+- [x] Add line spacing (30 dots) and character set (USA) commands
+- [x] Add extra feed commands between sections

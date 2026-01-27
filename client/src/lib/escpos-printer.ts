@@ -24,7 +24,21 @@ export class ESCPOSPrinter {
    * Initialize printer (reset to default state)
    */
   init(): this {
+    // Reset printer
     this.addCommand(`${ESC}@`);
+    
+    // Set codepage to PC437 (standard for most thermal printers)
+    this.addCommand(`${ESC}t${String.fromCharCode(0)}`);
+    
+    // Set character set to USA
+    this.addCommand(`${ESC}R${String.fromCharCode(0)}`);
+    
+    // Set line spacing to 30 dots (default for 80mm printers)
+    this.addCommand(`${ESC}3${String.fromCharCode(30)}`);
+    
+    // Enable auto line feed
+    this.addCommand(`${ESC}a${String.fromCharCode(0)}`);
+    
     return this;
   }
 
@@ -246,24 +260,28 @@ export function formatReceipt(receipt: {
 
   printer
     .init()
+    .feed(1) // Extra feed after init
     .align('center')
     .size(2, 2)
     .bold(true)
     .println(receipt.salonName)
     .bold(false)
     .size(1, 1)
+    .feed(1)
     .println(receipt.salonAddress)
     .println(receipt.salonPhone)
     .println(receipt.salonEmail)
     .println(`MVA: ${receipt.mvaNumber}`)
-    .feed(1)
+    .feed(2)
     .line('=', 32)
     .align('left')
+    .feed(1)
     .println(`Ordre: ${receipt.orderNumber}`)
     .println(`Dato: ${receipt.date}`)
     .println(`Tid: ${receipt.time}`)
+    .feed(1)
     .line('-', 32)
-    .feed(1);
+    .feed(2);
 
   // Print items
   receipt.items.forEach(item => {
