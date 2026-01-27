@@ -2001,3 +2001,9 @@
 - [x] Force body and html to 80mm width
 - [x] Prevent browser scaling/shrinking
 - [x] Add box-sizing: border-box for proper padding calculation
+
+## 🔧 Fix Serial API Permissions Error
+- [x] Add proper Serial API availability check before use
+- [x] Detect iframe context (dev server) and skip Serial API
+- [x] Fallback to window.print() when Serial API unavailable
+- [x] Show clear message: "ESC/POS kun tilgjengelig på publisert nettsted"

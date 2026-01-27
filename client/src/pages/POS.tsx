@@ -248,7 +248,16 @@ export default function POS() {
     });
 
     // Check if thermal printer is selected and supported
-    if (printOptions.paperSize === '80mm' && isThermalPrinterSupported()) {
+    const thermalSupported = isThermalPrinterSupported();
+    
+    if (printOptions.paperSize === '80mm' && !thermalSupported) {
+      // Serial API not available (likely dev server/iframe)
+      toast.info('Bruker nettleserutskrift (ESC/POS kun tilgjengelig på publisert nettsted)');
+      window.print();
+      return;
+    }
+    
+    if (printOptions.paperSize === '80mm' && thermalSupported) {
       try {
         // Use ESC/POS for thermal printer
         const receiptData = formatReceipt({

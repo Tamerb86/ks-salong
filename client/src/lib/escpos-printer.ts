@@ -231,10 +231,21 @@ export async function printToThermalPrinter(
 }
 
 /**
- * Check if Web Serial API is supported
+ * Check if Web Serial API is supported and allowed by permissions policy
  */
 export function isThermalPrinterSupported(): boolean {
-  return 'serial' in navigator;
+  // Check if Serial API exists
+  if (!('serial' in navigator)) {
+    return false;
+  }
+  
+  // Check if we're in an iframe (permissions policy usually blocks Serial API in iframes)
+  if (window.self !== window.top) {
+    console.warn('[ESC/POS] Serial API blocked: running in iframe (dev server)');
+    return false;
+  }
+  
+  return true;
 }
 
 /**
