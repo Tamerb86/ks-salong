@@ -8,7 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
 import { format } from "date-fns";
-import { formatReceipt, printToThermalPrinter, isThermalPrinterSupported } from "@/lib/escpos-printer";
 import { DollarSign, Minus, Plus, Printer, Search, ShoppingCart, Trash2, X, Scan, User } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -226,60 +225,9 @@ export default function POS() {
     });
   };
 
-  const printReceipt = async () => {
-    // For 80mm thermal printer: try ESC/POS first, fallback to browser print
-    if (printOptions.paperSize === '80mm') {
-      // Check if Web Serial API is available and not blocked by permissions policy
-      const isSerialAvailable = 'serial' in navigator && 
-        typeof (navigator as any).serial?.requestPort === 'function';
-      
-      if (isSerialAvailable) {
-        try {
-          // Use ESC/POS for thermal printer
-          const receiptData = formatReceipt({
-            salonName: settings?.salonName || 'K.S Salong',
-            salonAddress: settings?.salonAddress || '',
-            salonPhone: settings?.salonPhone || '',
-            salonEmail: settings?.salonEmail || '',
-            mvaNumber: settings?.mvaNumber || '',
-            orderNumber: lastReceipt?.orderNumber || '',
-            date: format(new Date(), 'dd.MM.yyyy'),
-            time: format(new Date(), 'HH:mm'),
-            items: (lastReceipt?.cartItems || []).map((item: any) => ({
-              name: item.name,
-              quantity: item.quantity,
-              price: item.price * item.quantity,
-            })),
-            subtotal: lastReceipt?.order ? parseFloat(lastReceipt.order.subtotal) / 1.25 : 0,
-            mva: lastReceipt?.order ? parseFloat(lastReceipt.order.taxAmount) : 0,
-            total: lastReceipt?.order ? parseFloat(lastReceipt.order.total) : 0,
-            paymentMethod: lastReceipt?.paymentMethod?.toUpperCase() || 'KONTANT',
-            customMessage: settings?.receiptMessage || printOptions.customMessage || undefined,
-          });
-          
-          await printToThermalPrinter(receiptData);
-          toast.success('Kvittering sendt til termisk skriver');
-          return; // Success, exit function
-        } catch (error) {
-          console.error('Thermal printer error:', error);
-          
-          // Check if user cancelled the printer selection
-          if (error instanceof Error && error.message.includes('No port selected')) {
-            toast.info('Utskrift avbrutt - ingen skriver valgt');
-            return; // Don't fallback to browser print if user cancelled
-          }
-          
-          // For other errors, fallback to browser print silently
-        }
-      }
-      
-      // Fallback to browser print (for dev server or when Serial API unavailable)
-      toast.info('Bruker nettleserutskrift');
-      window.print();
-    } else {
-      // Use browser print for A4/A5
-      window.print();
-    }
+  const printReceipt = () => {
+    // Simple window.print() - CSS handles the formatting
+    window.print();
   };
 
 

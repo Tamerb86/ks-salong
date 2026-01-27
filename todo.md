@@ -1979,3 +1979,9 @@
 - [x] Handle user cancellation gracefully
 - [x] Show friendly message instead of error
 - [x] Don't fallback to browser print when user cancels
+
+## 🔄 Replace ESC/POS with CSS-based Thermal Printing
+- [x] Remove ESC/POS library and imports
+- [x] Simplify printReceipt to use window.print() only
+- [x] Optimize CSS @page for 80mm width
+- [x] Force body/html width to 80mm
