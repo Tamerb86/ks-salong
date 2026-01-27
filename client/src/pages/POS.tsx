@@ -262,12 +262,19 @@ export default function POS() {
           return; // Success, exit function
         } catch (error) {
           console.error('Thermal printer error:', error);
-          // Don't show error toast, just fallback silently
+          
+          // Check if user cancelled the printer selection
+          if (error instanceof Error && error.message.includes('No port selected')) {
+            toast.info('Utskrift avbrutt - ingen skriver valgt');
+            return; // Don't fallback to browser print if user cancelled
+          }
+          
+          // For other errors, fallback to browser print silently
         }
       }
       
       // Fallback to browser print (for dev server or when Serial API unavailable)
-      toast.info('Bruker nettleserutskrift (Web Serial API ikke tilgjengelig)');
+      toast.info('Bruker nettleserutskrift');
       window.print();
     } else {
       // Use browser print for A4/A5

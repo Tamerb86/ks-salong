@@ -1974,3 +1974,8 @@
 - [x] Add better error handling for permissions policy
 - [x] Fallback to window.print() when Serial API blocked
 - [x] Test on dev server and production
+
+## 🎯 Improve Printer Selection UX
+- [x] Handle user cancellation gracefully
+- [x] Show friendly message instead of error
+- [x] Don't fallback to browser print when user cancels
