@@ -1987,3 +1987,10 @@
 - [x] Set correct codepage (PC437) for character encoding
 - [x] Add line spacing (30 dots) and character set (USA) commands
 - [x] Add extra feed commands between sections
+
+## 📊 Fix Attendance Reports (تقارير الدوام)
+- [x] Investigate current issues in attendance reports
+- [x] Fix overtime calculation (weekends)
+- [x] Fix post-auto-logout overtime calculation
+- [x] Add isOvertime, isWeekend, isPostAutoLogout flags
+- [x] Update Reports.tsx to use new overtime logic

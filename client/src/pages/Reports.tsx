@@ -63,7 +63,8 @@ export default function Reports() {
     timeEntries.forEach((entry: any) => {
       const minutes = entry.totalMinutes || 0;
       totalMinutes += minutes;
-      if (entry.isWeekend) {
+      // Use isOvertime which includes both weekend AND post-auto-logout
+      if (entry.isOvertime) {
         overtimeMinutes += minutes;
       }
     });
@@ -267,7 +268,7 @@ export default function Reports() {
             </CardHeader>
             <CardContent>
               <p className="text-4xl font-bold text-amber-900">{totals.overtimeHours}t</p>
-              <p className="text-sm text-amber-700 mt-1">Lørdag & Søndag</p>
+              <p className="text-sm text-amber-700 mt-1">Helg + Etter stengetid</p>
             </CardContent>
           </Card>
         </div>
@@ -319,9 +320,9 @@ export default function Reports() {
                           {entry.totalMinutes ? (entry.totalMinutes / 60).toFixed(1) + "t" : "-"}
                         </td>
                         <td className="py-3 px-4 text-center">
-                          {entry.isWeekend ? (
+                          {entry.isOvertime ? (
                             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
-                              Ja
+                              {entry.isWeekend ? "Helg" : "Etter stengetid"}
                             </span>
                           ) : (
                             <span className="text-gray-400">-</span>

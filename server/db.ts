@@ -980,7 +980,38 @@ export async function getTimeEntries(startDate: Date, endDate: Date, staffId?: n
     .where(and(...conditions))
     .orderBy(desc(timeEntries.clockIn));
   
-  return entries;
+  // Get salon settings for auto-logout time
+  const settings = await getSalonSettings();
+  const autoLogoutTime = settings?.autoLogoutTime || "22:00";
+  const [autoLogoutHour, autoLogoutMinute] = autoLogoutTime.split(":").map(Number);
+  
+  // Calculate overtime flags for each entry
+  return entries.map(entry => {
+    const clockInDate = new Date(entry.clockIn);
+    const dayOfWeek = clockInDate.getDay(); // 0 = Sunday, 6 = Saturday
+    const clockInHour = clockInDate.getHours();
+    const clockInMinutes = clockInDate.getMinutes();
+    const clockInTotalMinutes = clockInHour * 60 + clockInMinutes;
+    const autoLogoutTotalMinutes = autoLogoutHour * 60 + autoLogoutMinute;
+    
+    // Check if weekend (Saturday or Sunday)
+    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+    
+    // Check if clock-in is after auto-logout time
+    const isPostAutoLogout = clockInTotalMinutes > autoLogoutTotalMinutes;
+    
+    // Overtime if either weekend OR post-auto-logout
+    const isOvertime = isWeekend || isPostAutoLogout;
+    
+    return {
+      ...entry,
+      employeeName: entry.staffName,
+      totalMinutes: entry.totalWorkMinutes,
+      isWeekend,
+      isPostAutoLogout,
+      isOvertime,
+    };
+  });
 }
 
 // Get employee work summary
