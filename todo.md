@@ -1994,3 +1994,10 @@
 - [x] Fix post-auto-logout overtime calculation
 - [x] Add isOvertime, isWeekend, isPostAutoLogout flags
 - [x] Update Reports.tsx to use new overtime logic
+
+## 🖨️ Fix 80mm Thermal Printer CSS
+- [x] Add @page { size: 80mm auto; margin: 0; }
+- [x] Set receipt container to exact 80mm width
+- [x] Force body and html to 80mm width
+- [x] Prevent browser scaling/shrinking
+- [x] Add box-sizing: border-box for proper padding calculation

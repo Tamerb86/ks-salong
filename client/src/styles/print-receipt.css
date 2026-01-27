@@ -1,5 +1,13 @@
 /* 80mm Thermal Printer Receipt Styles */
 @media print {
+  /* Remove all margins and padding from body */
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 80mm !important;
+    max-width: 80mm !important;
+  }
+  
   /* Hide everything except receipt */
   body * {
     visibility: hidden;
@@ -14,16 +22,20 @@
     left: 0;
     top: 0;
     margin: 0;
+    padding: 0;
+    width: 80mm !important;
+    max-width: 80mm !important;
     font-family: 'Courier New', monospace;
     line-height: 1.4;
   }
   
   /* 80mm thermal printer */
   .receipt-print.print-80mm {
-    width: 80mm;
-    max-width: 80mm;
+    width: 80mm !important;
+    max-width: 80mm !important;
     padding: 3mm;
     font-size: 9pt;
+    box-sizing: border-box;
   }
   
   /* A4 paper */
@@ -122,9 +134,15 @@
     background: white !important;
   }
   
-  /* Page setup for 80mm paper */
+  /* Page setup for 80mm paper - force exact size */
   @page {
     size: 80mm auto;
     margin: 0;
+  }
+  
+  /* Prevent browser scaling */
+  html {
+    width: 80mm !important;
+    max-width: 80mm !important;
   }
 }
