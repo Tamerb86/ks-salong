@@ -227,39 +227,48 @@ export default function POS() {
   };
 
   const printReceipt = async () => {
-    // Check if thermal printer is selected and supported
-    if (printOptions.paperSize === '80mm' && isThermalPrinterSupported()) {
-      try {
-        // Use ESC/POS for thermal printer
-        const receiptData = formatReceipt({
-          salonName: settings?.salonName || 'K.S Salong',
-          salonAddress: settings?.salonAddress || '',
-          salonPhone: settings?.salonPhone || '',
-          salonEmail: settings?.salonEmail || '',
-          mvaNumber: settings?.mvaNumber || '',
-          orderNumber: lastReceipt?.orderNumber || '',
-          date: format(new Date(), 'dd.MM.yyyy'),
-          time: format(new Date(), 'HH:mm'),
-          items: (lastReceipt?.cartItems || []).map((item: any) => ({
-            name: item.name,
-            quantity: item.quantity,
-            price: item.price * item.quantity,
-          })),
-          subtotal: lastReceipt?.order ? parseFloat(lastReceipt.order.subtotal) / 1.25 : 0,
-          mva: lastReceipt?.order ? parseFloat(lastReceipt.order.taxAmount) : 0,
-          total: lastReceipt?.order ? parseFloat(lastReceipt.order.total) : 0,
-          paymentMethod: lastReceipt?.paymentMethod?.toUpperCase() || 'KONTANT',
-          customMessage: settings?.receiptMessage || printOptions.customMessage || undefined,
-        });
-        
-        await printToThermalPrinter(receiptData);
-        toast.success('Kvittering sendt til termisk skriver');
-      } catch (error) {
-        console.error('Thermal printer error:', error);
-        toast.error(error instanceof Error ? error.message : 'Feil ved utskrift');
-        // Fallback to browser print
-        window.print();
+    // For 80mm thermal printer: try ESC/POS first, fallback to browser print
+    if (printOptions.paperSize === '80mm') {
+      // Check if Web Serial API is available and not blocked by permissions policy
+      const isSerialAvailable = 'serial' in navigator && 
+        typeof (navigator as any).serial?.requestPort === 'function';
+      
+      if (isSerialAvailable) {
+        try {
+          // Use ESC/POS for thermal printer
+          const receiptData = formatReceipt({
+            salonName: settings?.salonName || 'K.S Salong',
+            salonAddress: settings?.salonAddress || '',
+            salonPhone: settings?.salonPhone || '',
+            salonEmail: settings?.salonEmail || '',
+            mvaNumber: settings?.mvaNumber || '',
+            orderNumber: lastReceipt?.orderNumber || '',
+            date: format(new Date(), 'dd.MM.yyyy'),
+            time: format(new Date(), 'HH:mm'),
+            items: (lastReceipt?.cartItems || []).map((item: any) => ({
+              name: item.name,
+              quantity: item.quantity,
+              price: item.price * item.quantity,
+            })),
+            subtotal: lastReceipt?.order ? parseFloat(lastReceipt.order.subtotal) / 1.25 : 0,
+            mva: lastReceipt?.order ? parseFloat(lastReceipt.order.taxAmount) : 0,
+            total: lastReceipt?.order ? parseFloat(lastReceipt.order.total) : 0,
+            paymentMethod: lastReceipt?.paymentMethod?.toUpperCase() || 'KONTANT',
+            customMessage: settings?.receiptMessage || printOptions.customMessage || undefined,
+          });
+          
+          await printToThermalPrinter(receiptData);
+          toast.success('Kvittering sendt til termisk skriver');
+          return; // Success, exit function
+        } catch (error) {
+          console.error('Thermal printer error:', error);
+          // Don't show error toast, just fallback silently
+        }
       }
+      
+      // Fallback to browser print (for dev server or when Serial API unavailable)
+      toast.info('Bruker nettleserutskrift (Web Serial API ikke tilgjengelig)');
+      window.print();
     } else {
       // Use browser print for A4/A5
       window.print();

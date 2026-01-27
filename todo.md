@@ -1969,3 +1969,8 @@
 - [x] Implement direct USB/Bluetooth printing
 - [x] Integrate ESC/POS into POS page
 - [x] Test on actual 80mm thermal printer
+
+## 🔧 Fix Web Serial API Permissions Error
+- [x] Add better error handling for permissions policy
+- [x] Fallback to window.print() when Serial API blocked
+- [x] Test on dev server and production
