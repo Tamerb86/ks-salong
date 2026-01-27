@@ -1969,3 +1969,15 @@
 - [x] Implement direct USB/Bluetooth printing
 - [x] Integrate ESC/POS into POS page
 - [x] Test on actual 80mm thermal printer
+
+## 🐛 Fix Incomplete Thermal Receipt Printing
+- [ ] Investigate why only 2 lines print ("Final Sale", "Item")
+- [ ] Check formatReceipt data passing from POS.tsx
+- [ ] Verify ESC/POS commands are complete
+- [ ] Test with actual receipt data
+
+## 🔧 Improve ESC/POS Printing Reliability
+- [x] Add configurable baudRate options
+- [x] Add transmission delays between commands
+- [x] Add chunked data transmission
+- [x] Auto-retry with different baudRate values

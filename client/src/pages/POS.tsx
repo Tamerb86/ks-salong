@@ -227,6 +227,26 @@ export default function POS() {
   };
 
   const printReceipt = async () => {
+    // Validate receipt data before printing
+    if (!lastReceipt || !lastReceipt.order || !lastReceipt.cartItems || lastReceipt.cartItems.length === 0) {
+      toast.error('Ingen kvittering å skrive ut. Fullfør en ordre først.');
+      return;
+    }
+
+    console.log('📄 Printing receipt with data:', {
+      orderNumber: lastReceipt.orderNumber,
+      cartItems: lastReceipt.cartItems,
+      order: lastReceipt.order,
+      paymentMethod: lastReceipt.paymentMethod,
+      settings: {
+        salonName: settings?.salonName,
+        salonAddress: settings?.salonAddress,
+        salonPhone: settings?.salonPhone,
+        salonEmail: settings?.salonEmail,
+        mvaNumber: settings?.mvaNumber,
+      }
+    });
+
     // Check if thermal printer is selected and supported
     if (printOptions.paperSize === '80mm' && isThermalPrinterSupported()) {
       try {
@@ -252,8 +272,28 @@ export default function POS() {
           customMessage: settings?.receiptMessage || printOptions.customMessage || undefined,
         });
         
-        await printToThermalPrinter(receiptData);
-        toast.success('Kvittering sendt til termisk skriver');
+        // Try different baudRates if first attempt fails
+        const baudRates = [9600, 19200, 38400, 115200];
+        let printed = false;
+        
+        for (const baudRate of baudRates) {
+          try {
+            console.log(`🖨️ Attempting to print with baudRate: ${baudRate}`);
+            await printToThermalPrinter(receiptData, { 
+              baudRate,
+              chunkSize: 64,
+              delayMs: 10
+            });
+            toast.success(`Kvittering sendt til termisk skriver (${baudRate} baud)`);
+            printed = true;
+            break;
+          } catch (err) {
+            console.warn(`Failed with baudRate ${baudRate}:`, err);
+            if (baudRate === baudRates[baudRates.length - 1]) {
+              throw err; // Throw on last attempt
+            }
+          }
+        }
       } catch (error) {
         console.error('Thermal printer error:', error);
         toast.error(error instanceof Error ? error.message : 'Feil ved utskrift');

@@ -168,7 +168,15 @@ export class ESCPOSPrinter {
  * Print receipt using Web Serial API
  * @param data ESC/POS byte array
  */
-export async function printToThermalPrinter(data: Uint8Array): Promise<void> {
+/**
+ * Print to thermal printer with configurable options
+ */
+export async function printToThermalPrinter(
+  data: Uint8Array,
+  options: { baudRate?: number; chunkSize?: number; delayMs?: number } = {}
+): Promise<void> {
+  const { baudRate = 9600, chunkSize = 64, delayMs = 10 } = options;
+
   if (!('serial' in navigator)) {
     throw new Error('Web Serial API ikke støttet i denne nettleseren. Bruk Chrome, Edge eller Opera.');
   }
@@ -177,14 +185,25 @@ export async function printToThermalPrinter(data: Uint8Array): Promise<void> {
     // Request serial port access
     const port = await (navigator as any).serial.requestPort();
     
-    // Open the port
-    await port.open({ baudRate: 9600 });
+    // Open the port with configurable baudRate
+    await port.open({ baudRate });
 
     // Get writer
     const writer = port.writable.getWriter();
 
-    // Write data
-    await writer.write(data);
+    // Write data in chunks with delays for better reliability
+    for (let i = 0; i < data.length; i += chunkSize) {
+      const chunk = data.slice(i, Math.min(i + chunkSize, data.length));
+      await writer.write(chunk);
+      
+      // Small delay between chunks to prevent buffer overflow
+      if (i + chunkSize < data.length && delayMs > 0) {
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+      }
+    }
+
+    // Wait a bit before closing to ensure all data is transmitted
+    await new Promise(resolve => setTimeout(resolve, 100));
 
     // Release writer and close port
     writer.releaseLock();
