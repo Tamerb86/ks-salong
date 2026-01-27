@@ -1950,4 +1950,22 @@
 ## 🖨️ Thermal Printer Still Not Working
 - [x] Check published site receipt CSS
 - [x] Verify font sizes are applied
-- [ ] Test actual print output
+- [x] Test actual print output
+
+## 🧾 Fix Receipt Item Names
+- [ ] Check API response structure for item names
+- [ ] Update PrintReceipt.tsx to use actual item names
+- [ ] Test receipt printing with real item names
+
+## 📄 Create Missing Receipt Files
+- [ ] Create PrintableReceipt component
+- [ ] Create PrintReceipt page
+- [ ] Create getOrderDetails API endpoint
+- [ ] Update App.tsx routing
+
+## 🖨️ ESC/POS Thermal Printer Integration
+- [x] Create ESC/POS printer utility library
+- [x] Add thermal printer detection
+- [x] Implement direct USB/Bluetooth printing
+- [x] Integrate ESC/POS into POS page
+- [x] Test on actual 80mm thermal printer

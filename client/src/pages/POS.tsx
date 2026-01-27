@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
 import { format } from "date-fns";
+import { formatReceipt, printToThermalPrinter, isThermalPrinterSupported } from "@/lib/escpos-printer";
 import { DollarSign, Minus, Plus, Printer, Search, ShoppingCart, Trash2, X, Scan, User } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -225,8 +226,44 @@ export default function POS() {
     });
   };
 
-  const printReceipt = () => {
-    window.print();
+  const printReceipt = async () => {
+    // Check if thermal printer is selected and supported
+    if (printOptions.paperSize === '80mm' && isThermalPrinterSupported()) {
+      try {
+        // Use ESC/POS for thermal printer
+        const receiptData = formatReceipt({
+          salonName: settings?.salonName || 'K.S Salong',
+          salonAddress: settings?.salonAddress || '',
+          salonPhone: settings?.salonPhone || '',
+          salonEmail: settings?.salonEmail || '',
+          mvaNumber: settings?.mvaNumber || '',
+          orderNumber: lastReceipt?.orderNumber || '',
+          date: format(new Date(), 'dd.MM.yyyy'),
+          time: format(new Date(), 'HH:mm'),
+          items: (lastReceipt?.cartItems || []).map((item: any) => ({
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price * item.quantity,
+          })),
+          subtotal: lastReceipt?.order ? parseFloat(lastReceipt.order.subtotal) / 1.25 : 0,
+          mva: lastReceipt?.order ? parseFloat(lastReceipt.order.taxAmount) : 0,
+          total: lastReceipt?.order ? parseFloat(lastReceipt.order.total) : 0,
+          paymentMethod: lastReceipt?.paymentMethod?.toUpperCase() || 'KONTANT',
+          customMessage: settings?.receiptMessage || printOptions.customMessage || undefined,
+        });
+        
+        await printToThermalPrinter(receiptData);
+        toast.success('Kvittering sendt til termisk skriver');
+      } catch (error) {
+        console.error('Thermal printer error:', error);
+        toast.error(error instanceof Error ? error.message : 'Feil ved utskrift');
+        // Fallback to browser print
+        window.print();
+      }
+    } else {
+      // Use browser print for A4/A5
+      window.print();
+    }
   };
 
 
