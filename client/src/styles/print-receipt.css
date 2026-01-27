@@ -18,13 +18,12 @@
     line-height: 1.4;
   }
   
-  /* 80mm thermal printer - force width */
-  .receipt-print.print-80mm,
-  .receipt-print {
-    width: 80mm !important;
-    max-width: 80mm !important;
-    padding: 3mm !important;
-    font-size: 10pt !important;
+  /* 80mm thermal printer */
+  .receipt-print.print-80mm {
+    width: 80mm;
+    max-width: 80mm;
+    padding: 3mm;
+    font-size: 9pt;
   }
   
   /* A4 paper */
@@ -123,20 +122,9 @@
     background: white !important;
   }
   
-  /* Page setup for 80mm paper - MUST be at top */
+  /* Page setup for 80mm paper */
   @page {
-    size: 80mm auto !important;
-    margin: 0 !important;
-  }
-  
-  /* Force body to respect page width */
-  body {
-    width: 80mm !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-  
-  html {
-    width: 80mm !important;
+    size: 80mm auto;
+    margin: 0;
   }
 }
