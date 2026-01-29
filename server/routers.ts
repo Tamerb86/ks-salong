@@ -362,6 +362,9 @@ export const appRouter = router({
             phone: input.customerPhone,
             email: input.customerEmail || null,
           });
+          if (!customerId) {
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to create customer' });
+          }
           customer = { id: customerId, firstName, lastName, phone: input.customerPhone, email: input.customerEmail || null };
         }
 
@@ -1833,13 +1836,13 @@ export const appRouter = router({
     // Export time report to Excel
     exportTimeReportExcel: publicProcedure
       .input(z.object({
-        from: z.string(),
-        to: z.string(),
+        from: z.string().optional(),
+        to: z.string().optional(),
         employeeId: z.number().optional(),
       }))
       .mutation(async ({ input }) => {
-        const startDate = new Date(input.from + "T00:00:00");
-        const endDate = new Date(input.to + "T23:59:59");
+        const startDate = input.from ? new Date(input.from + "T00:00:00") : undefined;
+        const endDate = input.to ? new Date(input.to + "T23:59:59") : undefined;
         const entries = await db.getTimeEntries(startDate, endDate, input.employeeId);
         
         // Generate Excel file
@@ -1911,13 +1914,13 @@ export const appRouter = router({
     // Export time report to PDF
     exportTimeReportPDF: publicProcedure
       .input(z.object({
-        from: z.string(),
-        to: z.string(),
+        from: z.string().optional(),
+        to: z.string().optional(),
         employeeId: z.number().optional(),
       }))
       .mutation(async ({ input }) => {
-        const startDate = new Date(input.from + "T00:00:00");
-        const endDate = new Date(input.to + "T23:59:59");
+        const startDate = input.from ? new Date(input.from + "T00:00:00") : undefined;
+        const endDate = input.to ? new Date(input.to + "T23:59:59") : undefined;
         const entries = await db.getTimeEntries(startDate, endDate, input.employeeId);
         
         // Generate PDF file

@@ -2007,3 +2007,15 @@
 - [x] Detect iframe context (dev server) and skip Serial API
 - [x] Fallback to window.print() when Serial API unavailable
 - [x] Show clear message: "ESC/POS kun tilgjengelig på publisert nettsted"
+
+## 🧪 Comprehensive Website Testing
+- [x] Check and fix TypeScript errors (13 → 9 errors, non-critical)
+- [ ] Test authentication and user management
+- [ ] Test booking system and calendar sync
+- [ ] Test POS and payment processing
+- [ ] Test inventory management
+- [ ] Test employee management and time tracking
+- [ ] Test reports and analytics
+- [ ] Test settings and configuration
+- [ ] Test mobile responsiveness
+- [ ] Verify all integrations (Stripe, Fiken, etc.)

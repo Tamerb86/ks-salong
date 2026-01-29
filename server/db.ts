@@ -487,9 +487,9 @@ export async function getCustomerByPhone(phone: string) {
   return result[0] || null;
 }
 
-export async function createCustomer(data: typeof customers.$inferInsert) {
+export async function createCustomer(data: typeof customers.$inferInsert): Promise<number | undefined> {
   const db = await getDb();
-  if (!db) return;
+  if (!db) return undefined;
   const result = await db.insert(customers).values(data);
   return Number(result[0].insertId);
 }
@@ -951,15 +951,18 @@ export async function getClockedInEmployees() {
 }
 
 // Get time entries for date range
-export async function getTimeEntries(startDate: Date, endDate: Date, staffId?: number) {
+export async function getTimeEntries(startDate?: Date, endDate?: Date, staffId?: number) {
   const db = await getDb();
   if (!db) return [];
   
-  const conditions = [
-    gte(timeEntries.clockIn, startDate),
-    lte(timeEntries.clockIn, endDate),
-  ];
+  const conditions = [];
   
+  if (startDate) {
+    conditions.push(gte(timeEntries.clockIn, startDate));
+  }
+  if (endDate) {
+    conditions.push(lte(timeEntries.clockIn, endDate));
+  }
   if (staffId) {
     conditions.push(eq(timeEntries.staffId, staffId));
   }

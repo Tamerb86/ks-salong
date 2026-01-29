@@ -16,7 +16,7 @@ export default function Reports() {
   const { data: staff } = trpc.staff.list.useQuery();
   
   // Calculate date range
-  const getDateRange = () => {
+  const getDateRange = (): { from: string | undefined; to: string | undefined } => {
     const today = new Date();
     switch (dateRange) {
       case "today":
