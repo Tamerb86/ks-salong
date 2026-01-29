@@ -6,8 +6,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useState } from "react";
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subDays } from "date-fns";
 import { nb } from "date-fns/locale";
-import { Calendar, Clock, TrendingUp, Users, Download, FileText } from "lucide-react";
+import { Calendar, Clock, TrendingUp, Users, Download, FileText, PieChart as PieChartIcon, BarChart3 } from "lucide-react";
 import { toast } from "sonner";
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 export default function Reports() {
   const [dateRange, setDateRange] = useState<"today" | "week" | "month" | "all">("all");
@@ -272,6 +273,125 @@ export default function Reports() {
             </CardContent>
           </Card>
         </div>
+        
+        {/* Charts Section */}
+        {timeEntries && timeEntries.length > 0 && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            {/* Pie Chart - Hours Distribution */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <PieChartIcon className="h-5 w-5 text-purple-600" />
+                  Timefordeling
+                </CardTitle>
+                <CardDescription>Ordinære vs overtidstimer</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={[
+                        { name: "Ordinære timer", value: parseFloat(totals.regularHours.toString()), fill: "#10b981" },
+                        { name: "Overtidstimer", value: parseFloat(totals.overtimeHours.toString()), fill: "#f59e0b" },
+                      ]}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                      outerRadius={80}
+                      dataKey="value"
+                    >
+                      <Cell fill="#10b981" />
+                      <Cell fill="#f59e0b" />
+                    </Pie>
+                    <Tooltip formatter={(value: any) => `${value}t`} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+            
+            {/* Bar Chart - Overtime Breakdown */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5 text-purple-600" />
+                  Overtidsfordeling
+                </CardTitle>
+                <CardDescription>Helg vs etter stengetid</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart
+                    data={[
+                      {
+                        name: "Helg",
+                        timer: (timeEntries.filter((e: any) => e.isWeekend).reduce((acc: number, e: any) => acc + (e.totalMinutes || 0), 0) / 60).toFixed(1),
+                      },
+                      {
+                        name: "Etter stengetid",
+                        timer: (timeEntries.filter((e: any) => e.isPostAutoLogout && !e.isWeekend).reduce((acc: number, e: any) => acc + (e.totalMinutes || 0), 0) / 60).toFixed(1),
+                      },
+                    ]}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis label={{ value: "Timer", angle: -90, position: "insideLeft" }} />
+                    <Tooltip formatter={(value: any) => `${value}t`} />
+                    <Bar dataKey="timer" fill="#f59e0b" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+        
+        {/* Employee Breakdown Section */}
+        {timeEntries && timeEntries.length > 0 && selectedEmployee === "all" && (
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-purple-600" />
+                Timefordeling per ansatt
+              </CardTitle>
+              <CardDescription>Totale timer for hver ansatt</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={400}>
+                <BarChart
+                  data={(() => {
+                    const employeeHours: { [key: string]: { regular: number; overtime: number } } = {};
+                    timeEntries.forEach((entry: any) => {
+                      const name = entry.employeeName;
+                      if (!employeeHours[name]) {
+                        employeeHours[name] = { regular: 0, overtime: 0 };
+                      }
+                      const hours = (entry.totalMinutes || 0) / 60;
+                      if (entry.isOvertime) {
+                        employeeHours[name].overtime += hours;
+                      } else {
+                        employeeHours[name].regular += hours;
+                      }
+                    });
+                    return Object.entries(employeeHours).map(([name, hours]) => ({
+                      name,
+                      "Ordinære timer": parseFloat(hours.regular.toFixed(1)),
+                      "Overtidstimer": parseFloat(hours.overtime.toFixed(1)),
+                    }));
+                  })()}
+                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis label={{ value: "Timer", angle: -90, position: "insideLeft" }} />
+                  <Tooltip formatter={(value: any) => `${value}t`} />
+                  <Legend />
+                  <Bar dataKey="Ordinære timer" stackId="a" fill="#10b981" />
+                  <Bar dataKey="Overtidstimer" stackId="a" fill="#f59e0b" />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        )}
         
         {/* Time Entries Table */}
         <Card>
