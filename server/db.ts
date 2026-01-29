@@ -302,7 +302,11 @@ export async function getAppointmentsByDateRange(startDate: string, endDate: str
   ))
   .orderBy(asc(appointments.appointmentDate), asc(appointments.startTime));
   
-  return results;
+  // Convert Date to string for frontend compatibility
+  return results.map(r => ({
+    ...r,
+    appointmentDate: r.appointmentDate.toISOString().split('T')[0]
+  }));
 }
 
 export async function getAppointmentsByStaffAndDate(staffId: number, date: Date) {

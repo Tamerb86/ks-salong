@@ -82,7 +82,7 @@ export default function Appointments() {
       toast.error("Kunne ikke oppdatere avtale");
     },
   });
-  const cancelMutation = trpc.appointments.cancelByToken.useMutation({
+  const cancelMutation = trpc.appointments.cancel.useMutation({
     onSuccess: () => {
       toast.success("Avtale kansellert!");
       refetch();
@@ -289,13 +289,13 @@ export default function Appointments() {
               ) : calendarView === "weekly" ? (
                 <WeeklyCalendar
                   currentWeek={currentWeek}
-                  appointments={appointments || []}
+                  appointments={(appointments as any) || []}
                   onAppointmentClick={handleAppointmentClick}
                 />
               ) : (
                 <DailyCalendar
                   selectedDate={selectedDate}
-                  appointments={appointments || []}
+                  appointments={(appointments as any) || []}
                   onAppointmentClick={handleAppointmentClick}
                   onTimeSlotClick={handleTimeSlotClick}
                 />

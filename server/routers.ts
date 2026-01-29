@@ -365,7 +365,10 @@ export const appRouter = router({
           if (!customerId) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to create customer' });
           }
-          customer = { id: customerId, firstName, lastName, phone: input.customerPhone, email: input.customerEmail || null };
+          customer = await db.getCustomerById(customerId);
+          if (!customer) {
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to fetch created customer' });
+          }
         }
 
         // Calculate end time
@@ -633,6 +636,28 @@ export const appRouter = router({
           status: "cancelled",
           cancellationReason: input.reason || "Avbestilt av kunde",
           cancelledAt: new Date(),
+        });
+        
+        return { success: true };
+      }),
+    
+    // Cancel appointment by ID (admin/staff use)
+    cancel: adminProcedure
+      .input(z.object({
+        id: z.number(),
+        reason: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const appointment = await db.getAppointmentById(input.id);
+        if (!appointment) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Avtale ikke funnet" });
+        }
+        
+        await db.updateAppointment(input.id, {
+          status: "cancelled",
+          cancellationReason: input.reason || `Avbestilt av ${ctx.user.name}`,
+          cancelledAt: new Date(),
+          cancelledBy: ctx.user.id,
         });
         
         return { success: true };
@@ -1823,13 +1848,13 @@ export const appRouter = router({
     // Get time report for date range
     getTimeReport: publicProcedure
       .input(z.object({
-        from: z.string(),
-        to: z.string(),
+        from: z.string().optional(),
+        to: z.string().optional(),
         employeeId: z.number().optional(),
       }))
       .query(async ({ input }) => {
-        const startDate = new Date(input.from + "T00:00:00");
-        const endDate = new Date(input.to + "T23:59:59");
+        const startDate = input.from ? new Date(input.from + "T00:00:00") : undefined;
+        const endDate = input.to ? new Date(input.to + "T23:59:59") : undefined;
         return await db.getTimeEntries(startDate, endDate, input.employeeId);
       }),
 

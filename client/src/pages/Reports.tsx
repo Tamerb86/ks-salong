@@ -42,8 +42,8 @@ export default function Reports() {
   const { from, to } = getDateRange();
   
   const { data: timeEntries, isLoading } = trpc.timeTracking.getTimeReport.useQuery({
-    from,
-    to,
+    from: from || undefined,
+    to: to || undefined,
     employeeId: selectedEmployee === "all" ? undefined : parseInt(selectedEmployee),
   });
   
@@ -90,8 +90,8 @@ export default function Reports() {
     try {
       toast.info("Genererer Excel-fil...");
       const result = await exportExcelMutation.mutateAsync({
-        from,
-        to,
+        from: from || undefined,
+        to: to || undefined,
         employeeId: selectedEmployee === "all" ? undefined : parseInt(selectedEmployee),
       });
       
@@ -128,8 +128,8 @@ export default function Reports() {
     try {
       toast.info("Genererer PDF-fil...");
       const result = await exportPDFMutation.mutateAsync({
-        from,
-        to,
+        from: from || undefined,
+        to: to || undefined,
         employeeId: selectedEmployee === "all" ? undefined : parseInt(selectedEmployee),
       });
       
