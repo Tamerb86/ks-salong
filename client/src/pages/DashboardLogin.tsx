@@ -22,16 +22,16 @@ export default function DashboardLogin() {
           role: data.user.role,
           timestamp: Date.now()
         }));
-        toast.success(`مرحباً ${data.user.name}!`);
+        toast.success(`Velkommen ${data.user.name}!`);
         setLocation("/dashboard");
       } else {
-        toast.error("رمز PIN غير صحيح");
+        toast.error("Feil PIN-kode");
         setPin("");
       }
       setIsLoading(false);
     },
     onError: () => {
-      toast.error("حدث خطأ أثناء التحقق من رمز PIN");
+      toast.error("Feil ved verifisering av PIN-kode");
       setPin("");
       setIsLoading(false);
     },
@@ -50,7 +50,7 @@ export default function DashboardLogin() {
 
   const handleSubmit = (pinValue: string = pin) => {
     if (pinValue.length !== 6) {
-      toast.error("يرجى إدخال رمز PIN مكون من 6 أرقام");
+      toast.error("Vennligst skriv inn 6-sifret PIN-kode");
       return;
     }
 
@@ -71,9 +71,9 @@ export default function DashboardLogin() {
           <div className="mx-auto w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4">
             <Lock className="h-8 w-8 text-purple-600" />
           </div>
-          <CardTitle className="text-2xl">دخول لوحة التحكم</CardTitle>
+          <CardTitle className="text-2xl">Dashboard innlogging</CardTitle>
           <CardDescription>
-            أدخل رمز PIN الخاص بك للوصول إلى لوحة الإدارة
+            Skriv inn PIN-koden din for å få tilgang til administrasjonspanelet
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -91,7 +91,7 @@ export default function DashboardLogin() {
               autoFocus
             />
             <p className="text-sm text-gray-500 text-center">
-              أدخل رمز PIN المكون من 6 أرقام
+              Skriv inn 6-sifret PIN-kode
             </p>
           </div>
 
@@ -127,7 +127,7 @@ export default function DashboardLogin() {
             className="w-full"
             onClick={() => setLocation("/")}
           >
-            العودة إلى الصفحة الرئيسية
+            Tilbake til hjemmesiden
           </Button>
         </CardContent>
       </Card>
